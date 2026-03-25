@@ -105,6 +105,6 @@ if (contactForm) {
       `Mensagem: ${message}`
     );
 
-    window.open(`https://wa.me/5511999999999?text=${whatsappMessage}`, '_blank');
+    window.open(`https://wa.me/5511912345678?text=${whatsappMessage}`, '_blank');
   });
 }
