@@ -667,7 +667,7 @@ img {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 4rem;
-  align-items: start;
+  align-items: center;
 }
 
 .contact__title {
@@ -720,9 +720,8 @@ img {
 }
 
 .contact__info-logo img {
-  height: 200px;
+  height: 160px;
   width: auto;
-  margin: -55px 0;
   object-fit: contain;
 }
 
@@ -885,31 +884,31 @@ img {
   line-height: 1.7;
 }
 
-/* ===== SERVICE CARDS CAROUSEL ===== */
+/* ===== SERVICE CARDS CAROUSEL (Slider) ===== */
 .service-cards-carousel {
   position: relative;
   margin-bottom: 3rem;
-  padding: 0 3rem;
+  padding: 0 2.5rem;
 }
 
 .service-cards-carousel__track-wrapper {
   overflow: hidden;
-  border-radius: 12px;
 }
 
 .service-cards-carousel__track {
   display: flex;
-  gap: 1.5rem;
-  transition: transform 0.5s ease;
+  transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 .service-cards-carousel__track .service-type-card {
-  min-width: calc(33.333% - 1rem);
-  flex-shrink: 0;
+  flex: 0 0 calc(33.333%);
+  max-width: calc(33.333%);
+  padding: 1.8rem;
+  margin: 0 0.6rem;
   background: var(--white);
   border-radius: 12px;
-  padding: 2rem;
   transition: transform 0.3s, box-shadow 0.3s;
+  box-sizing: border-box;
 }
 
 .service-cards-carousel__track .service-type-card:hover {
@@ -934,26 +933,25 @@ img {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  width: 42px;
-  height: 42px;
-  border-radius: 50%;
-  background: var(--white);
-  border: 2px solid var(--beige);
+  width: 36px;
+  height: 36px;
+  border: none;
+  background: transparent;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   z-index: 5;
   transition: all 0.3s;
-  font-size: 1.2rem;
-  color: var(--black);
+  font-size: 1.8rem;
+  font-weight: 300;
+  color: var(--beige-dark);
   font-family: var(--font);
+  padding: 0;
 }
 
 .carousel-arrow:hover {
-  background: var(--coral);
-  border-color: var(--coral);
-  color: var(--white);
+  color: var(--coral);
 }
 
 .carousel-arrow--prev {
@@ -1015,13 +1013,14 @@ img {
   max-width: 160px;
   position: relative;
   opacity: 0;
-  transform: translateY(20px);
-  transition: opacity 0.5s ease, transform 0.5s ease;
+  transform: translateY(25px) scale(0.95);
+  transition: opacity 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+              transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 .process-step.animate-in {
   opacity: 1;
-  transform: translateY(0);
+  transform: translateY(0) scale(1);
 }
 
 .process-step__circle {
@@ -1036,34 +1035,53 @@ img {
   color: var(--white);
   font-weight: 600;
   font-size: 1rem;
+  transition: transform 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.process-step.animate-in:hover .process-step__circle {
+  transform: scale(1.18);
+  background-color: var(--black);
+  box-shadow: 0 6px 20px rgba(28, 28, 28, 0.25);
 }
 
 .process-step__label {
   font-size: 0.82rem;
   font-weight: 500;
   line-height: 1.4;
+  transition: color 0.3s ease;
 }
 
-/* Arrow between steps */
+.process-step.animate-in:hover .process-step__label {
+  color: var(--coral);
+}
+
+/* Organic curved arrow between steps */
 .process-step__arrow {
   position: absolute;
-  top: 25px;
-  right: -8px;
+  top: 22px;
+  right: -6px;
   transform: translateY(-50%);
-  color: var(--coral);
-  font-size: 1.2rem;
+  width: 20px;
+  height: 16px;
   opacity: 0;
-  transition: opacity 0.4s ease 0.2s;
+  transition: opacity 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.3s;
+}
+
+.process-step__arrow svg {
+  width: 100%;
+  height: 100%;
 }
 
 .process-step.animate-in .process-step__arrow {
-  opacity: 0.5;
+  opacity: 0.45;
 }
 
 /* ===== SERVICE FULL-WIDTH IMAGE ===== */
 .service-image-full {
   width: 100%;
-  height: 550px;
+  height: 65vh;
+  min-height: 500px;
+  max-height: 750px;
   object-fit: cover;
 }
 
@@ -1080,6 +1098,7 @@ img {
   font-weight: 600;
   margin-bottom: 3rem;
   letter-spacing: 0.12em;
+  text-transform: uppercase;
 }
 
 .benefits-grid {
@@ -1343,30 +1362,7 @@ img {
   font-size: 0.85rem;
 }
 
-.includes-list {
-  margin-top: 2rem;
-}
-
-.includes-list__title {
-  font-size: 1rem;
-  font-weight: 600;
-  margin-bottom: 1rem;
-}
-
-.includes-list ul li {
-  font-size: 0.9rem;
-  line-height: 1.8;
-  padding-left: 1.5rem;
-  position: relative;
-}
-
-.includes-list ul li::before {
-  content: '\2713';
-  position: absolute;
-  left: 0;
-  color: var(--coral);
-  font-weight: 700;
-}
+/* Includes list removed - integrated into format cards */
 
 /* Acompanhamento CTA */
 .acomp-cta {
@@ -1526,7 +1522,8 @@ img {
   }
 
   .service-cards-carousel__track .service-type-card {
-    min-width: calc(50% - 0.75rem);
+    flex: 0 0 calc(50%);
+    max-width: calc(50%);
   }
 
   .benefits-grid {
@@ -1624,11 +1621,12 @@ img {
   }
 
   .service-cards-carousel__track .service-type-card {
-    min-width: calc(100% - 0rem);
+    flex: 0 0 calc(100%);
+    max-width: calc(100%);
   }
 
   .service-cards-carousel {
-    padding: 0 2.5rem;
+    padding: 0 2rem;
   }
 
   .comparison-table th,

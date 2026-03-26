@@ -109,13 +109,15 @@ if (carouselSlides.length > 0) {
   });
 }
 
-// ===== SERVICE CARDS CAROUSEL =====
+// ===== SERVICE CARDS CAROUSEL (Slider with autoplay) =====
 document.querySelectorAll('.service-cards-carousel').forEach(carousel => {
+  const wrapper = carousel.querySelector('.service-cards-carousel__track-wrapper');
   const track = carousel.querySelector('.service-cards-carousel__track');
   const prevBtn = carousel.querySelector('.carousel-arrow--prev');
   const nextBtn = carousel.querySelector('.carousel-arrow--next');
-  const cards = track.querySelectorAll('.service-type-card');
+  const cards = Array.from(track.querySelectorAll('.service-type-card'));
   let cardIndex = 0;
+  let autoplayTimer;
 
   function getVisibleCount() {
     if (window.innerWidth <= 768) return 1;
@@ -123,37 +125,69 @@ document.querySelectorAll('.service-cards-carousel').forEach(carousel => {
     return 3;
   }
 
-  function updateCarousel() {
+  function updateCarousel(animate) {
     const visible = getVisibleCount();
     const maxIndex = Math.max(0, cards.length - visible);
     cardIndex = Math.min(cardIndex, maxIndex);
-    const gap = 24; // 1.5rem
-    const cardWidth = cards[0].offsetWidth + gap;
-    track.style.transform = `translateX(-${cardIndex * cardWidth}px)`;
+    // Each card is (100% / visible) of the wrapper width
+    const percentage = (cardIndex * (100 / visible));
+    if (animate === false) {
+      track.style.transition = 'none';
+    } else {
+      track.style.transition = 'transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+    }
+    track.style.transform = 'translateX(-' + percentage + '%)';
+  }
+
+  function goNext() {
+    const visible = getVisibleCount();
+    const maxIndex = Math.max(0, cards.length - visible);
+    cardIndex++;
+    if (cardIndex > maxIndex) cardIndex = 0;
+    updateCarousel();
+  }
+
+  function goPrev() {
+    const visible = getVisibleCount();
+    const maxIndex = Math.max(0, cards.length - visible);
+    cardIndex--;
+    if (cardIndex < 0) cardIndex = maxIndex;
+    updateCarousel();
+  }
+
+  function startAutoplay() {
+    stopAutoplay();
+    autoplayTimer = setInterval(goNext, 5000);
+  }
+
+  function stopAutoplay() {
+    if (autoplayTimer) clearInterval(autoplayTimer);
   }
 
   if (prevBtn && nextBtn) {
     prevBtn.addEventListener('click', () => {
-      if (cardIndex > 0) {
-        cardIndex--;
-        updateCarousel();
-      }
+      goPrev();
+      startAutoplay();
     });
 
     nextBtn.addEventListener('click', () => {
-      const visible = getVisibleCount();
-      const maxIndex = Math.max(0, cards.length - visible);
-      if (cardIndex < maxIndex) {
-        cardIndex++;
-        updateCarousel();
-      }
+      goNext();
+      startAutoplay();
     });
 
-    window.addEventListener('resize', updateCarousel);
+    // Pause on hover
+    carousel.addEventListener('mouseenter', stopAutoplay);
+    carousel.addEventListener('mouseleave', startAutoplay);
+
+    window.addEventListener('resize', () => updateCarousel(false));
+
+    // Init
+    updateCarousel(false);
+    startAutoplay();
   }
 });
 
-// ===== PROCESS STEPS ANIMATION (Intersection Observer) =====
+// ===== PROCESS STEPS ANIMATION (slower, more fluid) =====
 const processSection = document.querySelector('.process-steps');
 if (processSection) {
   const steps = processSection.querySelectorAll('.process-step');
@@ -164,7 +198,7 @@ if (processSection) {
         steps.forEach((step, i) => {
           setTimeout(() => {
             step.classList.add('animate-in');
-          }, i * 300);
+          }, i * 450); // Slower sequential delay
         });
         processObserver.unobserve(entry.target);
       }
@@ -196,7 +230,6 @@ document.querySelectorAll('.portfolio-grid__item img').forEach(img => {
       img.closest('.portfolio-grid__item').classList.add('portfolio-grid__item--tall');
     }
   });
-  // For cached images
   if (img.complete && img.naturalHeight > 0) {
     if (img.naturalHeight > img.naturalWidth * 1.2) {
       img.closest('.portfolio-grid__item').classList.add('portfolio-grid__item--tall');
