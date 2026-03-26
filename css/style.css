@@ -95,13 +95,15 @@ img {
   align-items: center;
   max-width: 1200px;
   margin: 0 auto;
-  padding: 1rem 2rem;
+  padding: 0.3rem 2rem;
 }
 
 .nav__logo img {
   height: 120px;
   width: auto;
   transition: filter 0.4s;
+  margin: -30px 0;
+  object-fit: contain;
 }
 
 .nav__links {
@@ -397,9 +399,9 @@ img {
   margin: 0 auto 1.2rem;
 }
 
-/* Dark icon lines */
+/* Icons with built-in colored circles — no filter needed */
 .service-card__icon--dark {
-  filter: brightness(0) saturate(100%);
+  /* SVG strokes already set to dark */
 }
 
 .service-card__title {
@@ -655,18 +657,21 @@ img {
 }
 
 .contact__info-logo {
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem;
 }
 
 .contact__info-logo img {
-  height: 80px;
+  height: 120px;
   width: auto;
+  margin: -30px 0;
+  object-fit: contain;
 }
 
 .contact__info-title {
   font-size: 1.3rem;
   font-weight: 500;
   margin-bottom: 0.5rem;
+  color: var(--coral);
 }
 
 .contact__info-text {
@@ -1262,7 +1267,8 @@ img {
   }
 
   .nav__logo img {
-    height: 70px;
+    height: 80px;
+    margin: -20px 0;
   }
 
   .hero__title {
@@ -1323,6 +1329,7 @@ img {
   }
 
   .nav__logo img {
-    height: 55px;
+    height: 65px;
+    margin: -15px 0;
   }
 }
