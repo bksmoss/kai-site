@@ -1,7 +1,7 @@
-// Header scroll shadow
+// Header scroll: transparent → solid
 const header = document.querySelector('.header');
 window.addEventListener('scroll', () => {
-  header.classList.toggle('scrolled', window.scrollY > 10);
+  header.classList.toggle('scrolled', window.scrollY > 50);
 });
 
 // Mobile menu toggle
@@ -85,26 +85,34 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
   });
 });
 
-// Contact form
-const contactForm = document.querySelector('.contact__form');
-if (contactForm) {
-  contactForm.addEventListener('submit', (e) => {
-    e.preventDefault();
-    const data = new FormData(contactForm);
-    const name = data.get('name');
-    const phone = data.get('phone');
-    const email = data.get('email');
-    const location = data.get('location');
-    const message = data.get('message');
+// ===== WORK CAROUSEL =====
+const carouselSlides = document.querySelectorAll('.work-carousel__slide');
+const carouselDots = document.querySelectorAll('.work-carousel__dot');
+let currentSlide = 0;
+let carouselInterval;
 
-    const whatsappMessage = encodeURIComponent(
-      `Olá! Meu nome é ${name}.\n` +
-      `Telefone: ${phone}\n` +
-      `E-mail: ${email}\n` +
-      `Localização: ${location}\n` +
-      `Mensagem: ${message}`
-    );
+function goToSlide(index) {
+  carouselSlides.forEach(s => s.classList.remove('active'));
+  carouselDots.forEach(d => d.classList.remove('active'));
+  currentSlide = index;
+  carouselSlides[currentSlide].classList.add('active');
+  carouselDots[currentSlide].classList.add('active');
+}
 
-    window.open(`https://wa.me/5511912345678?text=${whatsappMessage}`, '_blank');
+function nextSlide() {
+  goToSlide((currentSlide + 1) % carouselSlides.length);
+}
+
+if (carouselSlides.length > 0) {
+  // Auto-play every 4 seconds
+  carouselInterval = setInterval(nextSlide, 4000);
+
+  // Dot click navigation
+  carouselDots.forEach(dot => {
+    dot.addEventListener('click', () => {
+      clearInterval(carouselInterval);
+      goToSlide(parseInt(dot.dataset.index));
+      carouselInterval = setInterval(nextSlide, 4000);
+    });
   });
 }
