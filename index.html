@@ -30,6 +30,9 @@
         <li><a href="portfolio.html">Portfólio</a></li>
         <li><a href="#contato">Contato</a></li>
       </ul>
+      <div class="nav__cta">
+        <a href="https://wa.me/5511912345678" target="_blank" class="btn">Orçamento</a>
+      </div>
       <button class="nav__hamburger" aria-label="Menu">
         <span></span><span></span><span></span>
       </button>
@@ -169,24 +172,9 @@
     </div>
   </section>
 
-  <!-- CONTATO -->
+  <!-- CONTATO (info primeiro, depois formulário) -->
   <section class="contact-section" id="contato">
     <div class="section__container">
-      <div>
-        <h2 class="contact__title">Entre em contato</h2>
-        <form class="contact__form" action="https://formsubmit.co/contato@kaiarquitetura.com.br" method="POST">
-          <!-- FormSubmit config -->
-          <input type="hidden" name="_subject" value="Novo contato via site KAI Arquitetura">
-          <input type="hidden" name="_captcha" value="false">
-          <input type="hidden" name="_next" value="https://kaiarquitetura.com.br">
-          <input type="text" name="name" class="contact__input" placeholder="Nome*" required>
-          <input type="tel" name="phone" class="contact__input" placeholder="Telefone (com DDD)">
-          <input type="email" name="email" class="contact__input" placeholder="E-mail*" required>
-          <input type="text" name="location" class="contact__input" placeholder="Localização">
-          <textarea name="message" class="contact__textarea" placeholder="Mensagem (me conte um pouco sobre o que precisa)*" required></textarea>
-          <button type="submit" class="btn btn--coral">Enviar</button>
-        </form>
-      </div>
       <div class="contact__info">
         <div class="contact__info-logo">
           <img src="img/logo.png" alt="KAI Arquitetura">
@@ -206,6 +194,20 @@
           <span>contato@kaiarquitetura.com.br</span>
           <span>@kaiarquitetura</span>
         </div>
+      </div>
+      <div>
+        <h2 class="contact__title">Entre em contato</h2>
+        <form class="contact__form" action="https://formsubmit.co/contato@kaiarquitetura.com.br" method="POST">
+          <input type="hidden" name="_subject" value="Novo contato via site KAI Arquitetura">
+          <input type="hidden" name="_captcha" value="false">
+          <input type="hidden" name="_next" value="https://kaiarquitetura.com.br">
+          <input type="text" name="name" class="contact__input" placeholder="Nome*" required>
+          <input type="tel" name="phone" class="contact__input" placeholder="Telefone (com DDD)">
+          <input type="email" name="email" class="contact__input" placeholder="E-mail*" required>
+          <input type="text" name="location" class="contact__input" placeholder="Localização">
+          <textarea name="message" class="contact__textarea" placeholder="Mensagem (me conte um pouco sobre o que precisa)*" required></textarea>
+          <button type="submit" class="btn btn--coral">Enviar</button>
+        </form>
       </div>
     </div>
   </section>

@@ -30,6 +30,9 @@
         <li><a href="portfolio.html">Portfólio</a></li>
         <li><a href="index.html#contato">Contato</a></li>
       </ul>
+      <div class="nav__cta">
+        <a href="https://wa.me/5511912345678" target="_blank" class="btn">Orçamento</a>
+      </div>
       <button class="nav__hamburger" aria-label="Menu">
         <span></span><span></span><span></span>
       </button>
@@ -50,7 +53,7 @@
   <!-- HERO -->
   <section class="service-hero">
     <h1 class="service-hero__title">Transforme seu espaço em algo único e feito para você.</h1>
-    <p class="service-hero__subtitle">Nossos serviços tem soluções personalizadas, práticas e com o seu estilo. Solicite seu orçamento e comece agora a transformar seu ambiente.</p>
+    <p class="service-hero__subtitle">Soluções personalizadas, práticas e com o seu estilo. Do conceito à entrega, cuidamos de cada detalhe para você.</p>
     <a href="https://wa.me/5511912345678" target="_blank" class="btn btn--coral">Quero um orçamento</a>
   </section>
 
@@ -59,57 +62,69 @@
     <h2 class="service-detail__title">Projetos</h2>
     <p class="service-detail__intro">Desenvolvemos projetos de interiores e arquitetura com foco em funcionalidade, estética e praticidade. Atendemos de forma online, com processos claros e soluções personalizadas para cada necessidade:</p>
 
-    <div class="service-types-grid">
-      <div class="service-type-card">
-        <h3 class="service-type-card__title">Projeto Residencial</h3>
-        <p class="service-type-card__text">Criamos ambientes que refletem seu estilo de vida e tornam a rotina mais leve, funcional e acolhedora. Cada projeto é desenvolvido de forma personalizada, com foco no conforto, na organização e no uso inteligente dos espaços. Pensamos nos detalhes que fazem diferença no dia a dia: desde a disposição do mobiliário até a escolha de materiais, cores, iluminação e texturas. Tudo é planejado para que seu lar seja prático, harmonioso e agradável de viver.</p>
+    <!-- Cards Carousel: 3 por vez com setas -->
+    <div class="service-cards-carousel">
+      <button class="carousel-arrow carousel-arrow--prev" aria-label="Anterior">&#8249;</button>
+      <div class="service-cards-carousel__track-wrapper">
+        <div class="service-cards-carousel__track">
+          <div class="service-type-card">
+            <h3 class="service-type-card__title">Projeto Residencial</h3>
+            <p class="service-type-card__text">Criamos ambientes que refletem seu estilo de vida e tornam a rotina mais leve, funcional e acolhedora. Cada projeto é desenvolvido de forma personalizada, com foco no conforto, na organização e no uso inteligente dos espaços.</p>
+          </div>
+          <div class="service-type-card">
+            <h3 class="service-type-card__title">Projeto Comercial</h3>
+            <p class="service-type-card__text">Desenvolvemos ambientes corporativos e comerciais pensando na identidade da sua marca, no conforto da equipe e na experiência do cliente. Garantimos estações de trabalho ergonômicas e circulação otimizada.</p>
+          </div>
+          <div class="service-type-card">
+            <h3 class="service-type-card__title">Reformas</h3>
+            <p class="service-type-card__text">Transformação de ambientes existentes com criatividade e bom aproveitamento, valorizando o que o imóvel já oferece e adaptando ao que você precisa agora. Sem desperdícios, com planejamento.</p>
+          </div>
+          <div class="service-type-card">
+            <h3 class="service-type-card__title">Arquitetônico</h3>
+            <p class="service-type-card__text">Projetos completos para novas construções residenciais, desenvolvidos com atenção a cada etapa, do conceito à entrega técnica. Planta, fachada e volumetria pensados de forma integrada.</p>
+          </div>
+          <div class="service-type-card">
+            <h3 class="service-type-card__title">Airbnb</h3>
+            <p class="service-type-card__text">Projetos voltados para imóveis de locação de curta temporada, com foco em estética, funcionalidade e experiência do hóspede. Mais atratividade e rentabilidade para seu imóvel.</p>
+          </div>
+          <div class="service-type-card">
+            <h3 class="service-type-card__title">Para Investidores</h3>
+            <p class="service-type-card__text">Soluções estratégicas para quem deseja valorizar imóveis, acelerar o processo de locação ou tornar a venda mais rápida e vantajosa. Retorno sobre investimento otimizado.</p>
+          </div>
+        </div>
       </div>
-      <div class="service-type-card">
-        <h3 class="service-type-card__title">Projeto Comercial</h3>
-        <p class="service-type-card__text">Desenvolvemos ambientes corporativos e comerciais pensando na identidade da sua marca, no conforto da equipe e na experiência do cliente. Com análise de fluxo e aproveitamento inteligente do espaço, garantimos estações de trabalho ergonômicas, áreas de convivência acolhedoras e circulação otimizada.</p>
-      </div>
-      <div class="service-type-card">
-        <h3 class="service-type-card__title">Reformas</h3>
-        <p class="service-type-card__text">Transformação de ambientes existentes com criatividade e bom aproveitamento, valorizando o que o imóvel já oferece e adaptando ao que você precisa agora.</p>
-      </div>
-      <div class="service-type-card">
-        <h3 class="service-type-card__title">Arquitetônico</h3>
-        <p class="service-type-card__text">Projetos completos para novas construções residenciais, desenvolvidos de forma online e com atenção a cada etapa, do conceito à entrega técnica.</p>
-      </div>
-      <div class="service-type-card">
-        <h3 class="service-type-card__title">Airbnb</h3>
-        <p class="service-type-card__text">Projetos voltados para imóveis de locação de curta temporada, com foco em estética, funcionalidade e experiência do hóspede. Mais atratividade e rentabilidade para seu imóvel.</p>
-      </div>
-      <div class="service-type-card">
-        <h3 class="service-type-card__title">Para Investidores (aluguel e venda)</h3>
-        <p class="service-type-card__text">Soluções estratégicas para quem deseja valorizar imóveis, acelerar o processo de locação ou tornar a venda mais rápida e vantajosa.</p>
-      </div>
+      <button class="carousel-arrow carousel-arrow--next" aria-label="Próximo">&#8250;</button>
     </div>
   </section>
 
-  <!-- NOSSO PROCESSO -->
+  <!-- NOSSO PROCESSO (animated steps) -->
   <section class="process-section">
     <h3 class="process-section__title">Nosso Processo</h3>
     <div class="process-steps">
       <div class="process-step">
         <div class="process-step__circle">1</div>
         <p class="process-step__label">Questionário Personalizado</p>
+        <span class="process-step__arrow">&#10132;</span>
       </div>
       <div class="process-step">
         <div class="process-step__circle">2</div>
         <p class="process-step__label">Levantamento</p>
+        <span class="process-step__arrow">&#10132;</span>
       </div>
       <div class="process-step">
         <div class="process-step__circle">3</div>
         <p class="process-step__label">Estudo criativo</p>
+        <span class="process-step__arrow">&#10132;</span>
       </div>
       <div class="process-step">
         <div class="process-step__circle">4</div>
         <p class="process-step__label">Projeto executivo e detalhamentos</p>
+        <span class="process-step__arrow">&#10132;</span>
       </div>
       <div class="process-step">
         <div class="process-step__circle">5</div>
         <p class="process-step__label">Ajustes e refinamento</p>
+        <span class="process-step__arrow">&#10132;</span>
       </div>
       <div class="process-step">
         <div class="process-step__circle">6</div>
@@ -118,71 +133,90 @@
     </div>
   </section>
 
-  <!-- FULL IMAGE -->
+  <!-- FULL IMAGE (taller) -->
   <img src="img/BB_Sala_3-Edit.jpg" alt="Sala projetada por KAI Arquitetura" class="service-image-full">
 
-  <!-- BENEFÍCIOS -->
+  <!-- BENEFÍCIOS (com estatísticas) -->
   <section class="benefits-section">
     <h3 class="benefits-section__title">Benefícios</h3>
     <div class="benefits-grid">
       <div class="benefit-card">
-        <img src="img/icons/Icone ideia.png" alt="Soluções personalizadas" class="benefit-card__icon">
-        <h4 class="benefit-card__title">Soluções personalizadas para o seu estilo de vida</h4>
-        <p class="benefit-card__text">Cada projeto é pensado para refletir suas necessidades, preferências e rotina, criando espaços que fazem sentido para você.</p>
-      </div>
-      <div class="benefit-card">
-        <img src="img/icons/Icone cofre.png" alt="Otimização" class="benefit-card__icon">
-        <h4 class="benefit-card__title">Otimização de tempo, espaço e investimento</h4>
-        <p class="benefit-card__text">Aproveitamos cada metro quadrado com inteligência, evitamos desperdícios e entregamos um planejamento eficiente do início ao fim.</p>
-      </div>
-      <div class="benefit-card">
-        <img src="img/icons/Icone Valorização.png" alt="Valorização" class="benefit-card__icon">
+        <div class="benefit-card__stat">+30%</div>
         <h4 class="benefit-card__title">Valorização do imóvel</h4>
-        <p class="benefit-card__text">Ambientes bem planejados aumentam o conforto e o valor de mercado, tornando seu investimento ainda mais estratégico.</p>
+        <p class="benefit-card__text">Imóveis com projeto de interiores profissional podem valorizar até 30% acima do valor de mercado, tornando seu investimento ainda mais estratégico.</p>
+      </div>
+      <div class="benefit-card">
+        <div class="benefit-card__stat">-40%</div>
+        <h4 class="benefit-card__title">Menos desperdício em obras</h4>
+        <p class="benefit-card__text">Com planejamento detalhado e especificações técnicas precisas, evitamos compras erradas, retrabalhos e gastos desnecessários durante a execução.</p>
+      </div>
+      <div class="benefit-card">
+        <div class="benefit-card__stat">100%</div>
+        <h4 class="benefit-card__title">Personalizado para você</h4>
+        <p class="benefit-card__text">Cada projeto é único e pensado exclusivamente para refletir suas necessidades, preferências e rotina. Nada de soluções genéricas.</p>
       </div>
     </div>
   </section>
 
-  <!-- FAQ -->
-  <section class="faq-section">
-    <h3 class="faq-section__title">Perguntas Frequentes</h3>
+  <!-- CTA -->
+  <section style="text-align:center; padding:3rem 2rem; background:var(--bg);">
+    <h3 style="font-size:1.3rem; font-weight:600; margin-bottom:0.6rem;">Pronto para transformar seu espaço?</h3>
+    <p style="font-size:0.92rem; color:#555; margin-bottom:1.5rem;">Solicite seu orçamento e comece agora o seu projeto.</p>
+    <a href="https://wa.me/5511912345678" target="_blank" class="btn btn--coral">Quero um orçamento</a>
+  </section>
 
-    <div class="faq-item">
-      <button class="faq-item__question">Qual é o primeiro passo para contratar um serviço do KAI arquitetura?</button>
-      <div class="faq-item__answer">
-        <p>O primeiro passo é entrar em contato para solicitar um orçamento, a partir disso vamos te enviar um questionário rápido e agendar uma conversa inicial para entender suas necessidades e enviar uma proposta personalizada.</p>
-      </div>
+  <!-- FAQ (título à esquerda, perguntas à direita) -->
+  <section class="faq-section faq-section--side">
+    <div>
+      <h3 class="faq-section__title">Perguntas Frequentes</h3>
+      <p class="faq-section__title-side-text">Tire suas dúvidas sobre nossos projetos. Se não encontrar o que procura, entre em contato pelo WhatsApp.</p>
+      <a href="https://wa.me/5511912345678" target="_blank" class="btn btn--outline" style="font-size:0.75rem;">Fale conosco</a>
     </div>
 
-    <div class="faq-item">
-      <button class="faq-item__question">Como saber qual serviço é ideal para mim: projeto completo ou consultoria?</button>
-      <div class="faq-item__answer">
-        <p>A consultoria é ideal para quem busca orientações pontuais ou pequenas atualizações simples em um único ambiente, com autonomia para executar por conta própria. Já o projeto completo é indicado para quem deseja transformar o espaço com soluções detalhadas, visualizações 3D, especificações técnicas e acompanhamento em cada etapa. Caso ainda esteja com dúvida de qual é o serviço ideal para você entre em contato e vamos avaliar suas necessidades na conversa inicial para indicar o formato mais adequado.</p>
+    <div>
+      <div class="faq-item">
+        <button class="faq-item__question">Qual é o primeiro passo para contratar um projeto?</button>
+        <div class="faq-item__answer">
+          <p>Basta entrar em contato pelo WhatsApp ou formulário do site. Vamos te enviar um questionário rápido para entender suas necessidades e, em seguida, agendar uma conversa inicial para alinhar expectativas e enviar uma proposta personalizada.</p>
+        </div>
       </div>
-    </div>
 
-    <div class="faq-item">
-      <button class="faq-item__question">Vocês atendem em outras cidades ou de forma online?</button>
-      <div class="faq-item__answer">
-        <p>Sim, atendemos presencialmente e também oferecemos o serviço 100% online para clientes de qualquer região.</p>
+      <div class="faq-item">
+        <button class="faq-item__question">Qual a diferença entre projeto completo e consultoria?</button>
+        <div class="faq-item__answer">
+          <p>A consultoria é ideal para dúvidas pontuais ou orientações em um único ambiente, com autonomia para executar por conta própria. Já o projeto completo inclui levantamento, estudo criativo, visualizações 3D, detalhamento técnico e acompanhamento em todas as etapas. Se estiver em dúvida, fale conosco para indicarmos o formato ideal.</p>
+        </div>
       </div>
-    </div>
 
-    <div class="faq-item">
-      <button class="faq-item__question">Qual o prazo médio para entrega de um projeto?</button>
-      <div class="faq-item__answer">
-        <p>O prazo varia conforme a complexidade e o escopo, mas geralmente leva de 30 a 90 dias.</p>
+      <div class="faq-item">
+        <button class="faq-item__question">Vocês atendem de forma online?</button>
+        <div class="faq-item__answer">
+          <p>Sim! Nosso atendimento é 100% online, o que nos permite atender clientes de qualquer cidade ou estado com a mesma qualidade e agilidade. Utilizamos ferramentas digitais para reuniões, apresentações e acompanhamento do projeto.</p>
+        </div>
       </div>
-    </div>
 
-    <div class="faq-item">
-      <button class="faq-item__question">O projeto já inclui acompanhamento de obra?</button>
-      <div class="faq-item__answer">
-        <p>Não, o acompanhamento é um serviço adicional e pode ser contratado conforme a necessidade do cliente.</p>
+      <div class="faq-item">
+        <button class="faq-item__question">Qual o prazo médio para entrega de um projeto?</button>
+        <div class="faq-item__answer">
+          <p>O prazo varia conforme o número de ambientes e a complexidade do projeto. Em média, projetos residenciais levam de 30 a 90 dias. Na proposta inicial, informamos o cronograma detalhado para que você possa se planejar.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-item__question">O projeto inclui lista de compras e indicação de fornecedores?</button>
+        <div class="faq-item__answer">
+          <p>Sim! O projeto completo inclui especificação técnica de todos os itens (mobiliário, revestimentos, iluminação, etc.) com links, referências e sugestões de fornecedores. Você recebe tudo organizado para facilitar as compras.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-item__question">Posso contratar o acompanhamento de obra junto com o projeto?</button>
+        <div class="faq-item__answer">
+          <p>O acompanhamento de obra é um serviço exclusivo para clientes de projeto e pode ser contratado à parte. É ideal para garantir que cada detalhe planejado seja executado com fidelidade, evitando retrabalhos e imprevistos.</p>
+        </div>
       </div>
     </div>
   </section>
-
 
   <!-- WHATSAPP FLOAT -->
   <a href="https://wa.me/5511912345678" target="_blank" class="whatsapp-float" aria-label="WhatsApp">

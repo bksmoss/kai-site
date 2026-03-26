@@ -30,6 +30,9 @@
         <li><a href="portfolio.html">Portfólio</a></li>
         <li><a href="index.html#contato">Contato</a></li>
       </ul>
+      <div class="nav__cta">
+        <a href="https://wa.me/5511912345678" target="_blank" class="btn">Orçamento</a>
+      </div>
       <button class="nav__hamburger" aria-label="Menu">
         <span></span><span></span><span></span>
       </button>
@@ -50,81 +53,160 @@
   <!-- HERO -->
   <section class="service-hero">
     <h1 class="service-hero__title">Sua obra merece atenção em cada detalhe!</h1>
-    <p class="service-hero__subtitle">Tenha uma obra tranquila contando com todo o nosso suporte. Fale conosco e solicite seu orçamento.</p>
+    <p class="service-hero__subtitle">Serviço exclusivo para nossos clientes de projeto. Tenha uma obra tranquila contando com todo o nosso suporte técnico.</p>
     <a href="https://wa.me/5511912345678" target="_blank" class="btn btn--coral">Quero um orçamento</a>
   </section>
 
   <!-- ACOMPANHAMENTO DETAIL -->
   <section class="service-detail">
     <h2 class="service-detail__title">Acompanhamento de Obra</h2>
-    <p class="service-detail__intro" style="margin-bottom:0.5rem;">Serviço exclusivo para nossos clientes de projeto!</p>
-    <p class="service-detail__intro">A execução do seu projeto merece atenção especializada para que cada detalhe pensado na fase de criação se transforme em realidade. Garantimos que a execução do seu projeto siga com qualidade, fidelidade e menos imprevistos.</p>
-    <p class="service-detail__intro" style="margin-top:-1.5rem;">Oferecemos dois formatos de acompanhamento para atender à sua necessidade com flexibilidade e eficiência:</p>
+    <p class="service-detail__intro">A execução do seu projeto merece atenção especializada para que cada detalhe pensado na fase de criação se transforme em realidade. Garantimos que a execução siga com qualidade, fidelidade e menos imprevistos.</p>
+    <p class="service-detail__intro" style="margin-top:-1.5rem;">Oferecemos dois formatos para atender à sua necessidade com flexibilidade:</p>
 
+    <!-- Format Cards (enhanced) -->
     <div class="format-grid">
-      <div class="format-card">
+      <div class="format-card reveal">
+        <span class="format-card__badge">Presencial + Online</span>
         <h3 class="format-card__title">Híbrido</h3>
-        <p class="format-card__text">Combinamos visitas técnicas pontuais em momentos estratégicos da obra com suporte remoto ativo por vídeo, mensagens e ligações. Uma forma prática de garantir que tudo siga conforme o projeto, tirar dúvidas dos fornecedores, evitar retrabalhos e tomar decisões com mais segurança — tudo com excelente custo-benefício, sem a necessidade de acompanhamento diário.</p>
+        <p class="format-card__subtitle">Ideal para quem quer segurança nos momentos-chave</p>
+        <p class="format-card__text">Combinamos visitas técnicas pontuais em momentos estratégicos da obra com suporte remoto ativo por vídeo, mensagens e ligações.</p>
+        <ul class="format-card__features">
+          <li>Visitas presenciais em etapas críticas</li>
+          <li>Suporte remoto contínuo entre visitas</li>
+          <li>Análise presencial de acabamentos e instalações</li>
+          <li>Intermediação direta com fornecedores</li>
+          <li>Relatórios de visita documentados</li>
+        </ul>
       </div>
-      <div class="format-card">
+      <div class="format-card reveal">
+        <span class="format-card__badge">100% Online</span>
         <h3 class="format-card__title">Remoto</h3>
-        <p class="format-card__text">Acompanhamento 100% online com suporte técnico contínuo. Analisamos fotos e vídeos enviados pela equipe da obra ou pelo cliente, oferecendo orientações rápidas e resolvendo dúvidas técnicas de forma precisa. Tudo feito remotamente, com atenção profissional em cada etapa, para garantir segurança na execução mesmo sem visitas presenciais.</p>
+        <p class="format-card__subtitle">Ideal para quem está em outra cidade ou busca praticidade</p>
+        <p class="format-card__text">Acompanhamento 100% online com suporte técnico contínuo. Analisamos fotos e vídeos enviados pela equipe e oferecemos orientações rápidas e precisas.</p>
+        <ul class="format-card__features">
+          <li>Atendimento de qualquer cidade do Brasil</li>
+          <li>Análise de fotos e vídeos da obra</li>
+          <li>Orientações técnicas por videochamada</li>
+          <li>Suporte por mensagem em horário comercial</li>
+          <li>Excelente custo-benefício</li>
+        </ul>
       </div>
     </div>
+  </section>
 
+  <!-- COMPARISON TABLE -->
+  <section class="comparison-section">
+    <h3 class="comparison-section__title">Compare os formatos</h3>
+    <table class="comparison-table">
+      <thead>
+        <tr>
+          <th>Característica</th>
+          <th>Híbrido</th>
+          <th>Remoto</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Visitas presenciais à obra</td>
+          <td><span class="check">&#10003;</span></td>
+          <td><span class="partial">&#8212;</span></td>
+        </tr>
+        <tr>
+          <td>Suporte remoto por vídeo e mensagem</td>
+          <td><span class="check">&#10003;</span></td>
+          <td><span class="check">&#10003;</span></td>
+        </tr>
+        <tr>
+          <td>Análise de fotos e vídeos da obra</td>
+          <td><span class="check">&#10003;</span></td>
+          <td><span class="check">&#10003;</span></td>
+        </tr>
+        <tr>
+          <td>Verificação presencial de acabamentos</td>
+          <td><span class="check">&#10003;</span></td>
+          <td><span class="partial">&#8212;</span></td>
+        </tr>
+        <tr>
+          <td>Intermediação com fornecedores</td>
+          <td><span class="check">&#10003;</span></td>
+          <td><span class="check">&#10003;</span></td>
+        </tr>
+        <tr>
+          <td>Atendimento para outras cidades</td>
+          <td><span class="partial">Consultar</span></td>
+          <td><span class="check">&#10003;</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- O QUE INCLUI -->
+  <section class="service-detail" style="padding-top:1rem;">
     <div class="includes-list">
       <h3 class="includes-list__title">Nosso acompanhamento inclui:</h3>
       <ul>
         <li>Verificação se a execução está fiel ao projeto aprovado</li>
         <li>Esclarecimento de dúvidas técnicas e orientação direta à equipe da obra</li>
         <li>Prevenção de erros, retrabalhos e decisões mal planejadas</li>
-        <li>Suporte nos momentos chave da obra (instalações, acabamentos, mobiliário, etc.)</li>
+        <li>Suporte nos momentos-chave da obra (instalações, acabamentos, mobiliário)</li>
         <li>Comunicação clara e organizada, com foco em agilidade e segurança</li>
         <li>Intermediação profissional com fornecedores, sempre que necessário</li>
       </ul>
     </div>
   </section>
 
-  <!-- FAQ -->
-  <section class="faq-section">
-    <h3 class="faq-section__title">Perguntas Frequentes</h3>
+  <!-- CTA -->
+  <section class="acomp-cta">
+    <h3 class="acomp-cta__title">Garanta que seu projeto saia do papel exatamente como planejado</h3>
+    <p class="acomp-cta__text">Fale conosco e descubra qual formato de acompanhamento é ideal para sua obra.</p>
+    <a href="https://wa.me/5511912345678" target="_blank" class="btn">Quero um orçamento</a>
+  </section>
 
-    <div class="faq-item">
-      <button class="faq-item__question">Qual é o primeiro passo para contratar um serviço do KAI arquitetura?</button>
-      <div class="faq-item__answer">
-        <p>O primeiro passo é entrar em contato para solicitar um orçamento, a partir disso vamos te enviar um questionário rápido e agendar uma conversa inicial para entender suas necessidades e enviar uma proposta personalizada.</p>
-      </div>
+  <!-- FAQ (título à esquerda, perguntas à direita) -->
+  <section class="faq-section faq-section--side">
+    <div>
+      <h3 class="faq-section__title">Perguntas Frequentes</h3>
+      <p class="faq-section__title-side-text">Entenda como funciona nosso acompanhamento de obra e tire suas dúvidas.</p>
+      <a href="https://wa.me/5511912345678" target="_blank" class="btn btn--outline" style="font-size:0.75rem;">Fale conosco</a>
     </div>
 
-    <div class="faq-item">
-      <button class="faq-item__question">Como saber qual serviço é ideal para mim: projeto completo ou consultoria?</button>
-      <div class="faq-item__answer">
-        <p>A consultoria é ideal para quem busca orientações pontuais ou pequenas atualizações simples em um único ambiente, com autonomia para executar por conta própria. Já o projeto completo é indicado para quem deseja transformar o espaço com soluções detalhadas, visualizações 3D, especificações técnicas e acompanhamento em cada etapa. Caso ainda esteja com dúvida de qual é o serviço ideal para você entre em contato e vamos avaliar suas necessidades na conversa inicial para indicar o formato mais adequado.</p>
+    <div>
+      <div class="faq-item">
+        <button class="faq-item__question">Preciso ter um projeto do KAI para contratar o acompanhamento?</button>
+        <div class="faq-item__answer">
+          <p>Sim, o acompanhamento de obra é um serviço exclusivo para clientes que contrataram o projeto conosco. Assim conseguimos garantir total fidelidade entre o que foi projetado e o que será executado.</p>
+        </div>
       </div>
-    </div>
 
-    <div class="faq-item">
-      <button class="faq-item__question">Vocês atendem em outras cidades ou de forma online?</button>
-      <div class="faq-item__answer">
-        <p>Sim, atendemos presencialmente e também oferecemos o serviço 100% online para clientes de qualquer região.</p>
+      <div class="faq-item">
+        <button class="faq-item__question">Qual a diferença prática entre o formato híbrido e o remoto?</button>
+        <div class="faq-item__answer">
+          <p>No formato híbrido, realizamos visitas presenciais em momentos estratégicos da obra (como instalações elétricas, hidráulicas e acabamentos), além do suporte remoto contínuo. No remoto, todo o acompanhamento é feito por vídeo, fotos e mensagens, ideal para quem está em outra cidade ou prefere mais praticidade.</p>
+        </div>
       </div>
-    </div>
 
-    <div class="faq-item">
-      <button class="faq-item__question">Qual o prazo médio para entrega de um projeto?</button>
-      <div class="faq-item__answer">
-        <p>O prazo varia conforme a complexidade e o escopo, mas geralmente leva de 30 a 90 dias.</p>
+      <div class="faq-item">
+        <button class="faq-item__question">Com que frequência são as visitas no formato híbrido?</button>
+        <div class="faq-item__answer">
+          <p>As visitas são realizadas em momentos-chave da obra, definidos em conjunto com o cliente. A frequência depende da complexidade e do andamento da execução, mas geralmente ocorrem nas etapas mais críticas como início, instalações e acabamentos.</p>
+        </div>
       </div>
-    </div>
 
-    <div class="faq-item">
-      <button class="faq-item__question">O projeto já inclui acompanhamento de obra?</button>
-      <div class="faq-item__answer">
-        <p>Não, o acompanhamento é um serviço adicional e pode ser contratado conforme a necessidade do cliente.</p>
+      <div class="faq-item">
+        <button class="faq-item__question">O acompanhamento evita problemas na obra?</button>
+        <div class="faq-item__answer">
+          <p>Significativamente! Com orientação técnica em cada etapa, evitamos erros de execução, compras erradas, retrabalhos e decisões que podem comprometer o resultado final. É um investimento que economiza tempo, dinheiro e estresse.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-item__question">Posso contratar o acompanhamento após o início da obra?</button>
+        <div class="faq-item__answer">
+          <p>Sim! Embora o ideal seja contratar desde o início da execução, podemos iniciar o acompanhamento em qualquer fase. Fazemos uma avaliação do que já foi executado e seguimos orientando as próximas etapas.</p>
+        </div>
       </div>
     </div>
   </section>
-
 
   <!-- WHATSAPP FLOAT -->
   <a href="https://wa.me/5511912345678" target="_blank" class="whatsapp-float" aria-label="WhatsApp">
