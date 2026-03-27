@@ -127,18 +127,24 @@ document.querySelectorAll('.service-cards-carousel').forEach(carousel => {
     return Math.max(0, cards.length - getVisibleCount());
   }
 
-  // Build dots
+  function getPageCount() {
+    const visible = getVisibleCount();
+    return Math.ceil(cards.length / visible);
+  }
+
+  // Build dots — one per group/page
   function buildDots() {
     if (!dotsContainer) return;
     dotsContainer.innerHTML = '';
-    const totalDots = getMaxIndex() + 1;
-    for (let i = 0; i < totalDots; i++) {
+    const pages = getPageCount();
+    for (let i = 0; i < pages; i++) {
       const dot = document.createElement('button');
       dot.classList.add('carousel-dot');
       if (i === 0) dot.classList.add('active');
-      dot.setAttribute('aria-label', 'Slide ' + (i + 1));
+      dot.setAttribute('aria-label', 'Grupo ' + (i + 1));
       dot.addEventListener('click', () => {
-        cardIndex = i;
+        const visible = getVisibleCount();
+        cardIndex = Math.min(i * visible, getMaxIndex());
         updateCarousel();
         startAutoplay();
       });
@@ -148,26 +154,34 @@ document.querySelectorAll('.service-cards-carousel').forEach(carousel => {
 
   function updateDots() {
     if (!dotsContainer) return;
+    const visible = getVisibleCount();
+    const currentPage = Math.floor(cardIndex / visible);
     dotsContainer.querySelectorAll('.carousel-dot').forEach((dot, i) => {
-      dot.classList.toggle('active', i === cardIndex);
+      dot.classList.toggle('active', i === currentPage);
     });
   }
 
   function updateCarousel(animate) {
     const visible = getVisibleCount();
     cardIndex = Math.min(cardIndex, getMaxIndex());
-    const percentage = (cardIndex * (100 / visible));
+    // Use actual card width for precise centering
+    const wrapperWidth = carousel.querySelector('.service-cards-carousel__track-wrapper').offsetWidth;
+    const card = cards[0];
+    const cardStyle = getComputedStyle(card);
+    const cardWidth = card.offsetWidth + parseFloat(cardStyle.marginLeft) + parseFloat(cardStyle.marginRight);
+    const offset = cardIndex * cardWidth;
     if (animate === false) {
       track.style.transition = 'none';
     } else {
-      track.style.transition = 'transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+      track.style.transition = 'transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
     }
-    track.style.transform = 'translateX(-' + percentage + '%)';
+    track.style.transform = 'translateX(-' + offset + 'px)';
     updateDots();
   }
 
   function goNext() {
-    cardIndex++;
+    const visible = getVisibleCount();
+    cardIndex += visible;
     if (cardIndex > getMaxIndex()) cardIndex = 0;
     updateCarousel();
   }
