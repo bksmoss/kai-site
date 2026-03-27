@@ -109,12 +109,10 @@ if (carouselSlides.length > 0) {
   });
 }
 
-// ===== SERVICE CARDS CAROUSEL (Slider with autoplay) =====
+// ===== SERVICE CARDS CAROUSEL (Dots + Drag + Autoplay) =====
 document.querySelectorAll('.service-cards-carousel').forEach(carousel => {
-  const wrapper = carousel.querySelector('.service-cards-carousel__track-wrapper');
   const track = carousel.querySelector('.service-cards-carousel__track');
-  const prevBtn = carousel.querySelector('.carousel-arrow--prev');
-  const nextBtn = carousel.querySelector('.carousel-arrow--next');
+  const dotsContainer = carousel.querySelector('.carousel-dots');
   const cards = Array.from(track.querySelectorAll('.service-type-card'));
   let cardIndex = 0;
   let autoplayTimer;
@@ -125,11 +123,39 @@ document.querySelectorAll('.service-cards-carousel').forEach(carousel => {
     return 3;
   }
 
+  function getMaxIndex() {
+    return Math.max(0, cards.length - getVisibleCount());
+  }
+
+  // Build dots
+  function buildDots() {
+    if (!dotsContainer) return;
+    dotsContainer.innerHTML = '';
+    const totalDots = getMaxIndex() + 1;
+    for (let i = 0; i < totalDots; i++) {
+      const dot = document.createElement('button');
+      dot.classList.add('carousel-dot');
+      if (i === 0) dot.classList.add('active');
+      dot.setAttribute('aria-label', 'Slide ' + (i + 1));
+      dot.addEventListener('click', () => {
+        cardIndex = i;
+        updateCarousel();
+        startAutoplay();
+      });
+      dotsContainer.appendChild(dot);
+    }
+  }
+
+  function updateDots() {
+    if (!dotsContainer) return;
+    dotsContainer.querySelectorAll('.carousel-dot').forEach((dot, i) => {
+      dot.classList.toggle('active', i === cardIndex);
+    });
+  }
+
   function updateCarousel(animate) {
     const visible = getVisibleCount();
-    const maxIndex = Math.max(0, cards.length - visible);
-    cardIndex = Math.min(cardIndex, maxIndex);
-    // Each card is (100% / visible) of the wrapper width
+    cardIndex = Math.min(cardIndex, getMaxIndex());
     const percentage = (cardIndex * (100 / visible));
     if (animate === false) {
       track.style.transition = 'none';
@@ -137,21 +163,12 @@ document.querySelectorAll('.service-cards-carousel').forEach(carousel => {
       track.style.transition = 'transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
     }
     track.style.transform = 'translateX(-' + percentage + '%)';
+    updateDots();
   }
 
   function goNext() {
-    const visible = getVisibleCount();
-    const maxIndex = Math.max(0, cards.length - visible);
     cardIndex++;
-    if (cardIndex > maxIndex) cardIndex = 0;
-    updateCarousel();
-  }
-
-  function goPrev() {
-    const visible = getVisibleCount();
-    const maxIndex = Math.max(0, cards.length - visible);
-    cardIndex--;
-    if (cardIndex < 0) cardIndex = maxIndex;
+    if (cardIndex > getMaxIndex()) cardIndex = 0;
     updateCarousel();
   }
 
@@ -164,27 +181,71 @@ document.querySelectorAll('.service-cards-carousel').forEach(carousel => {
     if (autoplayTimer) clearInterval(autoplayTimer);
   }
 
-  if (prevBtn && nextBtn) {
-    prevBtn.addEventListener('click', () => {
-      goPrev();
-      startAutoplay();
-    });
+  // Mouse drag support
+  let isDragging = false;
+  let startX = 0;
+  let currentTranslate = 0;
 
-    nextBtn.addEventListener('click', () => {
-      goNext();
-      startAutoplay();
-    });
+  track.addEventListener('mousedown', (e) => {
+    isDragging = true;
+    startX = e.pageX;
+    track.classList.add('dragging');
+    stopAutoplay();
+  });
 
-    // Pause on hover
-    carousel.addEventListener('mouseenter', stopAutoplay);
-    carousel.addEventListener('mouseleave', startAutoplay);
+  track.addEventListener('mousemove', (e) => {
+    if (!isDragging) return;
+    e.preventDefault();
+  });
 
-    window.addEventListener('resize', () => updateCarousel(false));
-
-    // Init
-    updateCarousel(false);
+  document.addEventListener('mouseup', (e) => {
+    if (!isDragging) return;
+    isDragging = false;
+    track.classList.remove('dragging');
+    const diff = e.pageX - startX;
+    if (Math.abs(diff) > 50) {
+      if (diff < 0) {
+        cardIndex = Math.min(cardIndex + 1, getMaxIndex());
+      } else {
+        cardIndex = Math.max(cardIndex - 1, 0);
+      }
+    }
+    updateCarousel();
     startAutoplay();
-  }
+  });
+
+  // Touch drag support
+  track.addEventListener('touchstart', (e) => {
+    startX = e.touches[0].pageX;
+    stopAutoplay();
+  }, { passive: true });
+
+  track.addEventListener('touchend', (e) => {
+    const diff = e.changedTouches[0].pageX - startX;
+    if (Math.abs(diff) > 50) {
+      if (diff < 0) {
+        cardIndex = Math.min(cardIndex + 1, getMaxIndex());
+      } else {
+        cardIndex = Math.max(cardIndex - 1, 0);
+      }
+    }
+    updateCarousel();
+    startAutoplay();
+  });
+
+  // Pause on hover
+  carousel.addEventListener('mouseenter', stopAutoplay);
+  carousel.addEventListener('mouseleave', startAutoplay);
+
+  window.addEventListener('resize', () => {
+    buildDots();
+    updateCarousel(false);
+  });
+
+  // Init
+  buildDots();
+  updateCarousel(false);
+  startAutoplay();
 });
 
 // ===== PROCESS STEPS ANIMATION (slower, more fluid) =====
@@ -198,7 +259,7 @@ if (processSection) {
         steps.forEach((step, i) => {
           setTimeout(() => {
             step.classList.add('animate-in');
-          }, i * 450); // Slower sequential delay
+          }, i * 600); // Slower, more elegant sequential delay
         });
         processObserver.unobserve(entry.target);
       }
