@@ -201,13 +201,28 @@
           <input type="hidden" name="_subject" value="Novo contato via site KAI Arquitetura">
           <input type="hidden" name="_captcha" value="false">
           <input type="hidden" name="_next" value="https://kaiarquitetura.com.br">
+          <input type="hidden" name="_template" value="table">
           <input type="text" name="name" class="contact__input" placeholder="Nome*" required>
           <input type="tel" name="phone" class="contact__input" placeholder="Telefone (com DDD)">
           <input type="email" name="email" class="contact__input" placeholder="E-mail*" required>
           <input type="text" name="location" class="contact__input" placeholder="Localização">
           <textarea name="message" class="contact__textarea" placeholder="Mensagem (me conte um pouco sobre o que precisa)*" required></textarea>
-          <button type="submit" class="btn btn--coral">Enviar</button>
+          <button type="submit" class="btn btn--coral contact__submit-btn">
+            <span class="contact__submit-text">Enviar</span>
+            <span class="contact__submit-loading" style="display:none;">Enviando...</span>
+          </button>
         </form>
+        <!-- Success overlay -->
+        <div class="contact__success" style="display:none;">
+          <div class="contact__success-icon">
+            <svg viewBox="0 0 52 52" width="60" height="60">
+              <circle class="contact__success-circle" cx="26" cy="26" r="24" fill="none" stroke="#D87C65" stroke-width="2"/>
+              <path class="contact__success-check" fill="none" stroke="#D87C65" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" d="M14 27l7 7 16-16"/>
+            </svg>
+          </div>
+          <p class="contact__success-title">Mensagem enviada!</p>
+          <p class="contact__success-text">Recebemos seu contato e retornaremos em breve.</p>
+        </div>
       </div>
     </div>
   </section>

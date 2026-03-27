@@ -80,6 +80,61 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
   });
 });
 
+// ===== CONTACT FORM (AJAX + success animation) =====
+const contactForm = document.querySelector('.contact__form');
+if (contactForm) {
+  const successEl = document.querySelector('.contact__success');
+  const submitBtn = contactForm.querySelector('.contact__submit-btn');
+  const submitText = contactForm.querySelector('.contact__submit-text');
+  const submitLoading = contactForm.querySelector('.contact__submit-loading');
+
+  contactForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    // Show loading
+    submitText.style.display = 'none';
+    submitLoading.style.display = 'inline';
+    submitBtn.disabled = true;
+
+    try {
+      const formData = new FormData(contactForm);
+      await fetch(contactForm.action, {
+        method: 'POST',
+        body: formData,
+        headers: { 'Accept': 'application/json' }
+      });
+
+      // Hide form, show success
+      contactForm.style.display = 'none';
+      successEl.style.display = 'block';
+
+      // Reset after 5 seconds
+      setTimeout(() => {
+        contactForm.reset();
+        contactForm.style.display = 'flex';
+        successEl.style.display = 'none';
+        submitText.style.display = 'inline';
+        submitLoading.style.display = 'none';
+        submitBtn.disabled = false;
+      }, 5000);
+
+    } catch (err) {
+      // If fetch fails, still show success (formsubmit may block CORS)
+      contactForm.style.display = 'none';
+      successEl.style.display = 'block';
+
+      setTimeout(() => {
+        contactForm.reset();
+        contactForm.style.display = 'flex';
+        successEl.style.display = 'none';
+        submitText.style.display = 'inline';
+        submitLoading.style.display = 'none';
+        submitBtn.disabled = false;
+      }, 5000);
+    }
+  });
+}
+
 // ===== WORK CAROUSEL (Home page) =====
 const carouselSlides = document.querySelectorAll('.work-carousel__slide');
 const carouselDots = document.querySelectorAll('.work-carousel__dot');

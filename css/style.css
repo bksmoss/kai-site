@@ -780,6 +780,61 @@ img {
   color: #555;
 }
 
+/* ===== CONTACT FORM SUCCESS ANIMATION ===== */
+.contact__success {
+  text-align: center;
+  padding: 3rem 1rem;
+  animation: fadeInUp 0.6s ease;
+}
+
+.contact__success-icon {
+  margin-bottom: 1.2rem;
+}
+
+.contact__success-circle {
+  stroke-dasharray: 150;
+  stroke-dashoffset: 150;
+  animation: drawCircle 0.6s ease forwards;
+}
+
+.contact__success-check {
+  stroke-dasharray: 50;
+  stroke-dashoffset: 50;
+  animation: drawCheck 0.4s ease forwards 0.5s;
+}
+
+.contact__success-title {
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: var(--coral);
+  margin-bottom: 0.5rem;
+}
+
+.contact__success-text {
+  font-size: 0.92rem;
+  color: #555;
+  line-height: 1.6;
+}
+
+@keyframes drawCircle {
+  to { stroke-dashoffset: 0; }
+}
+
+@keyframes drawCheck {
+  to { stroke-dashoffset: 0; }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 /* ===== WHATSAPP FLOAT ===== */
 .whatsapp-float {
   position: fixed;
