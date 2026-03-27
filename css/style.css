@@ -994,20 +994,19 @@ img {
 /* ===== PROCESS STEPS (animated) ===== */
 .process-section {
   padding: 3rem 2rem;
-  background: var(--beige);
+  background: var(--bg);
 }
 
 .process-section__title {
   font-size: 1.3rem;
   font-weight: 600;
   text-transform: uppercase;
-  text-align: left;
+  text-align: center;
   margin-bottom: 2rem;
   letter-spacing: 0.12em;
   max-width: 1000px;
   margin-left: auto;
   margin-right: auto;
-  color: var(--coral);
 }
 
 .process-steps {
@@ -1049,11 +1048,11 @@ img {
 }
 
 .process-step__circle {
-  width: 44px;
-  height: 44px;
+  width: 50px;
+  height: 50px;
   background: var(--coral);
   border-radius: 50%;
-  display: none; /* Hide circles — using text labels like the reference */
+  display: flex;
   align-items: center;
   justify-content: center;
   margin: 0 auto 0.8rem;
@@ -1065,21 +1064,20 @@ img {
 
 .process-step.animate-in:hover .process-step__circle {
   transform: scale(1.18);
-  background-color: var(--coral);
-  box-shadow: 0 6px 20px rgba(216, 124, 101, 0.35);
+  background-color: var(--beige-dark);
+  box-shadow: 0 6px 20px rgba(168, 152, 136, 0.35);
 }
 
 .process-step__label {
   font-size: 0.82rem;
   font-weight: 500;
   line-height: 1.4;
-  transition: color 0.3s ease, transform 0.3s ease;
-  color: var(--white);
+  transition: color 0.3s ease;
+  color: var(--black);
 }
 
 .process-step.animate-in:hover .process-step__label {
   color: var(--coral);
-  transform: scale(1.08);
 }
 
 /* Organic curved arrow between steps (using seta SVGs) */
