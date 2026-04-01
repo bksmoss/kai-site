@@ -6,8 +6,8 @@
 }
 
 :root {
-  --bg: #F7F5EF;
-  --coral: #D87C65;
+  --bg: #F7F3EF;
+  --coral: #D87C63;
   --black: #1C1C1C;
   --beige: #D9CFC5;
   --beige-dark: #A89888;
@@ -480,7 +480,7 @@ img {
 
 /* ===== WORK / CTA SECTION (with carousel) ===== */
 .work-section {
-  padding: 3rem 2rem;
+  padding: 3rem 2rem 6rem;
 }
 
 .work-section__inner {
@@ -612,7 +612,7 @@ img {
 
 /* ===== ABOUT (rounded, with margins) ===== */
 .about-section {
-  padding: 3rem 2rem;
+  padding: 6rem 2rem 3rem;
 }
 
 .about-section__inner {
@@ -1119,8 +1119,8 @@ img {
 
 .process-step.animate-in:hover .process-step__circle {
   transform: scale(1.18);
-  background-color: var(--beige-dark);
-  box-shadow: 0 6px 20px rgba(168, 152, 136, 0.35);
+  background-color: #D9CFC5;
+  box-shadow: 0 6px 20px rgba(217, 207, 197, 0.4);
 }
 
 .process-step__label {
