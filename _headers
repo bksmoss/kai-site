@@ -1,0 +1,15 @@
+# Regras de cache para Cloudflare Pages
+
+# Fontes nunca mudam -> cache longo e imutavel
+/fonts/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# Imagens -> cache de 30 dias
+/img/*
+  Cache-Control: public, max-age=2592000
+
+# CSS e JS -> cache de 1 dia
+/css/*
+  Cache-Control: public, max-age=86400
+/js/*
+  Cache-Control: public, max-age=86400
