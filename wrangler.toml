@@ -1,0 +1,6 @@
+name = "kai-site"
+compatibility_date = "2025-07-01"
+
+# Site estatico: nao ha codigo para compilar, apenas servir os arquivos.
+[assets]
+directory = "."
