@@ -1,0 +1,8 @@
+.git
+.git/**
+.gitignore
+.gitattributes
+.claude
+.claude/**
+.assetsignore
+wrangler.toml
