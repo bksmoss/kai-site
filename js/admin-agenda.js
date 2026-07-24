@@ -119,6 +119,10 @@
         '<span class="tag ' + (confirmada ? 'tag--conf' : 'tag--pend') + '">' + (confirmada ? 'confirmada' : 'aguardando você') + '</span>' +
       '</div>' +
       (r.notes ? '<p class="adm-item__obs">' + escapar(r.notes) + '</p>' : '') +
+      (r.avisado === false
+        ? '<p class="ag-aviso" style="margin:0.7rem 0 0">⚠ O aviso deste pedido <strong>não chegou até você</strong> por nenhum canal — você só está vendo aqui no painel. ' +
+          (r.avisoDetalhe ? '<br><span style="font-size:0.78rem;opacity:.8">' + escapar(r.avisoDetalhe) + '</span>' : '') + '</p>'
+        : '') +
       (confirmada && r.meetingLink
         ? '<p class="adm-item__obs" style="word-break:break-all">Link enviado: <a href="' + escapar(r.meetingLink) + '" target="_blank" rel="noopener" style="color:var(--coral)">' + escapar(r.meetingLink) + '</a></p>'
         : '') +

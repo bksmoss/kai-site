@@ -14,6 +14,11 @@ binding = "ASSETS"
 binding = "AGENDA"
 id = "55e18011204449d0ad89e66273d0d4dd"
 
+# Logs no painel da Cloudflare (Workers > kai-site > Observability),
+# para conseguir diagnosticar falha de envio de e-mail.
+[observability]
+enabled = true
+
 [vars]
 SITE_URL = "https://kaiarquitetura.com.br"
 # Precisa ser um dominio verificado no Resend (ver AGENDA-SETUP.md, passo 3).

@@ -314,10 +314,17 @@ async function enviarEmail(env, { para, assunto, html, texto, anexos }) {
 async function avisoFormSubmit(env, reserva) {
   const hash = env.FORMSUBMIT_HASH;
   if (!hash) return { ok: false, motivo: 'FORMSUBMIT_HASH nao configurada' };
+  const base = env.SITE_URL || 'https://kaiarquitetura.com.br';
   try {
     const r = await fetch('https://formsubmit.co/ajax/' + hash, {
       method: 'POST',
-      headers: { 'content-type': 'application/json', accept: 'application/json' },
+      headers: {
+        'content-type': 'application/json',
+        accept: 'application/json',
+        // Sem Origin/Referer o FormSubmit recusa e responde 200 com success:false.
+        origin: base,
+        referer: base + '/agendar-reuniao',
+      },
       body: JSON.stringify({
         _subject: `Nova reuniao solicitada — ${reserva.date} as ${reserva.time}`,
         Nome: reserva.name,
@@ -327,10 +334,16 @@ async function avisoFormSubmit(env, reserva) {
         Dia: dataParaBR(reserva.date),
         Horario: `${reserva.time} - ${reserva.endTime}`,
         Mensagem: reserva.notes || '-',
-        Painel: 'https://kaiarquitetura.com.br/kai-agenda-admin',
+        Painel: base + '/kai-agenda-admin',
       }),
     });
-    return r.ok ? { ok: true } : { ok: false, motivo: 'FormSubmit ' + r.status };
+
+    // O FormSubmit responde 200 mesmo quando recusa: o que vale e o campo success.
+    const corpo = await r.json().catch(() => ({}));
+    if (!r.ok || String(corpo.success) !== 'true') {
+      return { ok: false, motivo: `FormSubmit ${r.status}: ${corpo.message || 'resposta inesperada'}` };
+    }
+    return { ok: true };
   } catch (e) {
     return { ok: false, motivo: String(e) };
   }
@@ -594,19 +607,38 @@ async function avisarKarina(env, cfg, reserva) {
     `${reserva.subject ? 'Assunto: ' + reserva.subject + '\n' : ''}${reserva.notes ? reserva.notes + '\n' : ''}\n` +
     `Confirmar: ${urlConf}\nRecusar: ${urlRec}`;
 
-  const resultado = await enviarEmail(env, {
+  const email = await enviarEmail(env, {
     para: cfg.emailAviso, assunto: `Nova reuniao — ${dataParaBR(reserva.date)} as ${reserva.time} — ${reserva.name}`,
     html, texto,
   });
   // Se o Resend ainda nao estiver configurado, tenta o FormSubmit do site.
-  if (!resultado.ok) await avisoFormSubmit(env, reserva);
+  const formsubmit = email.ok ? { ok: false, motivo: 'nao precisou' } : await avisoFormSubmit(env, reserva);
 
-  await avisoTelegram(env,
+  const telegram = await avisoTelegram(env,
     `Nova reuniao solicitada\n${dataParaBR(reserva.date)} as ${reserva.time}\n${reserva.name} — ${reserva.email}` +
     `${reserva.subject ? '\n' + reserva.subject : ''}\n\nConfirmar:\n${urlConf}\n\nRecusar:\n${urlRec}`);
 
-  await avisoNtfy(env, 'Nova reuniao solicitada',
+  const ntfy = await avisoNtfy(env, 'Nova reuniao solicitada',
     `${reserva.name} — ${dataParaBR(reserva.date)} as ${reserva.time}\nConfirmar: ${urlConf}`);
+
+  // Guarda o resultado na propria reserva: se nenhum canal funcionou, o painel avisa.
+  const canais = { email, formsubmit, telegram, ntfy };
+  const algumFuncionou = Object.values(canais).some((c) => c.ok);
+  if (!algumFuncionou) {
+    console.error('nenhum aviso saiu para a reserva ' + reserva.id, JSON.stringify(canais));
+  }
+
+  const chave = `bk:${reserva.date}:${reserva.time}`;
+  const atual = await env.AGENDA.get(chave, 'json');
+  if (atual && atual.id === reserva.id) {
+    atual.avisado = algumFuncionou;
+    atual.avisoDetalhe = Object.entries(canais)
+      .filter(([, c]) => !c.ok && c.motivo !== 'nao precisou')
+      .map(([nome, c]) => `${nome}: ${c.motivo}`)
+      .join(' | ')
+      .slice(0, 400);
+    await env.AGENDA.put(chave, JSON.stringify(atual));
+  }
 }
 
 async function buscarReserva(env, id) {
