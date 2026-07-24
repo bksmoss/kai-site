@@ -216,6 +216,29 @@ function estaBloqueado(cfg, data) {
 
 /* ============================ horarios ============================ */
 
+// Intervalos [inicioMin, fimMin] ocupados por reuniao, agrupados por data.
+// Usa o endTime gravado, entao respeita reunioes fora da grade (convites).
+async function intervalosOcupados(env, de, ate) {
+  const ocupados = {};
+  let cursor;
+  do {
+    const pagina = await env.AGENDA.list({ prefix: 'bk:', cursor, limit: 1000 });
+    for (const chave of pagina.keys) {
+      const data = chave.name.split(':')[1];
+      if (data < de || data > ate) continue;
+      const r = await env.AGENDA.get(chave.name, 'json');
+      if (!r) continue;
+      (ocupados[data] = ocupados[data] || []).push([minutos(r.time), minutos(r.endTime)]);
+    }
+    cursor = pagina.list_complete ? null : pagina.cursor;
+  } while (cursor);
+  return ocupados;
+}
+
+function sobrepoe(intervalos, ini, fim) {
+  return (intervalos || []).some(([s, e]) => ini < e && s < fim);
+}
+
 // Gera os horarios livres entre duas datas (inclusive), ja descontando
 // passado, antecedencia minima, bloqueios e reunioes ja marcadas.
 async function horariosLivres(env, cfg, de, ate) {
@@ -225,23 +248,8 @@ async function horariosLivres(env, cfg, de, ate) {
   const fim = ate > limite ? limite : ate;
   if (inicio > fim) return {};
 
-  // reunioes ja marcadas no periodo
-  const ocupados = new Set();
-  let cursor;
-  do {
-    const pagina = await env.AGENDA.list({ prefix: 'bk:', cursor, limit: 1000 });
-    for (const chave of pagina.keys) {
-      // formato bk:AAAA-MM-DD:HH:MM — a hora tambem tem ':', entao junta o resto
-      const partes = chave.name.split(':');
-      const data = partes[1];
-      const hora = partes.slice(2).join(':');
-      if (data >= inicio && data <= fim) ocupados.add(data + ' ' + hora);
-    }
-    cursor = pagina.list_complete ? null : pagina.cursor;
-  } while (cursor);
-
-  const agora = Date.now();
-  const minimo = agora + cfg.antecedenciaHoras * 3600 * 1000;
+  const ocupados = await intervalosOcupados(env, inicio, fim);
+  const minimo = Date.now() + cfg.antecedenciaHoras * 3600 * 1000;
   const passo = cfg.duracaoMin + cfg.intervaloMin;
   const resultado = {};
 
@@ -255,10 +263,9 @@ async function horariosLivres(env, cfg, de, ate) {
       const ini = minutos(faixa.inicio);
       const termino = minutos(faixa.fim);
       for (let m = ini; m + cfg.duracaoMin <= termino; m += passo) {
-        const hora = hhmm(m);
-        if (ocupados.has(data + ' ' + hora)) continue;
-        if (instante(data, hora, cfg.timezone).getTime() < minimo) continue;
-        doDia.push(hora);
+        if (sobrepoe(ocupados[data], m, m + cfg.duracaoMin)) continue;
+        if (instante(data, hhmm(m), cfg.timezone).getTime() < minimo) continue;
+        doDia.push(hhmm(m));
       }
     }
 
@@ -266,6 +273,18 @@ async function horariosLivres(env, cfg, de, ate) {
   }
 
   return resultado;
+}
+
+// Validacao do convite da admin: qualquer dia (>= hoje) e horario,
+// desde que nao sobreponha uma reuniao ja marcada.
+async function conflitoConvite(env, cfg, data, hora) {
+  if (!dataValida(data) || !RE_HORA.test(hora)) return 'Data ou horario invalido.';
+  if (data < hojeNoFuso(cfg.timezone)) return 'Nao e possivel agendar em uma data que ja passou.';
+  const ocupados = await intervalosOcupados(env, data, data);
+  const m = minutos(hora);
+  const conflito = (ocupados[data] || []).find(([s, e]) => m < e && s < m + cfg.duracaoMin);
+  if (conflito) return `Esse horario conflita com a reuniao das ${hhmm(conflito[0])}.`;
+  return null;
 }
 
 // Confere se um horario especifico continua valido (usado na hora de reservar).
@@ -415,7 +434,7 @@ function escICS(s) {
 function montarICS(reserva, cfg, organizador) {
   const ini = instante(reserva.date, reserva.time, cfg.timezone);
   const fim = new Date(ini.getTime() + cfg.duracaoMin * 60000);
-  const link = reserva.meetingLink || cfg.linkReuniao || '';
+  const link = reserva.meetingLink || '';
   const descricao = [
     `Reuniao com ${escICS(reserva.name)}.`,
     reserva.subject ? `Assunto: ${escICS(reserva.subject)}` : '',
@@ -614,8 +633,8 @@ async function rotaConvidar(req, env) {
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) return json({ erro: 'Informe um e-mail valido.' }, 400);
 
   const cfg = await lerConfig(env);
-  const problema = await horarioValido(env, cfg, data, hora);
-  if (problema) return json({ erro: problema, recarregar: true }, 409);
+  const problema = await conflitoConvite(env, cfg, data, hora);
+  if (problema) return json({ erro: problema }, 409);
 
   const id = crypto.randomUUID().replace(/-/g, '').slice(0, 16);
   const reserva = {
@@ -716,7 +735,7 @@ async function confirmarReserva(env, id, linkManual) {
   const { reserva, chave } = achado;
   const cfg = await lerConfig(env);
 
-  const link = (linkManual || reserva.meetingLink || cfg.linkReuniao || '').trim();
+  const link = (linkManual || reserva.meetingLink || '').trim();
   reserva.status = 'confirmada';
   reserva.confirmedAt = new Date().toISOString();
   reserva.meetingLink = link;
@@ -918,7 +937,7 @@ async function tarefaAgendada(env) {
     if (r.status === 'confirmada') {
       // 30 min antes — so para reuniao ja confirmada
       if (cfg.lembrete30Min && !r.lembrete30 && faltamMin <= 30) {
-        const link = r.meetingLink || cfg.linkReuniao || '';
+        const link = r.meetingLink || '';
         await avisoTelegram(env, `Lembrete: reuniao em 30 min\n${r.time} — ${r.name}` +
           (r.subject ? `\n${r.subject}` : '') + (link ? `\n${link}` : ''));
         await marcar(r, 'lembrete30');

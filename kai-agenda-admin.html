@@ -69,7 +69,7 @@
     <section class="adm-panel" data-painel="convite">
       <div class="adm-box">
         <h2>Convidar um cliente</h2>
-        <p class="adm-box__hint">Você escolhe o horário e preenche os dados. O cliente recebe por e‑mail o convite já confirmado, com o link da reunião e o convite de calendário — sem precisar entrar no site.</p>
+        <p class="adm-box__hint">Aqui você tem liberdade total: escolha qualquer dia (inclusive fim de semana ou feriado) e qualquer horário que não esteja ocupado. O cliente recebe por e‑mail o convite já confirmado, com o link da reunião e o convite de calendário — sem precisar entrar no site.</p>
 
         <div id="conviteErro"></div>
 
@@ -77,17 +77,14 @@
           <div class="ag-row">
             <div class="ag-field">
               <label for="convDia">Dia *</label>
-              <select class="ag-select" id="convDia" required>
-                <option value="">Carregando horários…</option>
-              </select>
+              <input class="ag-input" id="convDia" type="date" required>
             </div>
             <div class="ag-field">
               <label for="convHora">Horário *</label>
-              <select class="ag-select" id="convHora" required disabled>
-                <option value="">Escolha o dia primeiro</option>
-              </select>
+              <input class="ag-input" id="convHora" type="time" step="300" required>
             </div>
           </div>
+          <p class="adm-box__hint" id="convOcupado" style="margin:-0.4rem 0 0.6rem"></p>
 
           <div class="ag-row">
             <div class="ag-field">
@@ -112,7 +109,7 @@
           </div>
 
           <div class="ag-field">
-            <label for="convLink">Link da reunião (opcional — usa o link padrão se vazio)</label>
+            <label for="convLink">Link da reunião (recomendado — crie em meet.new e cole aqui)</label>
             <input class="ag-input" id="convLink" type="url" placeholder="https://meet.google.com/...">
           </div>
 
@@ -175,12 +172,8 @@
     <!-- ---- ajustes ---- -->
     <section class="adm-panel" data-painel="ajustes">
       <div class="adm-box">
-        <h2>Link da reunião</h2>
-        <p class="adm-box__hint">Este link é enviado ao cliente quando você confirma. Pode ser uma sala fixa (Google Meet, Zoom, Teams) ou você troca por um link novo na hora de confirmar cada reunião.</p>
-        <div class="ag-field">
-          <label for="cfgLink">Link da sala</label>
-          <input class="ag-input" type="url" id="cfgLink" placeholder="https://meet.google.com/abc-defg-hij">
-        </div>
+        <h2>Plataforma da reunião</h2>
+        <p class="adm-box__hint">O link é único por reunião — você cria em <strong>meet.new</strong> e cola na hora de confirmar cada reunião (ou no convite). Aqui só define o nome que aparece para o cliente.</p>
         <div class="ag-field">
           <label for="cfgPlataforma">Nome da plataforma (aparece para o cliente)</label>
           <input class="ag-input" type="text" id="cfgPlataforma" placeholder="Google Meet">

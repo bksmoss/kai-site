@@ -86,30 +86,26 @@
   });
 
   /* ================= enviar convite ================= */
-  var conviteDias = {};
-
+  // Deixa a data mínima em hoje quando a aba abre.
   function carregarConviteHorarios() {
-    return fetch('/api/horarios', { headers: { accept: 'application/json' } })
-      .then(function (r) { return r.json(); })
-      .then(function (d) {
-        conviteDias = d.dias || {};
-        var dias = Object.keys(conviteDias).sort();
-        $('convDia').innerHTML = '<option value="">Escolha…</option>' +
-          dias.map(function (dt) { return '<option value="' + dt + '">' + escapar(porExtenso(dt)) + '</option>'; }).join('');
-        if (!dias.length) $('convDia').innerHTML = '<option value="">Nenhum horário livre</option>';
-        if (cfg && cfg.linkReuniao && !$('convLink').value) $('convLink').value = cfg.linkReuniao;
-      })
-      .catch(function () { aviso('conviteErro', 'Não consegui carregar os horários. Tente de novo.'); });
+    if (!$('convDia').min) $('convDia').min = hoje || new Date().toISOString().slice(0, 10);
+    mostrarOcupadosDoDia();
   }
 
-  $('convDia').addEventListener('change', function () {
-    var horas = conviteDias[$('convDia').value] || [];
-    var sel = $('convHora');
-    sel.disabled = !horas.length;
-    sel.innerHTML = horas.length
-      ? '<option value="">Escolha…</option>' + horas.map(function (h) { return '<option value="' + h + '">' + h + '</option>'; }).join('')
-      : '<option value="">—</option>';
-  });
+  // Mostra os horários já ocupados no dia escolhido, para evitar conflito.
+  function mostrarOcupadosDoDia() {
+    var d = $('convDia').value;
+    var box = $('convOcupado');
+    if (!d) { box.innerHTML = ''; return; }
+    var ocup = (reservasCache || []).filter(function (r) { return r.date === d; })
+      .sort(function (a, b) { return a.time.localeCompare(b.time); })
+      .map(function (r) { return r.time + '–' + r.endTime; });
+    box.innerHTML = ocup.length
+      ? 'Já ocupado nesse dia: <strong>' + ocup.join(', ') + '</strong>. Escolha um horário fora desses.'
+      : 'Nenhum horário ocupado nesse dia.';
+  }
+
+  $('convDia').addEventListener('change', mostrarOcupadosDoDia);
 
   $('formConvite').addEventListener('submit', function (e) {
     e.preventDefault();
@@ -131,8 +127,7 @@
     api('convidar', { method: 'POST', body: JSON.stringify(corpo) })
       .then(function (d) {
         $('formConvite').reset();
-        $('convHora').innerHTML = '<option value="">Escolha o dia primeiro</option>';
-        $('convHora').disabled = true;
+        $('convOcupado').innerHTML = '';
         aviso('avisoGeral', d.emailEnviado
           ? 'Convite enviado! O cliente recebeu o e‑mail com o link e o convite de calendário.'
           : 'Reunião criada, mas o <strong>e‑mail não saiu</strong> (' + escapar(d.motivoFalha || 'sem detalhe') + '). Avise o cliente por WhatsApp.',
@@ -147,9 +142,12 @@
   });
 
   /* ================= reuniões ================= */
+  var reservasCache = [];
+
   function carregarReservas() {
     return api('reservas').then(function (d) {
       hoje = d.hoje;
+      reservasCache = d.reservas || [];
       var proximas = [], passadas = [];
       d.reservas.forEach(function (r) { (r.date >= d.hoje ? proximas : passadas).push(r); });
 
@@ -185,16 +183,22 @@
         ? '<p class="ag-aviso" style="margin:0.7rem 0 0">⚠ O aviso deste pedido <strong>não chegou até você</strong> por nenhum canal — você só está vendo aqui no painel. ' +
           (r.avisoDetalhe ? '<br><span style="font-size:0.78rem;opacity:.8">' + escapar(r.avisoDetalhe) + '</span>' : '') + '</p>'
         : '') +
-      (confirmada && r.meetingLink
-        ? '<p class="adm-item__obs" style="word-break:break-all">Link enviado: <a href="' + escapar(r.meetingLink) + '" target="_blank" rel="noopener" style="color:var(--coral)">' + escapar(r.meetingLink) + '</a></p>'
+      (confirmada && !r.meetingLink && !passada
+        ? '<p class="ag-aviso" style="margin:0.7rem 0 0">Confirmada, mas ainda <strong>sem link</strong>. Cole o link abaixo e clique em “Enviar link da reunião”.</p>'
         : '') +
-      (passada ? '' :
-        '<div class="adm-item__acoes">' +
-          (confirmada ? '' :
-            '<input class="ag-input" style="flex:1;min-width:210px;width:auto" data-campo="link" placeholder="Link da reunião (opcional)" value="' + escapar(cfg && cfg.linkReuniao || '') + '">' +
-            '<button class="ag-btn ag-btn--sm" data-acao="confirmar">Confirmar e avisar cliente</button>') +
-          '<button class="ag-btn ag-btn--ghost ag-btn--sm" data-acao="cancelar">' + (confirmada ? 'Cancelar reunião' : 'Recusar') + '</button>' +
-        '</div>') +
+      (passada
+        ? (r.meetingLink ? '<p class="adm-item__obs" style="word-break:break-all">Link: ' + escapar(r.meetingLink) + '</p>' : '')
+        : confirmada
+          ? '<div class="adm-item__acoes">' +
+              '<input class="ag-input" style="flex:1;min-width:210px;width:auto" data-campo="link" placeholder="Cole o link (meet.new)" value="' + escapar(r.meetingLink || '') + '">' +
+              '<button class="ag-btn ag-btn--sm" data-acao="enviarlink">Enviar link da reunião</button>' +
+              '<button class="ag-btn ag-btn--ghost ag-btn--sm" data-acao="cancelar">Cancelar reunião</button>' +
+            '</div>'
+          : '<div class="adm-item__acoes">' +
+              '<input class="ag-input" style="flex:1;min-width:210px;width:auto" data-campo="link" placeholder="Cole o link (meet.new)" value="">' +
+              '<button class="ag-btn ag-btn--sm" data-acao="confirmar">Confirmar e avisar cliente</button>' +
+              '<button class="ag-btn ag-btn--ghost ag-btn--sm" data-acao="cancelar">Recusar</button>' +
+            '</div>') +
     '</div>';
   }
 
@@ -208,9 +212,15 @@
         if (acao === 'cancelar' && !confirm('Cancelar esta reunião? O horário será liberado e o cliente receberá um e‑mail.')) return;
 
         var corpo = { id: id };
-        if (acao === 'confirmar') {
+        // "enviarlink" reusa o endpoint de confirmar (grava o link e reenvia o e-mail)
+        var rota = acao === 'enviarlink' ? 'confirmar' : acao;
+
+        if (acao === 'confirmar' || acao === 'enviarlink') {
           var campo = item.querySelector('[data-campo="link"]');
           corpo.link = campo ? campo.value.trim() : '';
+          if (acao === 'enviarlink' && !corpo.link) {
+            return aviso('avisoGeral', 'Cole o link da reunião antes de enviar.', 'ag-aviso');
+          }
         } else {
           corpo.motivo = prompt('Quer explicar o motivo para o cliente? (opcional)') || '';
         }
@@ -218,10 +228,13 @@
         botao.disabled = true;
         botao.textContent = 'Aguarde…';
 
-        api(acao, { method: 'POST', body: JSON.stringify(corpo) })
+        api(rota, { method: 'POST', body: JSON.stringify(corpo) })
           .then(function (d) {
+            var okMsg = acao === 'enviarlink'
+              ? 'Link enviado! O cliente recebeu o e‑mail com o link da reunião.'
+              : 'Pronto. O cliente foi avisado por e‑mail.';
             aviso('avisoGeral', d.emailEnviado
-              ? 'Pronto. O cliente foi avisado por e‑mail.'
+              ? okMsg
               : 'Ação registrada, mas o <strong>e‑mail para o cliente não saiu</strong> (' + escapar(d.motivoFalha || 'envio não configurado') + '). Avise por WhatsApp.',
               d.emailEnviado ? 'ag-ok' : 'ag-aviso');
             return carregarReservas();
@@ -376,7 +389,7 @@
   var CAMPOS = {
     cfgDuracao: 'duracaoMin', cfgIntervalo: 'intervaloMin',
     cfgAntecedencia: 'antecedenciaHoras', cfgDias: 'diasAFrente',
-    cfgLink: 'linkReuniao', cfgPlataforma: 'plataforma',
+    cfgPlataforma: 'plataforma',
     cfgEmail: 'emailAviso', cfgMensagem: 'mensagemTopo',
     cfgAvisoDiario: 'avisoDiario',
   };
@@ -454,9 +467,6 @@
       .then(function () {
         desenharSemana();
         desenharBloqueios();
-        if (!cfg.linkReuniao) {
-          aviso('avisoGeral', 'Você ainda não cadastrou um <strong>link de reunião</strong>. Sem ele, o cliente recebe a confirmação sem o link de acesso. Configure em <em>Ajustes</em>.', 'ag-aviso');
-        }
       })
       .catch(function (err) {
         if (err.message !== 'sessao') aviso('avisoGeral', escapar(err.message));
