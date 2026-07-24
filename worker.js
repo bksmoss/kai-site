@@ -828,49 +828,77 @@ async function tarefaAgendada(env) {
   if (!env.TELEGRAM_BOT_TOKEN || !env.TELEGRAM_CHAT_ID) return; // sem Telegram, nada a fazer
 
   const hoje = hojeNoFuso(cfg.timezone);
-  const agora = horaNoFuso(cfg.timezone);
+  const agoraMin = minutos(horaNoFuso(cfg.timezone));
+  const agoraMs = Date.now();
   const reservas = await todasReservas(env);
 
+  // Manha: usa o horario do resumo (padrao 07h). Vale para o resumo e para
+  // a cobranca das reunioes do dia que ainda nao foram confirmadas.
+  const manhaAlvo = cfg.avisoDiario && RE_HORA.test(cfg.avisoDiario) ? cfg.avisoDiario : '07:00';
+  const naJanelaManha = (alvoStr) => {
+    const a = minutos(alvoStr);
+    return agoraMin >= a && agoraMin < a + 5; // janela de 5 min = 1 disparo por dia
+  };
+
+  // marca uma flag na reserva sem sobrescrever mudancas concorrentes
+  const marcar = async (r, campo) => {
+    const chave = `bk:${r.date}:${r.time}`;
+    const atual = await env.AGENDA.get(chave, 'json');
+    if (atual && atual.id === r.id) {
+      atual[campo] = true;
+      await env.AGENDA.put(chave, JSON.stringify(atual));
+    }
+  };
+
   // ---- 1) resumo da agenda do dia ----
-  // Dispara na 1a passagem cujo horario do fuso alcancou o configurado (janela de 5 min).
-  if (cfg.avisoDiario && RE_HORA.test(cfg.avisoDiario)) {
-    const jaMandou = await env.AGENDA.get('digest:' + hoje);
-    const alvo = minutos(cfg.avisoDiario);
-    const agoraMin = minutos(agora);
-    if (!jaMandou && agoraMin >= alvo && agoraMin < alvo + 5) {
-      const doDia = reservas.filter((r) => r.date === hoje);
+  if (cfg.avisoDiario && RE_HORA.test(cfg.avisoDiario) && naJanelaManha(cfg.avisoDiario)) {
+    if (!(await env.AGENDA.get('digest:' + hoje))) {
       await env.AGENDA.put('digest:' + hoje, '1', { expirationTtl: 60 * 60 * 36 });
-      await avisoTelegram(env, textoResumo(doDia, hoje));
+      await avisoTelegram(env, textoResumo(reservas.filter((r) => r.date === hoje), hoje));
     }
   }
 
-  // ---- 2) lembrete 30 min antes ----
-  if (cfg.lembrete30Min) {
-    const agoraMs = Date.now();
-    for (const r of reservas) {
-      if (r.date !== hoje || r.lembrete30) continue;
-      const faltamMin = (instante(r.date, r.time, cfg.timezone).getTime() - agoraMs) / 60000;
-      if (faltamMin > 0 && faltamMin <= 30) {
-        const confirmada = r.status === 'confirmada';
+  // ---- 2) lembretes por reserva ----
+  for (const r of reservas) {
+    if (r.date < hoje) continue;
+    const faltamMin = (instante(r.date, r.time, cfg.timezone).getTime() - agoraMs) / 60000;
+    if (faltamMin <= 0) continue;
+
+    if (r.status === 'confirmada') {
+      // 30 min antes — so para reuniao ja confirmada
+      if (cfg.lembrete30Min && !r.lembrete30 && faltamMin <= 30) {
         const link = r.meetingLink || cfg.linkReuniao || '';
-        const texto = (confirmada ? 'Lembrete: reuniao em 30 min' : 'ATENCAO: reuniao NAO confirmada em 30 min') +
-          `\n${r.time} — ${r.name}` +
-          (r.subject ? `\n${r.subject}` : '') +
-          (confirmada
-            ? (link ? `\n${link}` : '')
-            : `\n\nConfirme agora: ${(env.SITE_URL || 'https://kaiarquitetura.com.br')}/kai-agenda-admin`);
-        await avisoTelegram(env, texto);
-
-        // marca para nao repetir
-        const chave = `bk:${r.date}:${r.time}`;
-        const atual = await env.AGENDA.get(chave, 'json');
-        if (atual && atual.id === r.id) {
-          atual.lembrete30 = true;
-          await env.AGENDA.put(chave, JSON.stringify(atual));
-        }
+        await avisoTelegram(env, `Lembrete: reuniao em 30 min\n${r.time} — ${r.name}` +
+          (r.subject ? `\n${r.subject}` : '') + (link ? `\n${link}` : ''));
+        await marcar(r, 'lembrete30');
       }
+      continue;
+    }
+
+    // reuniao NAO confirmada: cobra ~26h antes e de novo na manha do dia
+    if (!r.nudge26 && faltamMin <= 26 * 60 && faltamMin > 26 * 60 - 15) {
+      await cobrarConfirmacao(env, r, 'Reuniao daqui a ~26h ainda nao confirmada');
+      await marcar(r, 'nudge26');
+    }
+    if (!r.nudge7h && r.date === hoje && naJanelaManha(manhaAlvo)) {
+      await cobrarConfirmacao(env, r, 'Reuniao HOJE ainda nao confirmada');
+      await marcar(r, 'nudge7h');
     }
   }
+}
+
+// Cobra a confirmacao de uma reserva pelo Telegram, com links de 1 clique.
+async function cobrarConfirmacao(env, r, titulo) {
+  const base = env.SITE_URL || 'https://kaiarquitetura.com.br';
+  const tConf = await tokenAcao(env, r.id, 'confirmar');
+  const tRec = await tokenAcao(env, r.id, 'recusar');
+  let msg = `${titulo}\n${dataParaBR(r.date)} as ${r.time} — ${r.name}`;
+  if (r.subject) msg += `\n${r.subject}`;
+  if (r.phone) msg += `\n${r.phone}`;
+  msg += tConf
+    ? `\n\nConfirmar:\n${base}/api/acao?id=${r.id}&a=confirmar&t=${tConf}\n\nRecusar:\n${base}/api/acao?id=${r.id}&a=recusar&t=${tRec}`
+    : `\n\nAbra o painel: ${base}/kai-agenda-admin`;
+  await avisoTelegram(env, msg);
 }
 
 function textoResumo(reservas, hoje) {
