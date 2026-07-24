@@ -396,21 +396,24 @@
 
   function preencherCampos() {
     Object.keys(CAMPOS).forEach(function (id) {
-      $(id).value = cfg[CAMPOS[id]] != null ? cfg[CAMPOS[id]] : '';
-      $(id).addEventListener('input', function () {
-        var v = $(id).value;
-        cfg[CAMPOS[id]] = $(id).type === 'number' ? Number(v) : v;
+      var el = $(id);
+      if (!el) return; // campo pode nao existir numa versao futura: nao quebra o painel
+      el.value = cfg[CAMPOS[id]] != null ? cfg[CAMPOS[id]] : '';
+      el.addEventListener('input', function () {
+        cfg[CAMPOS[id]] = el.type === 'number' ? Number(el.value) : el.value;
         marcarSujo();
       });
     });
 
     // checkbox tem estado proprio (checked), fora do fluxo de CAMPOS acima
     var lembrete = $('cfgLembrete30');
-    lembrete.checked = cfg.lembrete30Min !== false;
-    lembrete.addEventListener('change', function () {
-      cfg.lembrete30Min = lembrete.checked;
-      marcarSujo();
-    });
+    if (lembrete) {
+      lembrete.checked = cfg.lembrete30Min !== false;
+      lembrete.addEventListener('change', function () {
+        cfg.lembrete30Min = lembrete.checked;
+        marcarSujo();
+      });
+    }
   }
 
   function desenharIntegracoes(status) {

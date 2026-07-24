@@ -8,6 +8,14 @@
 /img/*
   Cache-Control: public, max-age=2592000
 
+# Arquivos da agenda -> sempre revalidar (evita cache preso entre HTML e JS)
+/css/agenda.css
+  Cache-Control: no-cache
+/js/agendar.js
+  Cache-Control: no-cache
+/js/admin-agenda.js
+  Cache-Control: no-cache
+
 # CSS e JS -> cache de 1 dia
 /css/*
   Cache-Control: public, max-age=86400
