@@ -1,6 +1,32 @@
 name = "kai-site"
+main = "worker.js"
 compatibility_date = "2025-07-01"
 
-# Site estatico: nao ha codigo para compilar, apenas servir os arquivos.
+# Site estatico + API de agendamento (/api/*).
+# Os arquivos continuam sendo servidos direto; o Worker so entra nas rotas /api/.
 [assets]
 directory = "."
+binding = "ASSETS"
+
+# Banco da agenda (configuracao + reunioes marcadas).
+# Namespace "kai-agenda", criado no painel da Cloudflare em 24/07/2026.
+[[kv_namespaces]]
+binding = "AGENDA"
+id = "55e18011204449d0ad89e66273d0d4dd"
+
+[vars]
+SITE_URL = "https://kaiarquitetura.com.br"
+# Precisa ser um dominio verificado no Resend (ver AGENDA-SETUP.md, passo 3).
+MAIL_FROM = "KAI Arquitetura <agenda@send.kaiarquitetura.com.br>"
+MAIL_REPLY_TO = "contato@kaiarquitetura.com.br"
+# Mesmo identificador do formulario de contato do site (plano B de aviso por e-mail).
+FORMSUBMIT_HASH = "ed02406866ef5fa2cb703f344b8bb43d"
+
+# Segredos (NAO ficam neste arquivo). Configure com:
+#   npx wrangler secret put ADMIN_PASSWORD
+#   npx wrangler secret put SESSION_SECRET
+#   npx wrangler secret put RESEND_API_KEY
+# Opcionais:
+#   npx wrangler secret put TELEGRAM_BOT_TOKEN
+#   npx wrangler secret put TELEGRAM_CHAT_ID
+#   npx wrangler secret put NTFY_TOPIC

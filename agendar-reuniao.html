@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow, noarchive, noimageindex">
+  <meta name="referrer" content="no-referrer">
+  <title>Agendar uma reunião | KAI Arquitetura</title>
+  <link rel="icon" type="image/png" href="img/simbolo.png">
+  <link rel="stylesheet" href="css/fonts.css">
+  <link rel="stylesheet" href="css/agenda.css">
+</head>
+<body>
+
+  <div class="ag-wrap">
+
+    <div class="ag-top">
+      <a href="https://kaiarquitetura.com.br"><img src="img/logo.png" alt="KAI Arquitetura"></a>
+      <span class="ag-top__note">Agenda particular · por convite</span>
+    </div>
+
+    <div class="ag-card">
+
+      <!-- coluna de informações -->
+      <aside class="ag-side">
+        <p class="ag-side__eyebrow">KAI Arquitetura</p>
+        <h1 class="ag-side__title">Vamos conversar sobre o seu projeto</h1>
+        <p class="ag-side__text" id="msgTopo">Escolha o melhor dia e horário para conversarmos sobre o seu projeto.</p>
+
+        <div class="ag-meta">
+          <div>
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+            <span id="metaDuracao">45 minutos</span>
+          </div>
+          <div>
+            <svg viewBox="0 0 24 24"><rect x="2" y="6" width="14" height="12" rx="2"/><path d="M16 10l6-3v10l-6-3"/></svg>
+            <span id="metaPlataforma">Reunião online</span>
+          </div>
+          <div>
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18a15 15 0 0 1 0-18"/></svg>
+            <span>Horário de Brasília (GMT‑3)</span>
+          </div>
+          <div>
+            <svg viewBox="0 0 24 24"><path d="M4 6h16v13H4z"/><path d="M4 10h16M9 3v4M15 3v4"/></svg>
+            <span id="metaAviso">Confirmação por e‑mail</span>
+          </div>
+        </div>
+      </aside>
+
+      <!-- coluna interativa -->
+      <main class="ag-main">
+
+        <div id="carregando" class="ag-load"><div class="ag-spin"></div></div>
+
+        <div id="conteudo" hidden>
+          <div id="erroGeral"></div>
+
+          <!-- 1. calendário -->
+          <section id="passoCalendario">
+            <p class="ag-step">1 · Escolha o dia</p>
+            <div class="cal-head">
+              <span class="cal-head__month" id="calMes"></span>
+              <div class="cal-nav">
+                <button type="button" id="calAnterior" aria-label="Mês anterior">‹</button>
+                <button type="button" id="calProximo" aria-label="Próximo mês">›</button>
+              </div>
+            </div>
+            <div class="cal-grid" id="calGrade"></div>
+            <div class="cal-legend">
+              <span><i style="background:#FBF1EC"></i> Com horários</span>
+              <span><i style="background:#EFE9E3"></i> Indisponível</span>
+            </div>
+          </section>
+
+          <!-- 2. horários -->
+          <section id="passoHorarios" class="ag-times" hidden>
+            <p class="ag-times__day" id="horariosDia"></p>
+            <div class="time-grid" id="horariosGrade"></div>
+          </section>
+
+          <!-- 3. dados -->
+          <section id="passoFormulario" class="ag-form" hidden>
+            <p class="ag-step">2 · Seus dados</p>
+
+            <div class="ag-chosen">
+              <span id="resumoEscolha"></span>
+              <button type="button" id="trocarHorario">trocar</button>
+            </div>
+
+            <div id="erroForm"></div>
+
+            <form id="formAgenda" novalidate>
+              <input type="text" name="website" class="ag-hp" tabindex="-1" autocomplete="off" aria-hidden="true">
+
+              <div class="ag-row">
+                <div class="ag-field">
+                  <label for="campoNome">Nome completo *</label>
+                  <input class="ag-input" id="campoNome" name="nome" type="text" required autocomplete="name" maxlength="80">
+                </div>
+                <div class="ag-field">
+                  <label for="campoEmail">E‑mail *</label>
+                  <input class="ag-input" id="campoEmail" name="email" type="email" required autocomplete="email" maxlength="120">
+                </div>
+              </div>
+
+              <div class="ag-row">
+                <div class="ag-field">
+                  <label for="campoTelefone">WhatsApp (opcional)</label>
+                  <input class="ag-input" id="campoTelefone" name="telefone" type="tel" autocomplete="tel" maxlength="30" placeholder="(11) 90000-0000">
+                </div>
+                <div class="ag-field">
+                  <label for="campoAssunto">Sobre o que quer falar?</label>
+                  <select class="ag-select" id="campoAssunto" name="assunto">
+                    <option value="">Selecione…</option>
+                    <option>Projeto de interiores</option>
+                    <option>Projeto arquitetônico</option>
+                    <option>Reforma</option>
+                    <option>Consultoria</option>
+                    <option>Acompanhamento de obra</option>
+                    <option>Outro assunto</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="ag-field">
+                <label for="campoObs">Conte um pouco sobre o que você precisa (opcional)</label>
+                <textarea class="ag-textarea" id="campoObs" name="observacoes" maxlength="800"></textarea>
+              </div>
+
+              <button type="submit" class="ag-btn" id="botaoEnviar">Solicitar reunião</button>
+              <p style="font-size:0.76rem;color:var(--muted);text-align:center;margin-top:0.8rem;">
+                O horário fica reservado para você. A confirmação chega por e‑mail com o link da reunião.
+              </p>
+            </form>
+          </section>
+
+          <!-- 4. sucesso -->
+          <section id="passoSucesso" hidden>
+            <div class="ag-sucesso">
+              <div class="ag-sucesso__icon">
+                <svg viewBox="0 0 24 24"><path d="M4 12.5l5.5 5.5L20 7"/></svg>
+              </div>
+              <h2>Pedido enviado!</h2>
+              <p>Recebemos sua solicitação e o horário já está reservado no seu nome.</p>
+              <div class="ag-sucesso__box" id="sucessoResumo"></div>
+              <p>Assim que a reunião for confirmada, você recebe um e‑mail com o link de acesso e o convite para adicionar na sua agenda.</p>
+            </div>
+          </section>
+        </div>
+      </main>
+    </div>
+
+    <p class="ag-rodape">
+      Prefere conversar antes? <a href="https://wa.me/5511925049959" target="_blank" rel="noopener">Chame no WhatsApp</a>
+    </p>
+  </div>
+
+  <script src="js/agendar.js"></script>
+</body>
+</html>

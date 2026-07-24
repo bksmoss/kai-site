@@ -13,3 +13,14 @@
   Cache-Control: public, max-age=86400
 /js/*
   Cache-Control: public, max-age=86400
+
+# Paginas ocultas da agenda -> fora dos buscadores e sem cache
+/agendar-reuniao*
+  X-Robots-Tag: noindex, nofollow, noarchive
+  Cache-Control: no-store
+  Referrer-Policy: no-referrer
+/kai-agenda-admin*
+  X-Robots-Tag: noindex, nofollow, noarchive
+  Cache-Control: no-store
+  Referrer-Policy: no-referrer
+  X-Frame-Options: DENY

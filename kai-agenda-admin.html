@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow, noarchive, noimageindex">
+  <meta name="referrer" content="no-referrer">
+  <title>Agenda · Painel | KAI Arquitetura</title>
+  <link rel="icon" type="image/png" href="img/simbolo.png">
+  <link rel="stylesheet" href="css/fonts.css">
+  <link rel="stylesheet" href="css/agenda.css">
+</head>
+<body>
+
+  <!-- ===== login ===== -->
+  <div class="adm-login" id="telaLogin" hidden>
+    <img src="img/logo.png" alt="KAI Arquitetura" style="height:30px;margin-bottom:1.4rem;">
+    <h1>Painel da agenda</h1>
+    <p>Área restrita da administradora.</p>
+    <div id="erroLogin"></div>
+    <form id="formLogin">
+      <div class="ag-field">
+        <label for="campoSenha">Senha</label>
+        <input class="ag-input" type="password" id="campoSenha" autocomplete="current-password" required>
+      </div>
+      <button type="submit" class="ag-btn" id="botaoEntrar">Entrar</button>
+    </form>
+  </div>
+
+  <!-- ===== painel ===== -->
+  <div class="adm-wrap" id="telaPainel" hidden>
+
+    <div class="adm-head">
+      <div>
+        <img src="img/logo.png" alt="KAI Arquitetura" style="height:26px;margin-bottom:0.5rem;">
+        <h1>Agenda de reuniões</h1>
+      </div>
+      <div style="display:flex;gap:0.6rem;align-items:center;">
+        <a class="ag-btn ag-btn--ghost ag-btn--sm" href="/agendar-reuniao" target="_blank" rel="noopener">Ver página do cliente</a>
+        <button class="ag-btn ag-btn--ghost ag-btn--sm" id="botaoSair">Sair</button>
+      </div>
+    </div>
+
+    <div id="avisoGeral"></div>
+
+    <div class="adm-tabs">
+      <button class="adm-tab is-active" data-aba="reunioes">Reuniões</button>
+      <button class="adm-tab" data-aba="horarios">Meus horários</button>
+      <button class="adm-tab" data-aba="folgas">Férias e bloqueios</button>
+      <button class="adm-tab" data-aba="ajustes">Ajustes</button>
+    </div>
+
+    <!-- ---- reuniões ---- -->
+    <section class="adm-panel is-active" data-painel="reunioes">
+      <div class="adm-box">
+        <h2>Próximas reuniões</h2>
+        <p class="adm-box__hint">Confirmar envia automaticamente o e‑mail com o link e o convite de calendário para o cliente. Recusar libera o horário na agenda.</p>
+        <div id="listaProximas"><div class="ag-load"><div class="ag-spin"></div></div></div>
+      </div>
+      <div class="adm-box">
+        <h2>Já aconteceram</h2>
+        <p class="adm-box__hint">Histórico das reuniões que já passaram da data.</p>
+        <div id="listaPassadas"></div>
+      </div>
+    </section>
+
+    <!-- ---- horários semanais ---- -->
+    <section class="adm-panel" data-painel="horarios">
+      <div class="adm-box">
+        <h2>Horários que aceito reunião</h2>
+        <p class="adm-box__hint">Defina as faixas de cada dia da semana. Dias sem faixa nenhuma não aparecem para o cliente.</p>
+        <div id="gradeSemana"></div>
+      </div>
+
+      <div class="adm-box">
+        <h2>Regras de encaixe</h2>
+        <p class="adm-box__hint">Como os horários são montados dentro das faixas acima.</p>
+        <div class="adm-grade">
+          <div class="ag-field">
+            <label for="cfgDuracao">Duração da reunião (min)</label>
+            <input class="ag-input" type="number" id="cfgDuracao" min="15" max="240" step="5">
+          </div>
+          <div class="ag-field">
+            <label for="cfgIntervalo">Intervalo entre reuniões (min)</label>
+            <input class="ag-input" type="number" id="cfgIntervalo" min="0" max="120" step="5">
+          </div>
+          <div class="ag-field">
+            <label for="cfgAntecedencia">Antecedência mínima (horas)</label>
+            <input class="ag-input" type="number" id="cfgAntecedencia" min="0" max="720" step="1">
+          </div>
+          <div class="ag-field">
+            <label for="cfgDias">Aceitar agendamento até (dias)</label>
+            <input class="ag-input" type="number" id="cfgDias" min="1" max="365" step="1">
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ---- férias e bloqueios ---- -->
+    <section class="adm-panel" data-painel="folgas">
+      <div class="adm-box">
+        <h2>Férias, feriados e dias travados</h2>
+        <p class="adm-box__hint">Nenhum horário aparece para o cliente dentro dos períodos listados aqui. Para travar um único dia, use a mesma data nos dois campos.</p>
+        <div id="listaBloqueios"></div>
+        <div style="display:flex;gap:0.6rem;margin-top:1rem;flex-wrap:wrap;">
+          <button class="ag-btn ag-btn--ghost ag-btn--sm" id="addBloqueio">+ Adicionar período</button>
+          <button class="ag-btn ag-btn--ghost ag-btn--sm" id="travarSemana">Travar os próximos 7 dias</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ---- ajustes ---- -->
+    <section class="adm-panel" data-painel="ajustes">
+      <div class="adm-box">
+        <h2>Link da reunião</h2>
+        <p class="adm-box__hint">Este link é enviado ao cliente quando você confirma. Pode ser uma sala fixa (Google Meet, Zoom, Teams) ou você troca por um link novo na hora de confirmar cada reunião.</p>
+        <div class="ag-field">
+          <label for="cfgLink">Link da sala</label>
+          <input class="ag-input" type="url" id="cfgLink" placeholder="https://meet.google.com/abc-defg-hij">
+        </div>
+        <div class="ag-field">
+          <label for="cfgPlataforma">Nome da plataforma (aparece para o cliente)</label>
+          <input class="ag-input" type="text" id="cfgPlataforma" placeholder="Google Meet">
+        </div>
+      </div>
+
+      <div class="adm-box">
+        <h2>Textos e avisos</h2>
+        <div class="ag-field">
+          <label for="cfgEmail">E‑mail que recebe os pedidos</label>
+          <input class="ag-input" type="email" id="cfgEmail">
+        </div>
+        <div class="ag-field">
+          <label for="cfgMensagem">Frase de apresentação na página do cliente</label>
+          <textarea class="ag-textarea" id="cfgMensagem" maxlength="300"></textarea>
+        </div>
+      </div>
+
+      <div class="adm-box">
+        <h2>Canais de aviso</h2>
+        <p class="adm-box__hint">Configurados por variáveis de ambiente no Cloudflare (veja o AGENDA-SETUP.md).</p>
+        <div class="adm-status" id="statusIntegracoes"></div>
+      </div>
+    </section>
+
+    <div class="adm-salvar" id="barraSalvar" hidden>
+      <span id="statusSalvar" style="font-size:0.84rem;color:var(--muted);"></span>
+      <button class="ag-btn" id="botaoSalvar">Salvar alterações</button>
+    </div>
+  </div>
+
+  <script src="js/admin-agenda.js"></script>
+</body>
+</html>
