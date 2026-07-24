@@ -137,6 +137,25 @@
       </div>
 
       <div class="adm-box">
+        <h2>Avisos no Telegram</h2>
+        <p class="adm-box__hint">Sua central de notificações. Funciona depois de conectar o Telegram no Cloudflare (veja o AGENDA‑SETUP.md).</p>
+        <div class="adm-grade">
+          <div class="ag-field">
+            <label for="cfgAvisoDiario">Resumo da agenda toda manhã às</label>
+            <input class="ag-input" type="time" id="cfgAvisoDiario">
+            <p class="adm-box__hint" style="margin:0.4rem 0 0">Deixe em branco para desligar o resumo diário.</p>
+          </div>
+          <div class="ag-field">
+            <label>Lembrete antes da reunião</label>
+            <label style="display:flex;align-items:center;gap:0.5rem;font-size:0.92rem;color:var(--black);margin-top:0.5rem;cursor:pointer">
+              <input type="checkbox" id="cfgLembrete30" style="width:18px;height:18px;accent-color:var(--coral)">
+              Avisar 30 minutos antes de cada reunião
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div class="adm-box">
         <h2>Canais de aviso</h2>
         <p class="adm-box__hint">Configurados por variáveis de ambiente no Cloudflare (veja o AGENDA-SETUP.md).</p>
         <div class="adm-status" id="statusIntegracoes"></div>

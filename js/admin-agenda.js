@@ -277,6 +277,7 @@
     cfgAntecedencia: 'antecedenciaHoras', cfgDias: 'diasAFrente',
     cfgLink: 'linkReuniao', cfgPlataforma: 'plataforma',
     cfgEmail: 'emailAviso', cfgMensagem: 'mensagemTopo',
+    cfgAvisoDiario: 'avisoDiario',
   };
 
   function preencherCampos() {
@@ -287,6 +288,14 @@
         cfg[CAMPOS[id]] = $(id).type === 'number' ? Number(v) : v;
         marcarSujo();
       });
+    });
+
+    // checkbox tem estado proprio (checked), fora do fluxo de CAMPOS acima
+    var lembrete = $('cfgLembrete30');
+    lembrete.checked = cfg.lembrete30Min !== false;
+    lembrete.addEventListener('change', function () {
+      cfg.lembrete30Min = lembrete.checked;
+      marcarSujo();
     });
   }
 

@@ -32,6 +32,8 @@ const CONFIG_PADRAO = {
   plataforma: 'Google Meet',
   emailAviso: 'contato@kaiarquitetura.com.br',
   mensagemTopo: 'Escolha o melhor dia e horario para conversarmos sobre o seu projeto.',
+  avisoDiario: '07:00',    // horario do resumo da agenda no Telegram ('' = desligado)
+  lembrete30Min: true,     // lembrete no Telegram 30 min antes de cada reuniao
 };
 
 /* ============================ utilitarios ============================ */
@@ -106,6 +108,13 @@ function instante(data, hora, timeZone = TZ) {
 
 function hojeNoFuso(timeZone = TZ) {
   return new Intl.DateTimeFormat('en-CA', { timeZone }).format(new Date()); // YYYY-MM-DD
+}
+
+// Hora de parede atual no fuso, como 'HH:MM'.
+function horaNoFuso(timeZone = TZ) {
+  return new Intl.DateTimeFormat('en-GB', {
+    timeZone, hour: '2-digit', minute: '2-digit', hour12: false,
+  }).format(new Date());
 }
 
 function somarDias(data, n) {
@@ -190,6 +199,13 @@ function sanearConfig(entrada, atual) {
   if (typeof entrada.plataforma === 'string') c.plataforma = entrada.plataforma.trim().slice(0, 40);
   if (typeof entrada.emailAviso === 'string') c.emailAviso = entrada.emailAviso.trim().slice(0, 120);
   if (typeof entrada.mensagemTopo === 'string') c.mensagemTopo = entrada.mensagemTopo.trim().slice(0, 300);
+
+  // '' desliga o resumo diario; qualquer outra coisa precisa ser HH:MM valido
+  if (typeof entrada.avisoDiario === 'string') {
+    const v = entrada.avisoDiario.trim();
+    c.avisoDiario = v === '' || RE_HORA.test(v) ? v : atual.avisoDiario;
+  }
+  if (typeof entrada.lembrete30Min === 'boolean') c.lembrete30Min = entrada.lembrete30Min;
 
   return c;
 }
@@ -783,7 +799,8 @@ async function rotaLogin(req, env) {
   });
 }
 
-async function rotaReservas(env) {
+// Le todas as reservas ativas (chaves bk:*), ordenadas por data/hora.
+async function todasReservas(env) {
   const lista = [];
   let cursor;
   do {
@@ -796,12 +813,87 @@ async function rotaReservas(env) {
   } while (cursor);
 
   lista.sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time));
-  return json({ hoje: hojeNoFuso(), reservas: lista });
+  return lista;
+}
+
+async function rotaReservas(env) {
+  return json({ hoje: hojeNoFuso(), reservas: await todasReservas(env) });
+}
+
+/* ============================ tarefas agendadas (cron) ============================ */
+
+// Roda a cada 5 min (Cron Trigger). Cuida do resumo diario e dos lembretes.
+async function tarefaAgendada(env) {
+  const cfg = await lerConfig(env);
+  if (!env.TELEGRAM_BOT_TOKEN || !env.TELEGRAM_CHAT_ID) return; // sem Telegram, nada a fazer
+
+  const hoje = hojeNoFuso(cfg.timezone);
+  const agora = horaNoFuso(cfg.timezone);
+  const reservas = await todasReservas(env);
+
+  // ---- 1) resumo da agenda do dia ----
+  // Dispara na 1a passagem cujo horario do fuso alcancou o configurado (janela de 5 min).
+  if (cfg.avisoDiario && RE_HORA.test(cfg.avisoDiario)) {
+    const jaMandou = await env.AGENDA.get('digest:' + hoje);
+    const alvo = minutos(cfg.avisoDiario);
+    const agoraMin = minutos(agora);
+    if (!jaMandou && agoraMin >= alvo && agoraMin < alvo + 5) {
+      const doDia = reservas.filter((r) => r.date === hoje);
+      await env.AGENDA.put('digest:' + hoje, '1', { expirationTtl: 60 * 60 * 36 });
+      await avisoTelegram(env, textoResumo(doDia, hoje));
+    }
+  }
+
+  // ---- 2) lembrete 30 min antes ----
+  if (cfg.lembrete30Min) {
+    const agoraMs = Date.now();
+    for (const r of reservas) {
+      if (r.date !== hoje || r.lembrete30) continue;
+      const faltamMin = (instante(r.date, r.time, cfg.timezone).getTime() - agoraMs) / 60000;
+      if (faltamMin > 0 && faltamMin <= 30) {
+        const confirmada = r.status === 'confirmada';
+        const link = r.meetingLink || cfg.linkReuniao || '';
+        const texto = (confirmada ? 'Lembrete: reuniao em 30 min' : 'ATENCAO: reuniao NAO confirmada em 30 min') +
+          `\n${r.time} — ${r.name}` +
+          (r.subject ? `\n${r.subject}` : '') +
+          (confirmada
+            ? (link ? `\n${link}` : '')
+            : `\n\nConfirme agora: ${(env.SITE_URL || 'https://kaiarquitetura.com.br')}/kai-agenda-admin`);
+        await avisoTelegram(env, texto);
+
+        // marca para nao repetir
+        const chave = `bk:${r.date}:${r.time}`;
+        const atual = await env.AGENDA.get(chave, 'json');
+        if (atual && atual.id === r.id) {
+          atual.lembrete30 = true;
+          await env.AGENDA.put(chave, JSON.stringify(atual));
+        }
+      }
+    }
+  }
+}
+
+function textoResumo(reservas, hoje) {
+  const cab = 'Bom dia! Agenda de ' + dataParaBR(hoje);
+  if (!reservas.length) return cab + '\n\nNenhuma reuniao marcada para hoje.';
+
+  const linhas = reservas.map((r) => {
+    const marca = r.status === 'confirmada' ? '[ok]' : '[a confirmar]';
+    return `${r.time}-${r.endTime}  ${r.name} ${marca}` + (r.subject ? `\n   ${r.subject}` : '');
+  });
+  const pendentes = reservas.filter((r) => r.status !== 'confirmada').length;
+  const rodape = pendentes ? `\n\n${pendentes} reuniao(oes) ainda esperando sua confirmacao.` : '';
+  return `${cab}\n\n${linhas.join('\n')}${rodape}`;
 }
 
 /* ============================ entrada ============================ */
 
 export default {
+  // Cron Trigger da Cloudflare (ver wrangler.toml). Roda sem ninguem acessar o site.
+  async scheduled(event, env, ctx) {
+    ctx.waitUntil(tarefaAgendada(env).catch((e) => console.error('tarefa agendada:', e && e.stack ? e.stack : e)));
+  },
+
   async fetch(req, env, ctx) {
     const url = new URL(req.url);
     const rota = url.pathname.replace(/\/+$/, '') || '/';

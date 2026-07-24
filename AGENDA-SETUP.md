@@ -59,22 +59,34 @@ O envio usa o [Resend](https://resend.com) — plano gratuito de 3.000 e‑mails
 
 ---
 
-## Passo 4 — Aviso instantâneo no celular (opcional, mas vale muito)
+## Passo 4 — Telegram: sua central de notificações
 
-E‑mail você pode demorar a ver. Escolha um destes (ou os dois):
+O Telegram é a central de avisos só sua, separada do WhatsApp (onde ficam clientes e fornecedores). Depois de conectado, ele entrega **três coisas**:
 
-### Telegram — recomendado
+1. **Novo pedido de reunião** — na hora, com botões *Confirmar* e *Recusar* (resolve tudo pelo celular, sem abrir o painel)
+2. **Resumo da agenda toda manhã** — a lista de reuniões do dia, no horário que você escolher (padrão 7h)
+3. **Lembrete 30 min antes** de cada reunião — e se faltar 30 min para uma reunião que você ainda **não confirmou**, ele te cutuca
+
+Os itens 2 e 3 você liga/desliga e ajusta no painel → aba **Ajustes** → *Avisos no Telegram*.
+
+### Como conectar
 1. No Telegram, converse com **@BotFather** → `/newbot` → escolha um nome → ele devolve um **token**
-2. Mande qualquer mensagem para o seu bot novo
+2. Mande qualquer mensagem para o seu bot novo (procure pelo @nome que você criou)
 3. Abra `https://api.telegram.org/bot<SEU_TOKEN>/getUpdates` no navegador e copie o número em `"chat":{"id": ...}`
-4. Cloudflare → adicione como **Secret**: `TELEGRAM_BOT_TOKEN` e `TELEGRAM_CHAT_ID`
+4. Cloudflare → **kai-site → Settings → Variables and Secrets → Add**, como **Secret**:
+   - `TELEGRAM_BOT_TOKEN` = o token do BotFather
+   - `TELEGRAM_CHAT_ID` = o número do passo 3
+5. **Deploy**
 
-Você recebe a notificação na hora, com os botões **Confirmar** e **Recusar** — dá para resolver tudo pelo celular sem abrir o painel.
+> O resumo diário e os lembretes dependem do Cron Trigger (o "despertador" do Worker), que já vai no `wrangler.toml` — não precisa configurar nada à mão. Confira em **kai-site → Settings → Trigger events** que existe um cron `*/5 * * * *`.
 
-### ntfy — alternativa sem cadastro
+### ntfy — alternativa sem cadastro (opcional)
+Se um dia não quiser Telegram, dá para receber só o aviso de novo pedido pelo app **ntfy**:
 1. Instale o app **ntfy** (Android/iOS)
 2. Inscreva‑se num tópico com nome difícil de adivinhar, ex.: `kai-agenda-x7k2m9`
 3. Cloudflare → **Secret**: `NTFY_TOPIC` = `kai-agenda-x7k2m9`
+
+(O ntfy recebe só o item 1. O resumo diário e os lembretes saem apenas pelo Telegram.)
 
 ---
 

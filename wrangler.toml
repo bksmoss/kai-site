@@ -19,6 +19,11 @@ id = "55e18011204449d0ad89e66273d0d4dd"
 [observability]
 enabled = true
 
+# "Despertador" do Worker: roda a cada 5 min para mandar o resumo da agenda
+# de manha e os lembretes de 30 min antes no Telegram. Sem custo no plano free.
+[triggers]
+crons = ["*/5 * * * *"]
+
 [vars]
 SITE_URL = "https://kaiarquitetura.com.br"
 # Precisa ser um dominio verificado no Resend (ver AGENDA-SETUP.md, passo 3).
