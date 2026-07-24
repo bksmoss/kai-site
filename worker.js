@@ -595,6 +595,52 @@ async function rotaAgendar(req, env, ctx) {
   });
 }
 
+// Convite criado pela administradora: reserva o horario e ja confirma,
+// enviando ao cliente o e-mail com link + convite de calendario.
+async function rotaConvidar(req, env) {
+  let dados;
+  try { dados = await req.json(); } catch { return json({ erro: 'Pedido invalido.' }, 400); }
+
+  const nome = String(dados.nome || '').trim().slice(0, 80);
+  const email = String(dados.email || '').trim().slice(0, 120);
+  const telefone = String(dados.telefone || '').trim().slice(0, 30);
+  const assunto = String(dados.assunto || '').trim().slice(0, 120);
+  const recado = String(dados.mensagem || '').trim().slice(0, 800);
+  const link = String(dados.link || '').trim().slice(0, 300);
+  const data = String(dados.data || '');
+  const hora = String(dados.hora || '');
+
+  if (nome.length < 2) return json({ erro: 'Informe o nome do cliente.' }, 400);
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) return json({ erro: 'Informe um e-mail valido.' }, 400);
+
+  const cfg = await lerConfig(env);
+  const problema = await horarioValido(env, cfg, data, hora);
+  if (problema) return json({ erro: problema, recarregar: true }, 409);
+
+  const id = crypto.randomUUID().replace(/-/g, '').slice(0, 16);
+  const reserva = {
+    id, date: data, time: hora,
+    endTime: hhmm(minutos(hora) + cfg.duracaoMin),
+    name: nome, email, phone: telefone, subject: assunto, notes: '',
+    status: 'pendente', origem: 'admin', inviteMessage: recado,
+    createdAt: new Date().toISOString(), meetingLink: '',
+  };
+
+  const chave = `bk:${data}:${hora}`;
+  await env.AGENDA.put(chave, JSON.stringify(reserva));
+  await env.AGENDA.put('bkid:' + id, chave);
+
+  // confirma na hora -> dispara o e-mail com link + .ics para o cliente
+  const r = await confirmarReserva(env, id, link);
+  if (r.erro) return json({ erro: r.erro }, 500);
+  return json({
+    ok: true,
+    emailEnviado: r.emailEnviado,
+    motivoFalha: r.motivoFalha,
+    resumo: { extenso: dataPorExtenso(data, hora), hora, fim: reserva.endTime },
+  });
+}
+
 async function avisarKarina(env, cfg, reserva) {
   const base = env.SITE_URL || 'https://kaiarquitetura.com.br';
   const tConf = await tokenAcao(env, reserva.id, 'confirmar');
@@ -677,8 +723,15 @@ async function confirmarReserva(env, id, linkManual) {
   await env.AGENDA.put(chave, JSON.stringify(reserva));
 
   const ics = montarICS(reserva, cfg, cfg.emailAviso);
+  const saudacao = reserva.origem === 'admin'
+    ? `Ola, ${escapar(reserva.name.split(' ')[0])}! A KAI Arquitetura reservou um horario para conversarmos.`
+    : `Ola, ${escapar(reserva.name.split(' ')[0])}! Sua reuniao com a KAI Arquitetura foi confirmada.`;
+  const recado = reserva.inviteMessage
+    ? `<p style="font-size:15px;line-height:1.7;margin:0 0 20px;background:#FBF1EC;border-radius:12px;padding:14px 16px;">${escapar(reserva.inviteMessage).replace(/\n/g, '<br>')}</p>`
+    : '';
   const html = moldura('Sua reuniao esta confirmada', `
-    <p style="font-size:15px;line-height:1.7;margin:0 0 20px;">Ola, ${escapar(reserva.name.split(' ')[0])}! Sua reuniao com a KAI Arquitetura foi confirmada.</p>
+    <p style="font-size:15px;line-height:1.7;margin:0 0 20px;">${saudacao}</p>
+    ${recado}
     ${linhas([
       ['Quando', `<strong>${escapar(dataPorExtenso(reserva.date, reserva.time))}</strong><br>${reserva.time} as ${reserva.endTime} (horario de Brasilia)`],
       ['Duracao', `${cfg.duracaoMin} minutos`],
@@ -832,11 +885,9 @@ async function tarefaAgendada(env) {
   const agoraMs = Date.now();
   const reservas = await todasReservas(env);
 
-  // Manha: usa o horario do resumo (padrao 07h). Vale para o resumo e para
-  // a cobranca das reunioes do dia que ainda nao foram confirmadas.
-  const manhaAlvo = cfg.avisoDiario && RE_HORA.test(cfg.avisoDiario) ? cfg.avisoDiario : '07:00';
-  const naJanelaManha = (alvoStr) => {
-    const a = minutos(alvoStr);
+  const naJanelaManha = () => {
+    if (!cfg.avisoDiario || !RE_HORA.test(cfg.avisoDiario)) return false;
+    const a = minutos(cfg.avisoDiario);
     return agoraMin >= a && agoraMin < a + 5; // janela de 5 min = 1 disparo por dia
   };
 
@@ -851,11 +902,11 @@ async function tarefaAgendada(env) {
   };
 
   // ---- 1) resumo da agenda do dia ----
-  if (cfg.avisoDiario && RE_HORA.test(cfg.avisoDiario) && naJanelaManha(cfg.avisoDiario)) {
-    if (!(await env.AGENDA.get('digest:' + hoje))) {
-      await env.AGENDA.put('digest:' + hoje, '1', { expirationTtl: 60 * 60 * 36 });
-      await avisoTelegram(env, textoResumo(reservas.filter((r) => r.date === hoje), hoje));
-    }
+  // Ja inclui as reunioes de hoje ainda nao confirmadas, com link de confirmar:
+  // e aqui que chega o lembrete "confirme a reuniao de hoje".
+  if (naJanelaManha() && !(await env.AGENDA.get('digest:' + hoje))) {
+    await env.AGENDA.put('digest:' + hoje, '1', { expirationTtl: 60 * 60 * 36 });
+    await avisoTelegram(env, await textoResumo(env, reservas.filter((r) => r.date === hoje), hoje));
   }
 
   // ---- 2) lembretes por reserva ----
@@ -875,14 +926,10 @@ async function tarefaAgendada(env) {
       continue;
     }
 
-    // reuniao NAO confirmada: cobra ~26h antes e de novo na manha do dia
-    if (!r.nudge26 && faltamMin <= 26 * 60 && faltamMin > 26 * 60 - 15) {
-      await cobrarConfirmacao(env, r, 'Reuniao daqui a ~26h ainda nao confirmada');
-      await marcar(r, 'nudge26');
-    }
-    if (!r.nudge7h && r.date === hoje && naJanelaManha(manhaAlvo)) {
-      await cobrarConfirmacao(env, r, 'Reuniao HOJE ainda nao confirmada');
-      await marcar(r, 'nudge7h');
+    // reuniao NAO confirmada: cobra ~24h antes (a cobranca do dia sai no resumo)
+    if (!r.nudge24 && faltamMin <= 24 * 60 && faltamMin > 24 * 60 - 15) {
+      await cobrarConfirmacao(env, r, 'Reuniao amanha ainda nao confirmada');
+      await marcar(r, 'nudge24');
     }
   }
 }
@@ -901,16 +948,28 @@ async function cobrarConfirmacao(env, r, titulo) {
   await avisoTelegram(env, msg);
 }
 
-function textoResumo(reservas, hoje) {
+async function textoResumo(env, reservas, hoje) {
   const cab = 'Bom dia! Agenda de ' + dataParaBR(hoje);
   if (!reservas.length) return cab + '\n\nNenhuma reuniao marcada para hoje.';
 
-  const linhas = reservas.map((r) => {
-    const marca = r.status === 'confirmada' ? '[ok]' : '[a confirmar]';
-    return `${r.time}-${r.endTime}  ${r.name} ${marca}` + (r.subject ? `\n   ${r.subject}` : '');
-  });
+  const base = env.SITE_URL || 'https://kaiarquitetura.com.br';
+  const linhas = [];
+  for (const r of reservas) {
+    if (r.status === 'confirmada') {
+      linhas.push(`${r.time}-${r.endTime}  ${r.name} [ok]` + (r.subject ? `\n   ${r.subject}` : ''));
+    } else {
+      let s = `${r.time}-${r.endTime}  ${r.name} [A CONFIRMAR]` + (r.subject ? `\n   ${r.subject}` : '');
+      const tConf = await tokenAcao(env, r.id, 'confirmar');
+      const tRec = await tokenAcao(env, r.id, 'recusar');
+      if (tConf) {
+        s += `\n   Confirmar: ${base}/api/acao?id=${r.id}&a=confirmar&t=${tConf}` +
+             `\n   Recusar: ${base}/api/acao?id=${r.id}&a=recusar&t=${tRec}`;
+      }
+      linhas.push(s);
+    }
+  }
   const pendentes = reservas.filter((r) => r.status !== 'confirmada').length;
-  const rodape = pendentes ? `\n\n${pendentes} reuniao(oes) ainda esperando sua confirmacao.` : '';
+  const rodape = pendentes ? `\n\n${pendentes} reuniao(oes) esperando sua confirmacao (links acima).` : '';
   return `${cab}\n\n${linhas.join('\n')}${rodape}`;
 }
 
@@ -973,6 +1032,8 @@ export default {
         }
 
         if (rota === '/api/admin/reservas' && metodo === 'GET') return await rotaReservas(env);
+
+        if (rota === '/api/admin/convidar' && metodo === 'POST') return await rotaConvidar(req, env);
 
         if (rota === '/api/admin/confirmar' && metodo === 'POST') {
           const { id, link } = await req.json();

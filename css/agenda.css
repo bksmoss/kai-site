@@ -35,7 +35,7 @@ img { max-width: 100%; height: auto; display: block; }
 
 /* ---------- topo ---------- */
 .ag-top { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 2rem; }
-.ag-top img { height: 34px; width: auto; }
+.ag-top img { height: 52px; width: auto; }
 .ag-top__note { font-size: 0.78rem; color: var(--muted); letter-spacing: 0.04em; }
 
 /* ---------- cartao principal ---------- */

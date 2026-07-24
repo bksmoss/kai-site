@@ -81,7 +81,69 @@
       document.querySelectorAll('.adm-panel').forEach(function (p) { p.classList.remove('is-active'); });
       aba.classList.add('is-active');
       document.querySelector('[data-painel="' + aba.dataset.aba + '"]').classList.add('is-active');
+      if (aba.dataset.aba === 'convite') carregarConviteHorarios();
     });
+  });
+
+  /* ================= enviar convite ================= */
+  var conviteDias = {};
+
+  function carregarConviteHorarios() {
+    return fetch('/api/horarios', { headers: { accept: 'application/json' } })
+      .then(function (r) { return r.json(); })
+      .then(function (d) {
+        conviteDias = d.dias || {};
+        var dias = Object.keys(conviteDias).sort();
+        $('convDia').innerHTML = '<option value="">Escolha…</option>' +
+          dias.map(function (dt) { return '<option value="' + dt + '">' + escapar(porExtenso(dt)) + '</option>'; }).join('');
+        if (!dias.length) $('convDia').innerHTML = '<option value="">Nenhum horário livre</option>';
+        if (cfg && cfg.linkReuniao && !$('convLink').value) $('convLink').value = cfg.linkReuniao;
+      })
+      .catch(function () { aviso('conviteErro', 'Não consegui carregar os horários. Tente de novo.'); });
+  }
+
+  $('convDia').addEventListener('change', function () {
+    var horas = conviteDias[$('convDia').value] || [];
+    var sel = $('convHora');
+    sel.disabled = !horas.length;
+    sel.innerHTML = horas.length
+      ? '<option value="">Escolha…</option>' + horas.map(function (h) { return '<option value="' + h + '">' + h + '</option>'; }).join('')
+      : '<option value="">—</option>';
+  });
+
+  $('formConvite').addEventListener('submit', function (e) {
+    e.preventDefault();
+    aviso('conviteErro', '');
+    var corpo = {
+      data: $('convDia').value, hora: $('convHora').value,
+      nome: $('convNome').value.trim(), email: $('convEmail').value.trim(),
+      telefone: $('convTelefone').value.trim(), assunto: $('convAssunto').value.trim(),
+      link: $('convLink').value.trim(), mensagem: $('convMsg').value.trim(),
+    };
+    if (!corpo.data || !corpo.hora) return aviso('conviteErro', 'Escolha o dia e o horário.');
+    if (corpo.nome.length < 2) return aviso('conviteErro', 'Informe o nome do cliente.');
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(corpo.email)) return aviso('conviteErro', 'Informe um e‑mail válido.');
+
+    var botao = $('convEnviar');
+    botao.disabled = true;
+    botao.textContent = 'Enviando…';
+
+    api('convidar', { method: 'POST', body: JSON.stringify(corpo) })
+      .then(function (d) {
+        $('formConvite').reset();
+        $('convHora').innerHTML = '<option value="">Escolha o dia primeiro</option>';
+        $('convHora').disabled = true;
+        aviso('avisoGeral', d.emailEnviado
+          ? 'Convite enviado! O cliente recebeu o e‑mail com o link e o convite de calendário.'
+          : 'Reunião criada, mas o <strong>e‑mail não saiu</strong> (' + escapar(d.motivoFalha || 'sem detalhe') + '). Avise o cliente por WhatsApp.',
+          d.emailEnviado ? 'ag-ok' : 'ag-aviso');
+        document.querySelector('[data-aba="reunioes"]').click();
+        return carregarReservas();
+      })
+      .catch(function (err) {
+        if (err.message !== 'sessao') aviso('conviteErro', escapar(err.message));
+      })
+      .finally(function () { botao.disabled = false; botao.textContent = 'Enviar convite ao cliente'; });
   });
 
   /* ================= reuniões ================= */
@@ -269,6 +331,45 @@
     cfg.bloqueios = (cfg.bloqueios || []).concat([{ inicio: hoje, fim: somarDias(hoje, 6), motivo: 'Semana travada' }]);
     marcarSujo();
     desenharBloqueios();
+  });
+
+  // Feriados nacionais 2026-2027 (datas móveis já calculadas). Carnaval e
+  // Corpus Christi são pontos facultativos, mas escritórios costumam fechar.
+  var FERIADOS = [
+    { inicio: '2026-09-07', fim: '2026-09-07', motivo: 'Independência' },
+    { inicio: '2026-10-12', fim: '2026-10-12', motivo: 'N. Sra. Aparecida' },
+    { inicio: '2026-11-02', fim: '2026-11-02', motivo: 'Finados' },
+    { inicio: '2026-11-15', fim: '2026-11-15', motivo: 'Proclamação da República' },
+    { inicio: '2026-11-20', fim: '2026-11-20', motivo: 'Consciência Negra' },
+    { inicio: '2026-12-25', fim: '2026-12-25', motivo: 'Natal' },
+    { inicio: '2027-01-01', fim: '2027-01-01', motivo: 'Confraternização Universal' },
+    { inicio: '2027-02-08', fim: '2027-02-09', motivo: 'Carnaval' },
+    { inicio: '2027-03-26', fim: '2027-03-26', motivo: 'Sexta-feira Santa' },
+    { inicio: '2027-04-21', fim: '2027-04-21', motivo: 'Tiradentes' },
+    { inicio: '2027-05-01', fim: '2027-05-01', motivo: 'Dia do Trabalho' },
+    { inicio: '2027-05-27', fim: '2027-05-27', motivo: 'Corpus Christi' },
+    { inicio: '2027-09-07', fim: '2027-09-07', motivo: 'Independência' },
+    { inicio: '2027-10-12', fim: '2027-10-12', motivo: 'N. Sra. Aparecida' },
+    { inicio: '2027-11-02', fim: '2027-11-02', motivo: 'Finados' },
+    { inicio: '2027-11-15', fim: '2027-11-15', motivo: 'Proclamação da República' },
+    { inicio: '2027-11-20', fim: '2027-11-20', motivo: 'Consciência Negra' },
+    { inicio: '2027-12-25', fim: '2027-12-25', motivo: 'Natal' },
+  ];
+
+  $('addFeriados').addEventListener('click', function () {
+    cfg.bloqueios = cfg.bloqueios || [];
+    var existe = function (f) {
+      return cfg.bloqueios.some(function (b) { return b.inicio === f.inicio && b.fim === f.fim; });
+    };
+    var novos = FERIADOS.filter(function (f) { return f.fim >= hoje && !existe(f); });
+    if (!novos.length) {
+      aviso('avisoGeral', 'Os feriados que ainda estão por vir já estão na lista.', 'ag-ok');
+      return;
+    }
+    cfg.bloqueios = cfg.bloqueios.concat(novos);
+    marcarSujo();
+    desenharBloqueios();
+    aviso('avisoGeral', novos.length + ' feriado(s) adicionado(s). Confira e clique em <strong>Salvar alterações</strong>.', 'ag-ok');
   });
 
   /* ================= config ================= */

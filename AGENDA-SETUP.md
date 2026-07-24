@@ -64,11 +64,11 @@ O envio usa o [Resend](https://resend.com) — plano gratuito de 3.000 e‑mails
 O Telegram é a central de avisos só sua, separada do WhatsApp (onde ficam clientes e fornecedores). Depois de conectado, ele entrega **três coisas**:
 
 1. **Novo pedido de reunião** — na hora, com botões *Confirmar* e *Recusar* (resolve tudo pelo celular, sem abrir o painel)
-2. **Resumo da agenda toda manhã** — a lista de reuniões do dia, no horário que você escolher (padrão 7h)
-3. **Cobrança de reunião não confirmada** — se você ainda não confirmou um pedido, o Telegram te lembra **~26h antes** da reunião e **de novo na manhã do dia** (no mesmo horário do resumo), sempre com os botões de confirmar/recusar
+2. **Resumo da agenda toda manhã** — a lista de reuniões do dia, no horário que você escolher (padrão 7h). As reuniões do dia ainda **não confirmadas** aparecem aqui já com o link de confirmar — é o lembrete "confirme a reunião de hoje"
+3. **Cobrança 24h antes** — se você ainda não confirmou um pedido, o Telegram te lembra cerca de **1 dia antes** da reunião, com os botões de confirmar/recusar
 4. **Lembrete 30 min antes** — só para reuniões **já confirmadas**, com o link da sala
 
-Os itens 2 e 4 você liga/desliga e ajusta no painel → aba **Ajustes** → *Avisos no Telegram*. As cobranças (item 3) acompanham o horário do resumo da manhã.
+Os itens 2 e 4 você liga/desliga e ajusta no painel → aba **Ajustes** → *Avisos no Telegram*.
 
 ### Como conectar
 1. No Telegram, converse com **@BotFather** → `/newbot` → escolha um nome → ele devolve um **token**

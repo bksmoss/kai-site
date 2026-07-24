@@ -14,7 +14,7 @@
 
   <!-- ===== login ===== -->
   <div class="adm-login" id="telaLogin" hidden>
-    <img src="img/logo.png" alt="KAI Arquitetura" style="height:30px;margin-bottom:1.4rem;">
+    <img src="img/logo-wordmark.png" alt="KAI Arquitetura" style="height:52px;margin-bottom:1.4rem;">
     <h1>Painel da agenda</h1>
     <p>Área restrita da administradora.</p>
     <div id="erroLogin"></div>
@@ -32,7 +32,7 @@
 
     <div class="adm-head">
       <div>
-        <img src="img/logo.png" alt="KAI Arquitetura" style="height:26px;margin-bottom:0.5rem;">
+        <img src="img/logo-wordmark.png" alt="KAI Arquitetura" style="height:44px;margin-bottom:0.5rem;">
         <h1>Agenda de reuniões</h1>
       </div>
       <div style="display:flex;gap:0.6rem;align-items:center;">
@@ -45,6 +45,7 @@
 
     <div class="adm-tabs">
       <button class="adm-tab is-active" data-aba="reunioes">Reuniões</button>
+      <button class="adm-tab" data-aba="convite">Enviar convite</button>
       <button class="adm-tab" data-aba="horarios">Meus horários</button>
       <button class="adm-tab" data-aba="folgas">Férias e bloqueios</button>
       <button class="adm-tab" data-aba="ajustes">Ajustes</button>
@@ -61,6 +62,67 @@
         <h2>Já aconteceram</h2>
         <p class="adm-box__hint">Histórico das reuniões que já passaram da data.</p>
         <div id="listaPassadas"></div>
+      </div>
+    </section>
+
+    <!-- ---- enviar convite ---- -->
+    <section class="adm-panel" data-painel="convite">
+      <div class="adm-box">
+        <h2>Convidar um cliente</h2>
+        <p class="adm-box__hint">Você escolhe o horário e preenche os dados. O cliente recebe por e‑mail o convite já confirmado, com o link da reunião e o convite de calendário — sem precisar entrar no site.</p>
+
+        <div id="conviteErro"></div>
+
+        <form id="formConvite">
+          <div class="ag-row">
+            <div class="ag-field">
+              <label for="convDia">Dia *</label>
+              <select class="ag-select" id="convDia" required>
+                <option value="">Carregando horários…</option>
+              </select>
+            </div>
+            <div class="ag-field">
+              <label for="convHora">Horário *</label>
+              <select class="ag-select" id="convHora" required disabled>
+                <option value="">Escolha o dia primeiro</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="ag-row">
+            <div class="ag-field">
+              <label for="convNome">Nome do cliente *</label>
+              <input class="ag-input" id="convNome" type="text" required maxlength="80">
+            </div>
+            <div class="ag-field">
+              <label for="convEmail">E‑mail do cliente *</label>
+              <input class="ag-input" id="convEmail" type="email" required maxlength="120">
+            </div>
+          </div>
+
+          <div class="ag-row">
+            <div class="ag-field">
+              <label for="convTelefone">WhatsApp (opcional)</label>
+              <input class="ag-input" id="convTelefone" type="tel" maxlength="30" placeholder="(11) 90000-0000">
+            </div>
+            <div class="ag-field">
+              <label for="convAssunto">Assunto (opcional)</label>
+              <input class="ag-input" id="convAssunto" type="text" maxlength="120">
+            </div>
+          </div>
+
+          <div class="ag-field">
+            <label for="convLink">Link da reunião (opcional — usa o link padrão se vazio)</label>
+            <input class="ag-input" id="convLink" type="url" placeholder="https://meet.google.com/...">
+          </div>
+
+          <div class="ag-field">
+            <label for="convMsg">Mensagem para o cliente (opcional)</label>
+            <textarea class="ag-textarea" id="convMsg" maxlength="800" placeholder="Ex.: Olá! Segue o convite para conversarmos sobre o seu projeto."></textarea>
+          </div>
+
+          <button type="submit" class="ag-btn" id="convEnviar">Enviar convite ao cliente</button>
+        </form>
       </div>
     </section>
 
@@ -105,6 +167,7 @@
         <div style="display:flex;gap:0.6rem;margin-top:1rem;flex-wrap:wrap;">
           <button class="ag-btn ag-btn--ghost ag-btn--sm" id="addBloqueio">+ Adicionar período</button>
           <button class="ag-btn ag-btn--ghost ag-btn--sm" id="travarSemana">Travar os próximos 7 dias</button>
+          <button class="ag-btn ag-btn--ghost ag-btn--sm" id="addFeriados">Adicionar feriados nacionais</button>
         </div>
       </div>
     </section>
