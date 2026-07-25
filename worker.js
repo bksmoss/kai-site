@@ -31,7 +31,7 @@ const CONFIG_PADRAO = {
   linkReuniao: '',         // link fixo da sala (Google Meet / Zoom / Teams)
   plataforma: 'Google Meet',
   emailAviso: 'contato@kaiarquitetura.com.br',
-  mensagemTopo: 'Escolha o melhor dia e horario para conversarmos sobre o seu projeto.',
+  mensagemTopo: 'Escolha o melhor dia e horário para conversarmos sobre o seu projeto.',
   avisoDiario: '07:00',    // horario do resumo da agenda no Telegram ('' = desligado)
   lembrete30Min: true,     // lembrete no Telegram 30 min antes de cada reuniao
   lembreteClienteDia: true, // e-mail de lembrete ao cliente na manha da reuniao
@@ -280,27 +280,27 @@ async function horariosLivres(env, cfg, de, ate) {
 // Validacao do convite da admin: qualquer dia (>= hoje) e horario,
 // desde que nao sobreponha uma reuniao ja marcada.
 async function conflitoConvite(env, cfg, data, hora) {
-  if (!dataValida(data) || !RE_HORA.test(hora)) return 'Data ou horario invalido.';
-  if (data < hojeNoFuso(cfg.timezone)) return 'Nao e possivel agendar em uma data que ja passou.';
+  if (!dataValida(data) || !RE_HORA.test(hora)) return 'Data ou horário inválido.';
+  if (data < hojeNoFuso(cfg.timezone)) return 'Não é possível agendar em uma data que já passou.';
   const ocupados = await intervalosOcupados(env, data, data);
   const m = minutos(hora);
   const conflito = (ocupados[data] || []).find(([s, e]) => m < e && s < m + cfg.duracaoMin);
-  if (conflito) return `Esse horario conflita com a reuniao das ${hhmm(conflito[0])}.`;
+  if (conflito) return `Esse horário conflita com a reunião das ${hhmm(conflito[0])}.`;
   return null;
 }
 
 // Confere se um horario especifico continua valido (usado na hora de reservar).
 async function horarioValido(env, cfg, data, hora) {
-  if (!dataValida(data) || !RE_HORA.test(hora)) return 'Data ou horario invalido.';
-  if (estaBloqueado(cfg, data)) return 'Esse dia nao esta disponivel.';
+  if (!dataValida(data) || !RE_HORA.test(hora)) return 'Data ou horário inválido.';
+  if (estaBloqueado(cfg, data)) return 'Esse dia não está disponível.';
 
   const hoje = hojeNoFuso(cfg.timezone);
-  if (data < hoje) return 'Nao e possivel agendar em uma data que ja passou.';
-  if (data > somarDias(hoje, cfg.diasAFrente)) return 'Essa data esta muito distante.';
+  if (data < hoje) return 'Não é possível agendar em uma data que já passou.';
+  if (data > somarDias(hoje, cfg.diasAFrente)) return 'Essa data está muito distante.';
 
   const minimo = Date.now() + cfg.antecedenciaHoras * 3600 * 1000;
   if (instante(data, hora, cfg.timezone).getTime() < minimo) {
-    return `As reunioes precisam ser marcadas com pelo menos ${cfg.antecedenciaHoras}h de antecedencia.`;
+    return `As reuniões precisam ser marcadas com pelo menos ${cfg.antecedenciaHoras}h de antecedência.`;
   }
 
   const passo = cfg.duracaoMin + cfg.intervaloMin;
@@ -311,9 +311,9 @@ async function horarioValido(env, cfg, data, hora) {
     const m = minutos(hora);
     return m >= ini && m + cfg.duracaoMin <= termino && (m - ini) % passo === 0;
   });
-  if (!encaixa) return 'Esse horario nao esta na agenda.';
+  if (!encaixa) return 'Esse horário não está na agenda.';
 
-  if (await env.AGENDA.get('bk:' + data + ':' + hora)) return 'Esse horario acabou de ser reservado. Escolha outro, por favor.';
+  if (await env.AGENDA.get('bk:' + data + ':' + hora)) return 'Esse horário acabou de ser reservado. Escolha outro, por favor.';
   return null;
 }
 
@@ -363,13 +363,13 @@ async function avisoFormSubmit(env, reserva) {
         referer: base + '/agendar-reuniao',
       },
       body: JSON.stringify({
-        _subject: `Nova reuniao solicitada — ${reserva.date} as ${reserva.time}`,
+        _subject: `Nova reunião solicitada — ${reserva.date} às ${reserva.time}`,
         Nome: reserva.name,
         Email: reserva.email,
         Telefone: reserva.phone || '-',
         Assunto: reserva.subject || '-',
         Dia: dataParaBR(reserva.date),
-        Horario: `${reserva.time} - ${reserva.endTime}`,
+        Horário: `${reserva.time} - ${reserva.endTime}`,
         Mensagem: reserva.notes || '-',
         Painel: base + '/kai-agenda-admin',
       }),
@@ -438,7 +438,7 @@ function montarICS(reserva, cfg, organizador) {
   const fim = new Date(ini.getTime() + cfg.duracaoMin * 60000);
   const link = reserva.meetingLink || '';
   const descricao = [
-    `Reuniao com ${escICS(reserva.name)}.`,
+    `Reunião com ${escICS(reserva.name)}.`,
     reserva.subject ? `Assunto: ${escICS(reserva.subject)}` : '',
     link ? `Link: ${escICS(link)}` : '',
   ].filter(Boolean).join('\\n');
@@ -454,7 +454,7 @@ function montarICS(reserva, cfg, organizador) {
     `DTSTAMP:${paraICS(new Date())}`,
     `DTSTART:${paraICS(ini)}`,
     `DTEND:${paraICS(fim)}`,
-    'SUMMARY:Reuniao — KAI Arquitetura',
+    'SUMMARY:Reunião — KAI Arquitetura',
     `DESCRIPTION:${descricao}`,
     link ? `LOCATION:${escICS(link)}` : 'LOCATION:Online',
     `ORGANIZER;CN=KAI Arquitetura:mailto:${organizador}`,
@@ -463,7 +463,7 @@ function montarICS(reserva, cfg, organizador) {
     'BEGIN:VALARM',
     'TRIGGER:-PT30M',
     'ACTION:DISPLAY',
-    'DESCRIPTION:Reuniao KAI Arquitetura em 30 minutos',
+    'DESCRIPTION:Reunião KAI Arquitetura em 30 minutos',
     'END:VALARM',
     'END:VEVENT',
     'END:VCALENDAR',
@@ -601,7 +601,7 @@ async function rotaAgendar(req, env, ctx) {
   try {
     dados = await req.json();
   } catch {
-    return json({ erro: 'Pedido invalido.' }, 400);
+    return json({ erro: 'Pedido inválido.' }, 400);
   }
 
   // campo-isca: preenchido = robo. Responde "ok" sem gravar nada.
@@ -618,7 +618,7 @@ async function rotaAgendar(req, env, ctx) {
   const hora = String(dados.hora || '');
 
   if (nome.length < 2) return json({ erro: 'Informe seu nome.' }, 400);
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) return json({ erro: 'Informe um e-mail valido.' }, 400);
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) return json({ erro: 'Informe um e-mail válido.' }, 400);
 
   const cfg = await lerConfig(env);
   const problema = await horarioValido(env, cfg, data, hora);
@@ -645,7 +645,7 @@ async function rotaAgendar(req, env, ctx) {
   return json({
     ok: true,
     id,
-    mensagem: 'Pedido enviado! Voce recebera a confirmacao por e-mail.',
+    mensagem: 'Pedido enviado! Você receberá a confirmação por e-mail.',
     resumo: { data, hora, fim: reserva.endTime, extenso: dataParaBR(data) },
   });
 }
@@ -654,7 +654,7 @@ async function rotaAgendar(req, env, ctx) {
 // envia ao cliente um e-mail pedindo que ele CONFIRME a presenca.
 async function rotaConvidar(req, env) {
   let dados;
-  try { dados = await req.json(); } catch { return json({ erro: 'Pedido invalido.' }, 400); }
+  try { dados = await req.json(); } catch { return json({ erro: 'Pedido inválido.' }, 400); }
 
   const nome = String(dados.nome || '').trim().slice(0, 80);
   const email = String(dados.email || '').trim().slice(0, 120);
@@ -666,7 +666,7 @@ async function rotaConvidar(req, env) {
   const hora = String(dados.hora || '');
 
   if (nome.length < 2) return json({ erro: 'Informe o nome do cliente.' }, 400);
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) return json({ erro: 'Informe um e-mail valido.' }, 400);
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) return json({ erro: 'Informe um e-mail válido.' }, 400);
 
   const cfg = await lerConfig(env);
   const problema = await conflitoConvite(env, cfg, data, hora);
@@ -739,39 +739,42 @@ async function avisarKarina(env, cfg, reserva) {
   const urlConf = tConf ? `${base}/api/acao?id=${reserva.id}&a=confirmar&t=${tConf}` : `${base}/kai-agenda-admin`;
   const urlRec = tRec ? `${base}/api/acao?id=${reserva.id}&a=recusar&t=${tRec}` : `${base}/kai-agenda-admin`;
 
-  const html = moldura('Novo pedido de reuniao', `
+  const html = moldura('Novo pedido de reunião', `
     ${linhas([
-      ['Quando', `<strong>${escapar(dataPorExtenso(reserva.date, reserva.time))}</strong><br>${reserva.time} as ${reserva.endTime} (horario de Brasilia)`],
+      ['Quando', `<strong>${escapar(dataPorExtenso(reserva.date, reserva.time))}</strong><br>${reserva.time} às ${reserva.endTime} (horário de Brasília)`],
       ['Nome', escapar(reserva.name)],
       ['E-mail', `<a href="mailto:${escapar(reserva.email)}" style="color:#D87C63;">${escapar(reserva.email)}</a>`],
       ['Telefone', reserva.phone ? `<a href="https://wa.me/55${reserva.phone.replace(/\D/g, '')}" style="color:#D87C63;">${escapar(reserva.phone)}</a>` : ''],
       ['Assunto', escapar(reserva.subject)],
-      ['Observacoes', escapar(reserva.notes).replace(/\n/g, '<br>')],
+      ['Observações', escapar(reserva.notes).replace(/\n/g, '<br>')],
     ])}
-    <p style="margin:24px 0 12px;font-size:14px;color:#555;">O horario ja esta reservado. Confirme para o cliente receber o link da reuniao:</p>
-    <p style="margin:0 0 10px;">${botao(urlConf, 'Confirmar reuniao', '#D87C63')}</p>
-    <p style="margin:0;"><a href="${escapar(urlRec)}" style="color:#8a8078;font-size:13px;">Recusar e liberar o horario</a>
-    &nbsp;·&nbsp; <a href="${base}/kai-agenda-admin" style="color:#8a8078;font-size:13px;">Abrir painel</a></p>
+    <p style="margin:24px 0 12px;font-size:14px;color:#555;line-height:1.6;">O horário já está reservado. Para <strong>enviar o link da reunião</strong> ao cliente, confirme <strong>pelo painel</strong> (cole o link e clique em Confirmar):</p>
+    <p style="margin:0 0 14px;">${botao(base + '/kai-agenda-admin', 'Abrir painel e confirmar', '#D87C63')}</p>
+    <p style="margin:0;font-size:13px;color:#8a8078;line-height:1.7;">Ou confirme por aqui mesmo — mas o cliente recebe a confirmação <strong>sem o link</strong> (você envia o link depois, pelo painel):<br>
+      <a href="${escapar(urlConf)}" style="color:#8a8078;">Confirmar sem o link</a>
+      &nbsp;·&nbsp;
+      <a href="${escapar(urlRec)}" style="color:#8a8078;">Recusar e liberar o horário</a></p>
   `);
 
-  const texto = `Novo pedido de reuniao\n${dataPorExtenso(reserva.date, reserva.time)} — ${reserva.time} as ${reserva.endTime}\n` +
+  const texto = `Novo pedido de reunião\n${dataPorExtenso(reserva.date, reserva.time)} — ${reserva.time} às ${reserva.endTime}\n` +
     `${reserva.name} · ${reserva.email}${reserva.phone ? ' · ' + reserva.phone : ''}\n` +
     `${reserva.subject ? 'Assunto: ' + reserva.subject + '\n' : ''}${reserva.notes ? reserva.notes + '\n' : ''}\n` +
-    `Confirmar: ${urlConf}\nRecusar: ${urlRec}`;
+    `Para enviar o link, confirme pelo painel: ${base}/kai-agenda-admin\n\n` +
+    `Confirmar sem o link: ${urlConf}\nRecusar: ${urlRec}`;
 
   const email = await enviarEmail(env, {
-    para: cfg.emailAviso, assunto: `Nova reuniao — ${dataParaBR(reserva.date)} as ${reserva.time} — ${reserva.name}`,
+    para: cfg.emailAviso, assunto: `Nova reunião — ${dataParaBR(reserva.date)} às ${reserva.time} — ${reserva.name}`,
     html, texto,
   });
   // Se o Resend ainda nao estiver configurado, tenta o FormSubmit do site.
   const formsubmit = email.ok ? { ok: false, motivo: 'nao precisou' } : await avisoFormSubmit(env, reserva);
 
   const telegram = await avisoTelegram(env,
-    `Nova reuniao solicitada\n${dataParaBR(reserva.date)} as ${reserva.time}\n${reserva.name} — ${reserva.email}` +
+    `Nova reunião solicitada\n${dataParaBR(reserva.date)} às ${reserva.time}\n${reserva.name} — ${reserva.email}` +
     `${reserva.subject ? '\n' + reserva.subject : ''}\n\nConfirmar:\n${urlConf}\n\nRecusar:\n${urlRec}`);
 
-  const ntfy = await avisoNtfy(env, 'Nova reuniao solicitada',
-    `${reserva.name} — ${dataParaBR(reserva.date)} as ${reserva.time}\nConfirmar: ${urlConf}`);
+  const ntfy = await avisoNtfy(env, 'Nova reunião solicitada',
+    `${reserva.name} — ${dataParaBR(reserva.date)} às ${reserva.time}\nConfirmar: ${urlConf}`);
 
   // Guarda o resultado na propria reserva: se nenhum canal funcionou, o painel avisa.
   const canais = { email, formsubmit, telegram, ntfy };
@@ -803,7 +806,7 @@ async function buscarReserva(env, id) {
 // Confirma uma reserva e envia ao cliente o e-mail de CONFIRMACAO (com .ics).
 async function confirmarReserva(env, id, linkManual) {
   const achado = await buscarReserva(env, id);
-  if (!achado) return { erro: 'Reuniao nao encontrada (pode ter sido cancelada).' };
+  if (!achado) return { erro: 'Reunião não encontrada (pode ter sido cancelada).' };
   const { reserva, chave } = achado;
   const cfg = await lerConfig(env);
 
@@ -838,12 +841,12 @@ async function confirmarReserva(env, id, linkManual) {
 // Envia ao cliente SÓ o link da reunião (e-mail "Link para a reunião").
 async function enviarLinkReserva(env, id, linkManual) {
   const achado = await buscarReserva(env, id);
-  if (!achado) return { erro: 'Reuniao nao encontrada.' };
+  if (!achado) return { erro: 'Reunião não encontrada.' };
   const { reserva, chave } = achado;
   const cfg = await lerConfig(env);
 
   const link = (linkManual || reserva.meetingLink || '').trim();
-  if (!link) return { erro: 'Cole o link da reuniao antes de enviar.' };
+  if (!link) return { erro: 'Cole o link da reunião antes de enviar.' };
   reserva.meetingLink = link;
   reserva.linkEnviado = true;
   if (reserva.status !== 'confirmada') reserva.status = 'confirmada';
@@ -872,7 +875,7 @@ async function enviarLinkReserva(env, id, linkManual) {
 // Lembrete da reunião (e-mail "Lembrete: Reunião"). Usado pelo botao e pelo cron.
 async function enviarLembreteReserva(env, id) {
   const achado = await buscarReserva(env, id);
-  if (!achado) return { erro: 'Reuniao nao encontrada.' };
+  if (!achado) return { erro: 'Reunião não encontrada.' };
   const { reserva, chave } = achado;
   const cfg = await lerConfig(env);
   const link = (reserva.meetingLink || '').trim();
@@ -902,14 +905,14 @@ async function enviarLembreteReserva(env, id) {
 // Cliente confirmou o convite -> vira "confirmada" e recebe a confirmacao.
 async function confirmarConvite(env, id) {
   const achado = await buscarReserva(env, id);
-  if (!achado) return { erro: 'Convite nao encontrado (pode ter sido cancelado).' };
+  if (!achado) return { erro: 'Convite não encontrado (pode ter sido cancelado).' };
   if (achado.reserva.status === 'confirmada') return { reserva: achado.reserva, jaConfirmada: true };
   return confirmarReserva(env, id, '');
 }
 
 async function cancelarReserva(env, id, motivo, opts = {}) {
   const achado = await buscarReserva(env, id);
-  if (!achado) return { erro: 'Reuniao nao encontrada.' };
+  if (!achado) return { erro: 'Reunião não encontrada.' };
   const { reserva, chave } = achado;
   const cfg = await lerConfig(env);
 
@@ -1091,10 +1094,10 @@ async function notificarAdminCliente(env, cfg, tipo, reserva) {
 
 async function rotaLogin(req, env) {
   let dados;
-  try { dados = await req.json(); } catch { return json({ erro: 'Pedido invalido.' }, 400); }
+  try { dados = await req.json(); } catch { return json({ erro: 'Pedido inválido.' }, 400); }
 
   if (!env.ADMIN_PASSWORD || !env.SESSION_SECRET) {
-    return json({ erro: 'Painel ainda nao configurado (faltam os segredos ADMIN_PASSWORD e SESSION_SECRET).' }, 500);
+    return json({ erro: 'Painel ainda não configurado (faltam os segredos ADMIN_PASSWORD e SESSION_SECRET).' }, 500);
   }
   // pequeno atraso para desestimular tentativa de forca bruta
   await new Promise((r) => setTimeout(r, 400));
@@ -1222,7 +1225,7 @@ async function tarefaAgendada(env) {
       // 30 min antes — so para reuniao ja confirmada
       if (cfg.lembrete30Min && !r.lembrete30 && faltamMin <= 30) {
         const link = r.meetingLink || '';
-        await avisoTelegram(env, `Lembrete: reuniao em 30 min\n${r.time} — ${r.name}` +
+        await avisoTelegram(env, `Lembrete: reunião em 30 min\n${r.time} — ${r.name}` +
           (r.subject ? `\n${r.subject}` : '') + (link ? `\n${link}` : ''));
         await marcar(r, 'lembrete30');
       }
@@ -1230,19 +1233,19 @@ async function tarefaAgendada(env) {
       if (!r.nudgeLink && !r.linkEnviado && janela24) {
         const base = env.SITE_URL || 'https://kaiarquitetura.com.br';
         await avisoTelegram(env,
-          `Reuniao de amanha confirmada, mas voce ainda NAO enviou o link para o cliente\n` +
-          `${dataParaBR(r.date)} as ${r.time} — ${r.name}` +
+          `Reunião de amanhã confirmada, mas você ainda NÃO enviou o link para o cliente\n` +
+          `${dataParaBR(r.date)} às ${r.time} — ${r.name}` +
           `${r.subject ? '\n' + r.subject : ''}\n\nEnvie o link pelo painel:\n${base}/kai-agenda-admin`);
         await marcar(r, 'nudgeLink');
       }
       continue;
     }
 
-    // NAO confirmada: cobra ~24h antes (a cobranca do dia tambem sai no resumo)
+    // NÃO confirmada: cobra ~24h antes (a cobrança do dia também sai no resumo)
     if (!r.nudge24 && janela24) {
       const titulo = r.status === 'convite'
-        ? 'O cliente ainda nao confirmou o convite de amanha'
-        : 'Voce ainda nao confirmou a reuniao de amanha com o cliente';
+        ? 'O cliente ainda não confirmou o convite de amanhã'
+        : 'Você ainda não confirmou a reunião de amanhã com o cliente';
       await cobrarConfirmacao(env, r, titulo);
       await marcar(r, 'nudge24');
     }
@@ -1254,7 +1257,7 @@ async function cobrarConfirmacao(env, r, titulo) {
   const base = env.SITE_URL || 'https://kaiarquitetura.com.br';
   const tConf = await tokenAcao(env, r.id, 'confirmar');
   const tRec = await tokenAcao(env, r.id, 'recusar');
-  let msg = `${titulo}\n${dataParaBR(r.date)} as ${r.time} — ${r.name}`;
+  let msg = `${titulo}\n${dataParaBR(r.date)} às ${r.time} — ${r.name}`;
   if (r.subject) msg += `\n${r.subject}`;
   if (r.phone) msg += `\n${r.phone}`;
   msg += tConf
@@ -1265,7 +1268,7 @@ async function cobrarConfirmacao(env, r, titulo) {
 
 async function textoResumo(env, reservas, hoje) {
   const cab = 'Bom dia! Agenda de ' + dataParaBR(hoje);
-  if (!reservas.length) return cab + '\n\nNenhuma reuniao marcada para hoje.';
+  if (!reservas.length) return cab + '\n\nNenhuma reunião marcada para hoje.';
 
   const base = env.SITE_URL || 'https://kaiarquitetura.com.br';
   const linhas = [];
@@ -1289,8 +1292,8 @@ async function textoResumo(env, reservas, hoje) {
   const pendentes = reservas.filter((r) => r.status === 'pendente').length;
   const semLink = reservas.filter((r) => r.status === 'confirmada' && !r.linkEnviado).length;
   let rodape = '';
-  if (pendentes) rodape += `\n\n${pendentes} reuniao(oes) esperando sua confirmacao (links acima).`;
-  if (semLink) rodape += `\n${semLink} reuniao(oes) confirmada(s) sem link enviado — envie pelo painel.`;
+  if (pendentes) rodape += `\n\n${pendentes} reunião(ões) esperando sua confirmação (links acima).`;
+  if (semLink) rodape += `\n${semLink} reunião(ões) confirmada(s) sem link enviado — envie pelo painel.`;
   return `${cab}\n\n${linhas.join('\n')}${rodape}`;
 }
 
@@ -1331,7 +1334,7 @@ export default {
       }
 
       if (rota.startsWith('/api/admin/')) {
-        if (!(await exigirAdmin(req, env))) return json({ erro: 'Sessao expirada. Entre novamente.' }, 401);
+        if (!(await exigirAdmin(req, env))) return json({ erro: 'Sessão expirada. Entre novamente.' }, 401);
 
         if (rota === '/api/admin/config' && metodo === 'GET') {
           const cfg = await lerConfig(env);
@@ -1395,7 +1398,7 @@ export default {
         }
       }
 
-      return json({ erro: 'Rota nao encontrada.' }, 404);
+      return json({ erro: 'Rota não encontrada.' }, 404);
     } catch (e) {
       console.error('erro na agenda:', e && e.stack ? e.stack : e);
       return json({ erro: 'Erro interno. Tente novamente em instantes.' }, 500);
