@@ -37,6 +37,13 @@
       </div>
       <div style="display:flex;gap:0.6rem;align-items:center;">
         <a class="ag-btn ag-btn--ghost ag-btn--sm" href="/agendar-reuniao" target="_blank" rel="noopener">Ver página do cliente</a>
+        <div class="adm-sino">
+          <button class="adm-sino__btn" id="botaoSino" aria-label="Notificações" title="Notificações">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
+            <span class="adm-sino__badge" id="sinoBadge" hidden>0</span>
+          </button>
+          <div class="adm-sino__menu" id="sinoMenu" hidden></div>
+        </div>
         <button class="ag-btn ag-btn--ghost ag-btn--sm" id="botaoSair">Sair</button>
       </div>
     </div>
@@ -48,6 +55,7 @@
       <button class="adm-tab" data-aba="convite">Enviar convite</button>
       <button class="adm-tab" data-aba="horarios">Meus horários</button>
       <button class="adm-tab" data-aba="folgas">Férias e bloqueios</button>
+      <button class="adm-tab" data-aba="historico">Histórico</button>
       <button class="adm-tab" data-aba="ajustes">Ajustes</button>
     </div>
 
@@ -57,11 +65,6 @@
         <h2>Próximas reuniões</h2>
         <p class="adm-box__hint">Confirmar envia automaticamente o e‑mail com o link e o convite de calendário para o cliente. Recusar libera o horário na agenda.</p>
         <div id="listaProximas"><div class="ag-load"><div class="ag-spin"></div></div></div>
-      </div>
-      <div class="adm-box">
-        <h2>Já aconteceram</h2>
-        <p class="adm-box__hint">Histórico das reuniões que já passaram da data.</p>
-        <div id="listaPassadas"></div>
       </div>
     </section>
 
@@ -120,6 +123,15 @@
 
           <button type="submit" class="ag-btn" id="convEnviar">Enviar convite ao cliente</button>
         </form>
+      </div>
+    </section>
+
+    <!-- ---- histórico ---- -->
+    <section class="adm-panel" data-painel="historico">
+      <div class="adm-box">
+        <h2>Histórico de reuniões</h2>
+        <p class="adm-box__hint">Todas as reuniões, incluindo as que já aconteceram e as canceladas.</p>
+        <div id="listaHistorico"><div class="ag-load"><div class="ag-spin"></div></div></div>
       </div>
     </section>
 

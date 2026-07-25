@@ -640,6 +640,7 @@ async function rotaAgendar(req, env, ctx) {
 
   // A reserva ja esta gravada: se o aviso falhar, o cliente nao pode ser penalizado.
   ctx.waitUntil(avisarKarina(env, cfg, reserva).catch((e) => console.error('falha ao avisar:', e)));
+  ctx.waitUntil(registrarEvento(env, { tipo: 'novo', name: nome, email, date: data, time: hora }));
 
   return json({
     ok: true,
@@ -708,8 +709,7 @@ async function enviarConvite(env, cfg, reserva) {
     <p style="margin:24px 0 12px;font-size:15px;line-height:1.6;"><strong>É importante confirmar sua presença</strong> para garantirmos o horário.</p>
     <p style="margin:0 0 12px;">${botao(urlConf, 'Confirmar presença', '#1D9E75')}</p>
     <p style="margin:0;font-size:13px;">Não pode nesse horário?
-      <a href="${escapar(urlRec)}" style="color:#8a8078;">Cancelar</a> ·
-      <a href="${base}/agendar-reuniao" style="color:#8a8078;">escolher outro horário</a></p>
+      <a href="${escapar(urlRec)}" style="color:#8a8078;">Cancelar ou escolher outro horário</a></p>
     <p style="margin:22px 0 0;font-size:13px;color:#8a8078;">Ao confirmar, você recebe o link de acesso e o convite para a sua agenda.</p>
   `);
 
@@ -989,7 +989,10 @@ async function rotaAcao(req, env) {
 
   const r = await cancelarReserva(env, id, '');
   if (r.erro) return pagina('Não foi possível recusar', escapar(r.erro));
-  return pagina('Horário liberado', 'O horário voltou a ficar disponível e o cliente foi avisado.', '#8a8078');
+  return pagina('Horário liberado',
+    'O horário voltou a ficar disponível e o cliente foi avisado.<br><br>' +
+    '<span style="font-size:13px;color:#8a8078">Se você não pode atender nesse horário em geral, <strong>bloqueie-o no painel</strong> (aba Férias e bloqueios) para não aparecer de novo.</span>',
+    '#8a8078');
 }
 
 // Botoes "Confirmar presenca"/"Cancelar" que vao para o CLIENTE (convite).
@@ -1021,31 +1024,67 @@ async function rotaConvite(req, env) {
     return pagina('Link inválido', 'Esse link expirou ou foi alterado. Fale com a KAI Arquitetura pelo WhatsApp.');
   }
 
+  const reagendar = `<a class="btn" href="/agendar-reuniao">Marcar um novo horário</a>`;
+
   if (acao === 'confirmar') {
     const r = await confirmarConvite(env, id);
-    if (r.erro) return pagina('Não foi possível confirmar', escapar(r.erro));
+    if (r.erro) {
+      return pagina('Não foi possível confirmar',
+        escapar(r.erro) + '<br><br>Cancelou sem querer ou quer reagendar?<br><br>' + reagendar);
+    }
     const cfg = await lerConfig(env);
     const link = r.reserva.meetingLink;
-    if (!r.jaConfirmada) await avisarConfirmacaoCliente(env, cfg, r.reserva);
+    if (!r.jaConfirmada) await notificarAdminCliente(env, cfg, 'confirmou', r.reserva);
     return pagina('Presença confirmada!',
       `${escapar(dataPorExtenso(r.reserva.date, r.reserva.time))}<br>${r.reserva.time} às ${r.reserva.endTime} (horário de Brasília).<br><br>` +
       (link ? `<a class="btn" href="${escapar(link)}">Entrar na reunião</a><br><br><span class="lk">${escapar(link)}</span><br><br>` : '') +
       'Enviamos também um e-mail com os detalhes e o convite para a sua agenda. Até lá!');
   }
 
+  // recusar / reagendar: cancela o horario, avisa a admin e oferece novo agendamento
+  const cfg = await lerConfig(env);
   const r = await cancelarReserva(env, id, '', { silencioso: true });
-  if (r.erro) return pagina('Tudo certo', 'Esse convite já não está mais ativo.');
-  await avisoTelegram(env, `O cliente RECUSOU o convite\n${dataParaBR(r.reserva.date)} às ${r.reserva.time}\n${r.reserva.name}`);
-  return pagina('Sem problema',
-    `O horário foi liberado. Se quiser, você pode <a href="/agendar-reuniao" style="color:#D87C63">escolher outro horário</a> quando preferir.`, '#8a8078');
+  if (r.erro) return pagina('Tudo certo', 'Esse convite já não está mais ativo.<br><br>' + reagendar);
+  await notificarAdminCliente(env, cfg, 'cancelou', r.reserva);
+  return pagina('Horário liberado',
+    'Tudo certo, o horário foi liberado. Quer escolher outro horário?<br><br>' + reagendar, '#8a8078');
 }
 
-// Avisa a admin (Telegram) que o cliente confirmou o convite.
-async function avisarConfirmacaoCliente(env, cfg, reserva) {
+// Guarda um evento (para o sino de notificacoes do painel).
+async function registrarEvento(env, ev) {
+  try {
+    const lista = (await env.AGENDA.get('eventos', 'json')) || [];
+    lista.unshift({ ts: Date.now(), ...ev });
+    await env.AGENDA.put('eventos', JSON.stringify(lista.slice(0, 50)));
+  } catch (e) { console.error('registrarEvento:', e); }
+}
+
+// Cliente confirmou/cancelou: registra o evento, manda e-mail para a admin e avisa nos canais.
+async function notificarAdminCliente(env, cfg, tipo, reserva) {
+  await registrarEvento(env, { tipo, name: reserva.name, email: reserva.email, date: reserva.date, time: reserva.time });
+  const confirmou = tipo === 'confirmou';
+  const titulo = confirmou ? 'Cliente confirmou a reunião' : 'Cliente cancelou o convite';
+  const base = env.SITE_URL || 'https://kaiarquitetura.com.br';
+  const html = moldura(titulo, `
+    ${linhas([
+      ['Quando', `<strong>${escapar(dataPorExtenso(reserva.date, reserva.time))}</strong><br>${reserva.time} às ${reserva.endTime} (horário de Brasília)`],
+      ['Cliente', escapar(reserva.name)],
+      ['E-mail', `<a href="mailto:${escapar(reserva.email)}" style="color:#D87C63;">${escapar(reserva.email)}</a>`],
+    ])}
+    ${confirmou && !reserva.meetingLink ? '<p style="margin:20px 0 0;font-size:14px;color:#D87C63;font-weight:600;">Ainda sem link — envie pelo painel.</p>' : ''}
+    ${!confirmou ? '<p style="margin:20px 0 0;font-size:14px;color:#555;">O horário foi liberado na agenda.</p>' : ''}
+    <p style="margin:18px 0 0;"><a href="${base}/kai-agenda-admin" style="color:#8a8078;font-size:13px;">Abrir painel</a></p>
+  `);
+  await enviarEmail(env, {
+    para: cfg.emailAviso,
+    assunto: `${titulo} — ${dataParaBR(reserva.date)} às ${reserva.time} — ${reserva.name}`,
+    html,
+    texto: `${titulo}\n${dataPorExtenso(reserva.date, reserva.time)} — ${reserva.time}\n${reserva.name} · ${reserva.email}`,
+  });
   await avisoTelegram(env,
-    `Cliente CONFIRMOU a reunião\n${dataParaBR(reserva.date)} às ${reserva.time}\n${reserva.name}` +
-    (reserva.meetingLink ? '' : '\n\nAtenção: ainda sem link — envie pelo painel.'));
-  await avisoNtfy(env, 'Cliente confirmou a reunião', `${reserva.name} — ${dataParaBR(reserva.date)} às ${reserva.time}`);
+    `${confirmou ? 'Cliente CONFIRMOU' : 'Cliente CANCELOU'} a reunião\n${dataParaBR(reserva.date)} às ${reserva.time}\n${reserva.name}` +
+    (confirmou && !reserva.meetingLink ? '\n\nAinda sem link — envie pelo painel.' : ''));
+  await avisoNtfy(env, titulo, `${reserva.name} — ${dataParaBR(reserva.date)} às ${reserva.time}`);
 }
 
 /* ---------- rotas do painel ---------- */
@@ -1086,6 +1125,32 @@ async function todasReservas(env) {
 
 async function rotaReservas(env) {
   return json({ hoje: hojeNoFuso(), reservas: await todasReservas(env) });
+}
+
+// Historico completo: reunioes ativas (bk:*) + canceladas (arch:*),
+// com um status de exibicao (realizada / confirmada / cancelada / ...).
+async function rotaHistorico(env) {
+  const hoje = hojeNoFuso();
+  const lista = [];
+
+  for (const r of await todasReservas(env)) {
+    let display = r.status;
+    if (r.status === 'confirmada' && r.date < hoje) display = 'realizada';
+    lista.push({ ...r, display });
+  }
+
+  let cursor;
+  do {
+    const pagina = await env.AGENDA.list({ prefix: 'arch:', cursor, limit: 1000 });
+    for (const chave of pagina.keys) {
+      const r = await env.AGENDA.get(chave.name, 'json');
+      if (r) lista.push({ ...r, display: 'cancelada' });
+    }
+    cursor = pagina.list_complete ? null : pagina.cursor;
+  } while (cursor);
+
+  lista.sort((a, b) => (b.date + b.time).localeCompare(a.date + a.time)); // mais recente primeiro
+  return json({ hoje, reservas: lista.slice(0, 200) });
 }
 
 /* ============================ tarefas agendadas (cron) ============================ */
@@ -1262,6 +1327,19 @@ export default {
         }
 
         if (rota === '/api/admin/reservas' && metodo === 'GET') return await rotaReservas(env);
+
+        if (rota === '/api/admin/historico' && metodo === 'GET') return await rotaHistorico(env);
+
+        if (rota === '/api/admin/eventos' && metodo === 'GET') {
+          const eventos = (await env.AGENDA.get('eventos', 'json')) || [];
+          const vistos = Number(await env.AGENDA.get('eventos:vistos')) || 0;
+          return json({ eventos, naoVistos: eventos.filter((e) => e.ts > vistos).length });
+        }
+
+        if (rota === '/api/admin/eventos-vistos' && metodo === 'POST') {
+          await env.AGENDA.put('eventos:vistos', String(Date.now()));
+          return json({ ok: true });
+        }
 
         if (rota === '/api/admin/convidar' && metodo === 'POST') return await rotaConvidar(req, env);
 

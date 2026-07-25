@@ -82,7 +82,66 @@
       aba.classList.add('is-active');
       document.querySelector('[data-painel="' + aba.dataset.aba + '"]').classList.add('is-active');
       if (aba.dataset.aba === 'convite') carregarConviteHorarios();
+      if (aba.dataset.aba === 'historico') carregarHistorico();
     });
+  });
+
+  /* ================= sino de notificações ================= */
+  function relativo(ts) {
+    var s = Math.floor((Date.now() - ts) / 1000);
+    if (s < 60) return 'agora';
+    if (s < 3600) return 'há ' + Math.floor(s / 60) + ' min';
+    if (s < 86400) return 'há ' + Math.floor(s / 3600) + 'h';
+    return 'há ' + Math.floor(s / 86400) + ' dia(s)';
+  }
+
+  var EVENTO = {
+    novo: ['#D87C63', 'Novo pedido de reunião'],
+    confirmou: ['#2F6B44', 'Cliente confirmou a presença'],
+    cancelou: ['#A8402A', 'Cliente cancelou'],
+  };
+
+  function carregarEventos() {
+    return api('eventos').then(function (d) {
+      var badge = $('sinoBadge');
+      badge.hidden = !d.naoVistos;
+      badge.textContent = d.naoVistos > 9 ? '9+' : d.naoVistos;
+
+      $('sinoMenu').innerHTML = d.eventos.length
+        ? d.eventos.slice(0, 30).map(function (e) {
+            var meta = EVENTO[e.tipo] || ['#8a8078', e.tipo];
+            return '<div class="adm-ev">' +
+              '<span class="adm-ev__dot" style="background:' + meta[0] + '"></span>' +
+              '<div><div>' + meta[1] + '</div>' +
+                '<div class="adm-ev__quando"><strong>' + escapar(e.name || '') + '</strong> · ' +
+                  escapar(dataBR(e.date)) + ' às ' + escapar(e.time || '') + '</div>' +
+                '<div class="adm-ev__quando">' + relativo(e.ts) + '</div>' +
+              '</div></div>';
+          }).join('')
+        : '<div class="adm-ev--vazio">Nenhuma novidade por aqui.</div>';
+    }).catch(function () {});
+  }
+
+  function dataBR(d) {
+    if (!d) return '';
+    var p = d.split('-');
+    return p[2] + '/' + p[1] + '/' + p[0];
+  }
+
+  $('botaoSino').addEventListener('click', function (e) {
+    e.stopPropagation();
+    var menu = $('sinoMenu');
+    menu.hidden = !menu.hidden;
+    if (!menu.hidden) {
+      // abriu -> marca como visto e some o badge
+      fetch('/api/admin/eventos-vistos', { method: 'POST' }).catch(function () {});
+      $('sinoBadge').hidden = true;
+    }
+  });
+
+  document.addEventListener('click', function (e) {
+    var sino = $('sinoMenu');
+    if (!sino.hidden && !e.target.closest('.adm-sino')) sino.hidden = true;
   });
 
   /* ================= enviar convite ================= */
@@ -148,19 +207,50 @@
     return api('reservas').then(function (d) {
       hoje = d.hoje;
       reservasCache = d.reservas || [];
-      var proximas = [], passadas = [];
-      d.reservas.forEach(function (r) { (r.date >= d.hoje ? proximas : passadas).push(r); });
+      // só as futuras (as passadas ficam na aba Histórico)
+      var proximas = d.reservas.filter(function (r) { return r.date >= d.hoje; });
 
       $('listaProximas').innerHTML = proximas.length
         ? proximas.map(function (r) { return cartao(r, false); }).join('')
         : '<p class="ag-vazio">Nenhuma reunião marcada por enquanto.</p>';
 
-      $('listaPassadas').innerHTML = passadas.length
-        ? passadas.reverse().slice(0, 30).map(function (r) { return cartao(r, true); }).join('')
-        : '<p class="ag-vazio">Nada por aqui ainda.</p>';
-
       ligarBotoesReserva();
     });
+  }
+
+  /* ================= histórico ================= */
+  function carregarHistorico() {
+    $('listaHistorico').innerHTML = '<div class="ag-load"><div class="ag-spin"></div></div>';
+    return api('historico').then(function (d) {
+      $('listaHistorico').innerHTML = d.reservas.length
+        ? d.reservas.map(cartaoHistorico).join('')
+        : '<p class="ag-vazio">Nenhuma reunião no histórico ainda.</p>';
+    }).catch(function (err) {
+      if (err.message !== 'sessao') $('listaHistorico').innerHTML = '<p class="ag-vazio">' + escapar(err.message) + '</p>';
+    });
+  }
+
+  var STATUS_HIST = {
+    realizada: ['tag--real', 'realizada'],
+    confirmada: ['tag--conf', 'confirmada'],
+    cancelada: ['tag--canc', 'cancelada'],
+    convite: ['tag--conv', 'aguardando o cliente'],
+    pendente: ['tag--pend', 'aguardando você'],
+  };
+
+  function cartaoHistorico(r) {
+    var st = STATUS_HIST[r.display] || ['tag--pend', escapar(r.display || '')];
+    var tel = (r.phone || '').replace(/\D/g, '');
+    return '<div class="adm-item' + (r.display === 'cancelada' ? ' is-passada' : '') + '">' +
+      '<div class="adm-item__top">' +
+        '<div>' +
+          '<p class="adm-item__quando">' + escapar(porExtenso(r.date)) + ' · ' + escapar(r.time) + ' às ' + escapar(r.endTime) + '</p>' +
+          '<p class="adm-item__quem"><strong>' + escapar(r.name) + '</strong> · ' + escapar(r.email) +
+            (r.subject ? ' · ' + escapar(r.subject) : '') + '</p>' +
+        '</div>' +
+        '<span class="tag ' + st[0] + '">' + st[1] + '</span>' +
+      '</div>' +
+    '</div>';
   }
 
   function cartao(r, passada) {
@@ -268,7 +358,7 @@
           return;
         }
 
-        if (acao === 'cancelar' && !confirm('Cancelar esta reunião? O horário será liberado e o cliente receberá um e‑mail.')) return;
+        if (acao === 'cancelar' && !confirm('Cancelar esta reunião? O horário será liberado e o cliente receberá um e‑mail.\n\nDica: se você não pode atender nesse horário em geral, bloqueie-o depois na aba "Férias e bloqueios" para não aparecer de novo.')) return;
 
         var corpo = { id: id };
         if (acao === 'confirmar' || acao === 'enviarlink') {
@@ -527,6 +617,12 @@
       .then(function () {
         desenharSemana();
         desenharBloqueios();
+        carregarEventos();
+        if (!window.__sinoTimer) {
+          window.__sinoTimer = setInterval(function () {
+            if ($('sinoMenu').hidden) carregarEventos();
+          }, 60000);
+        }
       })
       .catch(function (err) {
         if (err.message !== 'sessao') aviso('avisoGeral', escapar(err.message));
