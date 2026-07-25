@@ -101,7 +101,7 @@
       .sort(function (a, b) { return a.time.localeCompare(b.time); })
       .map(function (r) { return r.time + '–' + r.endTime; });
     box.innerHTML = ocup.length
-      ? 'Já ocupado nesse dia: <strong>' + ocup.join(', ') + '</strong>. Escolha um horário fora desses.'
+      ? '<span class="ag-aviso" style="display:block;margin:0">⚠ Já ocupado nesse dia: <strong>' + ocup.join(', ') + '</strong>. Escolha um horário fora desses.</span>'
       : 'Nenhum horário ocupado nesse dia.';
   }
 
@@ -129,8 +129,8 @@
         $('formConvite').reset();
         $('convOcupado').innerHTML = '';
         aviso('avisoGeral', d.emailEnviado
-          ? 'Convite enviado! O cliente recebeu o e‑mail com o link e o convite de calendário.'
-          : 'Reunião criada, mas o <strong>e‑mail não saiu</strong> (' + escapar(d.motivoFalha || 'sem detalhe') + '). Avise o cliente por WhatsApp.',
+          ? 'Convite enviado! O cliente vai receber um e‑mail para <strong>confirmar a presença</strong>. Enquanto isso, aparece como “aguardando o cliente”.'
+          : 'Convite criado, mas o <strong>e‑mail não saiu</strong> (' + escapar(d.motivoFalha || 'sem detalhe') + '). Avise o cliente por WhatsApp.',
           d.emailEnviado ? 'ag-ok' : 'ag-aviso');
         document.querySelector('[data-aba="reunioes"]').click();
         return carregarReservas();
@@ -152,7 +152,7 @@
       d.reservas.forEach(function (r) { (r.date >= d.hoje ? proximas : passadas).push(r); });
 
       $('listaProximas').innerHTML = proximas.length
-        ? proximas.map(cartao).join('')
+        ? proximas.map(function (r) { return cartao(r, false); }).join('')
         : '<p class="ag-vazio">Nenhuma reunião marcada por enquanto.</p>';
 
       $('listaPassadas').innerHTML = passadas.length
@@ -165,7 +165,44 @@
 
   function cartao(r, passada) {
     var confirmada = r.status === 'confirmada';
+    var convite = r.status === 'convite';
     var tel = (r.phone || '').replace(/\D/g, '');
+
+    var tagClasse = confirmada ? 'tag--conf' : 'tag--pend';
+    var tagTexto = confirmada ? 'confirmada' : convite ? 'aguardando o cliente' : 'aguardando você';
+
+    var inputLink = '<input class="ag-input" style="flex:1;min-width:210px;width:auto" data-campo="link" placeholder="Cole o link (meet.new)" value="' + escapar(r.meetingLink || '') + '">';
+
+    var acoes = '';
+    if (passada) {
+      acoes = r.meetingLink ? '<p class="adm-item__obs" style="word-break:break-all">Link: ' + escapar(r.meetingLink) + '</p>' : '';
+    } else if (convite) {
+      acoes = '<p class="adm-item__obs">Convite enviado. Aguardando o cliente confirmar a presença.</p>' +
+        '<div class="adm-item__acoes">' +
+          '<button class="ag-btn ag-btn--sm" data-acao="confirmar">Confirmar no lugar do cliente</button>' +
+          '<button class="ag-btn ag-btn--ghost ag-btn--sm" data-acao="cancelar">Cancelar convite</button>' +
+        '</div>';
+    } else if (confirmada && r.linkEnviado) {
+      acoes = whatsappBloco(r) +
+        '<div class="adm-item__acoes">' +
+          inputLink +
+          '<button class="ag-btn ag-btn--sm" data-acao="lembrete">Enviar lembrete da reunião</button>' +
+          '<button class="ag-btn ag-btn--ghost ag-btn--sm" data-acao="cancelar">Cancelar reunião</button>' +
+        '</div>';
+    } else if (confirmada) {
+      acoes = '<div class="adm-item__acoes">' +
+          inputLink +
+          '<button class="ag-btn ag-btn--sm" data-acao="enviarlink">Enviar link da reunião</button>' +
+          '<button class="ag-btn ag-btn--ghost ag-btn--sm" data-acao="cancelar">Cancelar reunião</button>' +
+        '</div>';
+    } else { // pendente
+      acoes = '<div class="adm-item__acoes">' +
+          '<input class="ag-input" style="flex:1;min-width:210px;width:auto" data-campo="link" placeholder="Cole o link (meet.new)" value="">' +
+          '<button class="ag-btn ag-btn--sm" data-acao="confirmar">Confirmar e avisar cliente</button>' +
+          '<button class="ag-btn ag-btn--ghost ag-btn--sm" data-acao="cancelar">Recusar</button>' +
+        '</div>';
+    }
+
     return '<div class="adm-item' + (passada ? ' is-passada' : '') + '" data-id="' + escapar(r.id) + '">' +
       '<div class="adm-item__top">' +
         '<div>' +
@@ -176,31 +213,41 @@
           '</p>' +
           (r.subject ? '<p class="adm-item__quem">' + escapar(r.subject) + '</p>' : '') +
         '</div>' +
-        '<span class="tag ' + (confirmada ? 'tag--conf' : 'tag--pend') + '">' + (confirmada ? 'confirmada' : 'aguardando você') + '</span>' +
+        '<span class="tag ' + tagClasse + '">' + tagTexto + '</span>' +
       '</div>' +
       (r.notes ? '<p class="adm-item__obs">' + escapar(r.notes) + '</p>' : '') +
       (r.avisado === false
         ? '<p class="ag-aviso" style="margin:0.7rem 0 0">⚠ O aviso deste pedido <strong>não chegou até você</strong> por nenhum canal — você só está vendo aqui no painel. ' +
           (r.avisoDetalhe ? '<br><span style="font-size:0.78rem;opacity:.8">' + escapar(r.avisoDetalhe) + '</span>' : '') + '</p>'
         : '') +
-      (confirmada && !r.meetingLink && !passada
+      (confirmada && !r.linkEnviado && !passada
         ? '<p class="ag-aviso" style="margin:0.7rem 0 0">Confirmada, mas ainda <strong>sem link</strong>. Cole o link abaixo e clique em “Enviar link da reunião”.</p>'
         : '') +
-      (passada
-        ? (r.meetingLink ? '<p class="adm-item__obs" style="word-break:break-all">Link: ' + escapar(r.meetingLink) + '</p>' : '')
-        : confirmada
-          ? '<div class="adm-item__acoes">' +
-              '<input class="ag-input" style="flex:1;min-width:210px;width:auto" data-campo="link" placeholder="Cole o link (meet.new)" value="' + escapar(r.meetingLink || '') + '">' +
-              '<button class="ag-btn ag-btn--sm" data-acao="enviarlink">Enviar link da reunião</button>' +
-              '<button class="ag-btn ag-btn--ghost ag-btn--sm" data-acao="cancelar">Cancelar reunião</button>' +
-            '</div>'
-          : '<div class="adm-item__acoes">' +
-              '<input class="ag-input" style="flex:1;min-width:210px;width:auto" data-campo="link" placeholder="Cole o link (meet.new)" value="">' +
-              '<button class="ag-btn ag-btn--sm" data-acao="confirmar">Confirmar e avisar cliente</button>' +
-              '<button class="ag-btn ag-btn--ghost ag-btn--sm" data-acao="cancelar">Recusar</button>' +
-            '</div>') +
+      acoes +
     '</div>';
   }
+
+  // Texto de lembrete pronto para copiar/enviar no WhatsApp do cliente.
+  function whatsappBloco(r) {
+    var msg = 'Olá ' + (r.name || '').split(' ')[0] + '! Passando para lembrar da nossa reunião na KAI Arquitetura em ' +
+      porExtenso(r.date).toLowerCase() + ', às ' + r.time + '.' + (r.meetingLink ? ' Link: ' + r.meetingLink : '');
+    var tel = (r.phone || '').replace(/\D/g, '');
+    return '<div style="margin-top:0.8rem">' +
+      '<p class="adm-box__hint" style="margin:0 0 0.35rem">Lembrete para enviar no WhatsApp:</p>' +
+      '<textarea class="ag-textarea" data-campo="wamsg" readonly style="min-height:60px;font-size:0.86rem">' + escapar(msg) + '</textarea>' +
+      '<div style="display:flex;gap:0.5rem;margin-top:0.4rem;flex-wrap:wrap">' +
+        '<button type="button" class="ag-btn ag-btn--ghost ag-btn--sm" data-acao="copiarwa">Copiar texto</button>' +
+        (tel ? '<a class="ag-btn ag-btn--ghost ag-btn--sm" href="https://wa.me/55' + tel + '?text=' + encodeURIComponent(msg) + '" target="_blank" rel="noopener">Abrir no WhatsApp</a>' : '') +
+      '</div>' +
+    '</div>';
+  }
+
+  var MENSAGENS = {
+    confirmar: 'Pronto. O cliente foi avisado por e‑mail.',
+    enviarlink: 'Link enviado! O cliente recebeu o e‑mail com o link da reunião.',
+    lembrete: 'Lembrete enviado ao cliente por e‑mail.',
+    cancelar: 'Reunião cancelada e horário liberado.',
+  };
 
   function ligarBotoesReserva() {
     document.querySelectorAll('.adm-item [data-acao]').forEach(function (botao) {
@@ -209,34 +256,40 @@
         var id = item.dataset.id;
         var acao = botao.dataset.acao;
 
+        // copiar texto do WhatsApp (sem chamar a API)
+        if (acao === 'copiarwa') {
+          var ta = item.querySelector('[data-campo="wamsg"]');
+          if (ta) {
+            ta.select();
+            try { document.execCommand('copy'); } catch (e) {}
+            if (navigator.clipboard) navigator.clipboard.writeText(ta.value).catch(function () {});
+            aviso('avisoGeral', 'Texto copiado! Cole no WhatsApp do cliente.', 'ag-ok');
+          }
+          return;
+        }
+
         if (acao === 'cancelar' && !confirm('Cancelar esta reunião? O horário será liberado e o cliente receberá um e‑mail.')) return;
 
         var corpo = { id: id };
-        // "enviarlink" reusa o endpoint de confirmar (grava o link e reenvia o e-mail)
-        var rota = acao === 'enviarlink' ? 'confirmar' : acao;
-
         if (acao === 'confirmar' || acao === 'enviarlink') {
           var campo = item.querySelector('[data-campo="link"]');
           corpo.link = campo ? campo.value.trim() : '';
           if (acao === 'enviarlink' && !corpo.link) {
             return aviso('avisoGeral', 'Cole o link da reunião antes de enviar.', 'ag-aviso');
           }
-        } else {
+        } else if (acao === 'cancelar') {
           corpo.motivo = prompt('Quer explicar o motivo para o cliente? (opcional)') || '';
         }
 
         botao.disabled = true;
         botao.textContent = 'Aguarde…';
 
-        api(rota, { method: 'POST', body: JSON.stringify(corpo) })
+        api(acao, { method: 'POST', body: JSON.stringify(corpo) })
           .then(function (d) {
-            var okMsg = acao === 'enviarlink'
-              ? 'Link enviado! O cliente recebeu o e‑mail com o link da reunião.'
-              : 'Pronto. O cliente foi avisado por e‑mail.';
-            aviso('avisoGeral', d.emailEnviado
-              ? okMsg
+            aviso('avisoGeral', d.emailEnviado || acao === 'cancelar'
+              ? (MENSAGENS[acao] || 'Feito.')
               : 'Ação registrada, mas o <strong>e‑mail para o cliente não saiu</strong> (' + escapar(d.motivoFalha || 'envio não configurado') + '). Avise por WhatsApp.',
-              d.emailEnviado ? 'ag-ok' : 'ag-aviso');
+              (d.emailEnviado || acao === 'cancelar') ? 'ag-ok' : 'ag-aviso');
             return carregarReservas();
           })
           .catch(function (err) {
@@ -405,15 +458,19 @@
       });
     });
 
-    // checkbox tem estado proprio (checked), fora do fluxo de CAMPOS acima
-    var lembrete = $('cfgLembrete30');
-    if (lembrete) {
-      lembrete.checked = cfg.lembrete30Min !== false;
-      lembrete.addEventListener('change', function () {
-        cfg.lembrete30Min = lembrete.checked;
-        marcarSujo();
-      });
-    }
+    // checkboxes tem estado proprio (checked), fora do fluxo de CAMPOS acima
+    ligarCheckbox('cfgLembrete30', 'lembrete30Min');
+    ligarCheckbox('cfgLembreteCliente', 'lembreteClienteDia');
+  }
+
+  function ligarCheckbox(id, chave) {
+    var el = $(id);
+    if (!el) return;
+    el.checked = cfg[chave] !== false;
+    el.addEventListener('change', function () {
+      cfg[chave] = el.checked;
+      marcarSujo();
+    });
   }
 
   function desenharIntegracoes(status) {

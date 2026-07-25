@@ -202,13 +202,22 @@
             <p class="adm-box__hint" style="margin:0.4rem 0 0">Deixe em branco para desligar o resumo diário.</p>
           </div>
           <div class="ag-field">
-            <label>Lembrete antes da reunião</label>
+            <label>Lembrete antes da reunião (para você)</label>
             <label style="display:flex;align-items:center;gap:0.5rem;font-size:0.92rem;color:var(--black);margin-top:0.5rem;cursor:pointer">
               <input type="checkbox" id="cfgLembrete30" style="width:18px;height:18px;accent-color:var(--coral)">
-              Avisar 30 minutos antes de cada reunião
+              Me avisar 30 minutos antes de cada reunião
             </label>
           </div>
         </div>
+      </div>
+
+      <div class="adm-box">
+        <h2>Lembrete automático para o cliente</h2>
+        <p class="adm-box__hint">Funciona com o e‑mail (Resend), independente do Telegram.</p>
+        <label style="display:flex;align-items:center;gap:0.5rem;font-size:0.92rem;color:var(--black);cursor:pointer">
+          <input type="checkbox" id="cfgLembreteCliente" style="width:18px;height:18px;accent-color:var(--coral)">
+          Enviar um e‑mail de lembrete ao cliente na manhã do dia da reunião (com o link)
+        </label>
       </div>
 
       <div class="adm-box">
