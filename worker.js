@@ -1124,18 +1124,28 @@ async function todasReservas(env) {
 }
 
 async function rotaReservas(env) {
-  return json({ hoje: hojeNoFuso(), reservas: await todasReservas(env) });
+  return json({ hoje: hojeNoFuso(), agora: horaNoFuso(), reservas: await todasReservas(env) });
+}
+
+// Momento do ultimo "acontecimento" da reserva, para ordenar o historico.
+function tsEvento(r) {
+  if (r.display === 'cancelada') return Date.parse(r.canceledAt || r.createdAt || 0) || 0;
+  if (r.display === 'realizada') return instante(r.date, r.endTime).getTime();
+  if (r.display === 'confirmada') return Date.parse(r.confirmedAt || r.createdAt || 0) || 0;
+  return Date.parse(r.createdAt || 0) || 0; // pendente / convite
 }
 
 // Historico completo: reunioes ativas (bk:*) + canceladas (arch:*),
-// com um status de exibicao (realizada / confirmada / cancelada / ...).
+// com status de exibicao e ordenado pela cronologia dos acontecimentos.
 async function rotaHistorico(env) {
   const hoje = hojeNoFuso();
+  const agora = horaNoFuso();
+  const jaAconteceu = (r) => r.date < hoje || (r.date === hoje && r.endTime <= agora);
   const lista = [];
 
   for (const r of await todasReservas(env)) {
     let display = r.status;
-    if (r.status === 'confirmada' && r.date < hoje) display = 'realizada';
+    if (r.status === 'confirmada' && jaAconteceu(r)) display = 'realizada';
     lista.push({ ...r, display });
   }
 
@@ -1149,8 +1159,10 @@ async function rotaHistorico(env) {
     cursor = pagina.list_complete ? null : pagina.cursor;
   } while (cursor);
 
-  lista.sort((a, b) => (b.date + b.time).localeCompare(a.date + a.time)); // mais recente primeiro
-  return json({ hoje, reservas: lista.slice(0, 200) });
+  // mais recente (ultimo acontecimento) no topo
+  const comTs = lista.map((r) => ({ ...r, eventoTs: tsEvento(r) }));
+  comTs.sort((a, b) => b.eventoTs - a.eventoTs);
+  return json({ hoje, reservas: comTs.slice(0, 200) });
 }
 
 /* ============================ tarefas agendadas (cron) ============================ */

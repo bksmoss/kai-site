@@ -207,12 +207,24 @@
     return api('reservas').then(function (d) {
       hoje = d.hoje;
       reservasCache = d.reservas || [];
-      // só as futuras (as passadas ficam na aba Histórico)
-      var proximas = d.reservas.filter(function (r) { return r.date >= d.hoje; });
+      var agora = d.agora || '23:59';
+      // já aconteceu = data passada, ou hoje com o horário de término já vencido
+      var jaAconteceu = function (r) { return r.date < d.hoje || (r.date === d.hoje && r.endTime <= agora); };
+
+      var pendentes = [], proximas = [];
+      d.reservas.forEach(function (r) {
+        if (jaAconteceu(r)) return; // sai da aba de reuniões (fica só no Histórico)
+        if (r.status === 'confirmada') proximas.push(r);
+        else pendentes.push(r); // pendente (você) ou convite (cliente)
+      });
+
+      $('listaPendentes').innerHTML = pendentes.length
+        ? pendentes.map(function (r) { return cartao(r, false); }).join('')
+        : '<p class="ag-vazio">Nenhuma reunião pendente. Tudo em dia!</p>';
 
       $('listaProximas').innerHTML = proximas.length
         ? proximas.map(function (r) { return cartao(r, false); }).join('')
-        : '<p class="ag-vazio">Nenhuma reunião marcada por enquanto.</p>';
+        : '<p class="ag-vazio">Nenhuma reunião confirmada por enquanto.</p>';
 
       ligarBotoesReserva();
     });
@@ -238,9 +250,11 @@
     pendente: ['tag--pend', 'aguardando você'],
   };
 
+  var EVENTO_HIST = { realizada: 'realizada', confirmada: 'confirmada', cancelada: 'cancelada', convite: 'convite enviado', pendente: 'pedido feito' };
+
   function cartaoHistorico(r) {
     var st = STATUS_HIST[r.display] || ['tag--pend', escapar(r.display || '')];
-    var tel = (r.phone || '').replace(/\D/g, '');
+    var quandoEvento = r.eventoTs ? (EVENTO_HIST[r.display] || r.display) + ' ' + relativo(r.eventoTs) : '';
     return '<div class="adm-item' + (r.display === 'cancelada' ? ' is-passada' : '') + '">' +
       '<div class="adm-item__top">' +
         '<div>' +
@@ -248,7 +262,10 @@
           '<p class="adm-item__quem"><strong>' + escapar(r.name) + '</strong> · ' + escapar(r.email) +
             (r.subject ? ' · ' + escapar(r.subject) : '') + '</p>' +
         '</div>' +
-        '<span class="tag ' + st[0] + '">' + st[1] + '</span>' +
+        '<div style="text-align:right;flex:none">' +
+          '<span class="tag ' + st[0] + '">' + st[1] + '</span>' +
+          (quandoEvento ? '<div class="adm-ev__quando" style="margin-top:0.4rem">' + escapar(quandoEvento) + '</div>' : '') +
+        '</div>' +
       '</div>' +
     '</div>';
   }

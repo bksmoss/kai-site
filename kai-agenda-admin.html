@@ -8,7 +8,7 @@
   <title>Agenda · Painel | KAI Arquitetura</title>
   <link rel="icon" type="image/png" href="img/simbolo.png">
   <link rel="stylesheet" href="css/fonts.css">
-  <link rel="stylesheet" href="css/agenda.css?v=3">
+  <link rel="stylesheet" href="css/agenda.css?v=4">
 </head>
 <body>
 
@@ -62,8 +62,13 @@
     <!-- ---- reuniões ---- -->
     <section class="adm-panel is-active" data-painel="reunioes">
       <div class="adm-box">
+        <h2>Reuniões pendentes</h2>
+        <p class="adm-box__hint">Horários reservados que ainda <strong>não foram confirmados</strong> — por você (pedidos do cliente) ou pelo cliente (convites que você enviou).</p>
+        <div id="listaPendentes"><div class="ag-load"><div class="ag-spin"></div></div></div>
+      </div>
+      <div class="adm-box">
         <h2>Próximas reuniões</h2>
-        <p class="adm-box__hint">Confirmar envia automaticamente o e‑mail com o link e o convite de calendário para o cliente. Recusar libera o horário na agenda.</p>
+        <p class="adm-box__hint">Reuniões <strong>confirmadas</strong> que ainda vão acontecer. Depois que a reunião passa, ela sai daqui e vai para o Histórico.</p>
         <div id="listaProximas"><div class="ag-load"><div class="ag-spin"></div></div></div>
       </div>
     </section>
@@ -245,6 +250,6 @@
     </div>
   </div>
 
-  <script src="js/admin-agenda.js?v=3"></script>
+  <script src="js/admin-agenda.js?v=4"></script>
 </body>
 </html>
