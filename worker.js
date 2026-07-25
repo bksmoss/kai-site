@@ -1204,6 +1204,8 @@ async function tarefaAgendada(env) {
     const faltamMin = (instante(r.date, r.time, cfg.timezone).getTime() - agoraMs) / 60000;
     if (faltamMin <= 0) continue;
 
+    const janela24 = faltamMin <= 24 * 60 && faltamMin > 24 * 60 - 15;
+
     if (r.status === 'confirmada') {
       // 30 min antes — so para reuniao ja confirmada
       if (cfg.lembrete30Min && !r.lembrete30 && faltamMin <= 30) {
@@ -1212,14 +1214,23 @@ async function tarefaAgendada(env) {
           (r.subject ? `\n${r.subject}` : '') + (link ? `\n${link}` : ''));
         await marcar(r, 'lembrete30');
       }
+      // ~24h antes: confirmada mas ainda SEM link enviado
+      if (!r.nudgeLink && !r.linkEnviado && janela24) {
+        const base = env.SITE_URL || 'https://kaiarquitetura.com.br';
+        await avisoTelegram(env,
+          `Reuniao de amanha confirmada, mas voce ainda NAO enviou o link para o cliente\n` +
+          `${dataParaBR(r.date)} as ${r.time} — ${r.name}` +
+          `${r.subject ? '\n' + r.subject : ''}\n\nEnvie o link pelo painel:\n${base}/kai-agenda-admin`);
+        await marcar(r, 'nudgeLink');
+      }
       continue;
     }
 
-    // NAO confirmada: cobra ~24h antes (a cobranca do dia ja sai no resumo)
-    if (!r.nudge24 && faltamMin <= 24 * 60 && faltamMin > 24 * 60 - 15) {
+    // NAO confirmada: cobra ~24h antes (a cobranca do dia tambem sai no resumo)
+    if (!r.nudge24 && janela24) {
       const titulo = r.status === 'convite'
-        ? 'Cliente ainda nao confirmou o convite de amanha'
-        : 'Reuniao de amanha ainda nao confirmada';
+        ? 'O cliente ainda nao confirmou o convite de amanha'
+        : 'Voce ainda nao confirmou a reuniao de amanha com o cliente';
       await cobrarConfirmacao(env, r, titulo);
       await marcar(r, 'nudge24');
     }
@@ -1248,7 +1259,8 @@ async function textoResumo(env, reservas, hoje) {
   const linhas = [];
   for (const r of reservas) {
     if (r.status === 'confirmada') {
-      linhas.push(`${r.time}-${r.endTime}  ${r.name} [ok]` + (r.subject ? `\n   ${r.subject}` : ''));
+      const marca = r.linkEnviado ? '[ok]' : '[confirmada, FALTA ENVIAR O LINK]';
+      linhas.push(`${r.time}-${r.endTime}  ${r.name} ${marca}` + (r.subject ? `\n   ${r.subject}` : ''));
     } else if (r.status === 'convite') {
       linhas.push(`${r.time}-${r.endTime}  ${r.name} [aguardando o cliente]` + (r.subject ? `\n   ${r.subject}` : ''));
     } else {
@@ -1263,7 +1275,10 @@ async function textoResumo(env, reservas, hoje) {
     }
   }
   const pendentes = reservas.filter((r) => r.status === 'pendente').length;
-  const rodape = pendentes ? `\n\n${pendentes} reuniao(oes) esperando sua confirmacao (links acima).` : '';
+  const semLink = reservas.filter((r) => r.status === 'confirmada' && !r.linkEnviado).length;
+  let rodape = '';
+  if (pendentes) rodape += `\n\n${pendentes} reuniao(oes) esperando sua confirmacao (links acima).`;
+  if (semLink) rodape += `\n${semLink} reuniao(oes) confirmada(s) sem link enviado — envie pelo painel.`;
   return `${cab}\n\n${linhas.join('\n')}${rodape}`;
 }
 
