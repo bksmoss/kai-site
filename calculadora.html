@@ -180,9 +180,9 @@
     border: 1px solid var(--glass-brd); box-shadow: var(--glass-sh); border-radius: 24px;
   }
 
-  .calc { display: grid; grid-template-columns: 1.1fr .9fr; gap: 22px; align-items: stretch; }
-  .calc__form { padding: 36px 34px; display: flex; flex-direction: column; gap: 34px; }
-  .calc__right { display: flex; flex-direction: column; gap: 22px; }
+  .calc { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr); gap: 22px; align-items: stretch; }
+  .calc__form { padding: 36px 34px; display: flex; flex-direction: column; gap: 34px; min-width: 0; }
+  .calc__right { display: flex; flex-direction: column; gap: 22px; min-width: 0; }
 
   .step { position: relative; }
   .step__head { display: flex; align-items: center; gap: 11px; margin-bottom: 18px; }
@@ -203,7 +203,7 @@
   .tip:hover .tip__bubble, .tip__btn:focus-visible + .tip__bubble { opacity: 1; visibility: visible; transform: translateY(0); }
 
   /* slider */
-  .range-row { display: flex; align-items: center; gap: 18px; }
+  .range-row { display: flex; align-items: center; gap: 18px; min-width: 0; }
   .rng-wrap { position: relative; flex: 1; height: 28px; border-radius: 50px; }
   .rng-track { position: absolute; inset: 0; border-radius: 50px; overflow: hidden; background: var(--glass-inner); }
   .rng-fill { height: 100%; border-radius: 50px; width: calc(var(--p, 0) * (100% - 28px) + 28px); background: linear-gradient(90deg, #F3C4AC 0%, #E08A6C 45%, #D0603F 100%); }
@@ -216,7 +216,7 @@
   .rng { -webkit-tap-highlight-color: transparent; }
   .rng:focus { outline: none; }
   .rng-wrap:focus-within { outline: none; }
-  .rng-wrap:has(.rng:focus-visible) { outline: 2px solid var(--ink); outline-offset: 4px; }
+  .rng-wrap:has(.rng:focus-visible) { box-shadow: 0 0 0 3px rgba(28,28,28,.30); }
   .area-val { font-size: 24px; font-weight: 600; min-width: 6ch; text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
   .area-val small { font-size: 13px; color: var(--muted); font-weight: 400; }
 
@@ -236,7 +236,7 @@
   .amb-row { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 14px 0; border-bottom: 1px solid var(--glass-brd); }
   .amb-row:first-child { padding-top: 4px; }
   .amb-row:last-child { border-bottom: 0; padding-bottom: 0; }
-  .amb-row__lbl { font-size: 15px; }
+  .amb-row__lbl { font-size: 15px; min-width: 0; }
   .amb-row__lbl small { display: block; color: var(--muted); font-size: 12px; }
   .stepper { display: flex; align-items: center; gap: 14px; flex-shrink: 0; }
   .stepper button { width: 32px; height: 32px; border-radius: 50%; border: 1px solid var(--coral); background: transparent; color: var(--coral); font-size: 18px; line-height: 1; cursor: pointer; font-family: inherit; transition: all .2s; display: flex; align-items: center; justify-content: center; }
@@ -251,7 +251,7 @@
   .subq__lbl small { display: block; color: var(--muted); font-size: 11.5px; }
 
   /* ---- painel de resultado ---- */
-  .calc__out { padding: 34px 30px; display: flex; flex-direction: column; }
+  .calc__out { padding: 34px 30px; display: flex; flex-direction: column; min-width: 0; }
   .olbl { font-size: 11px; letter-spacing: .18em; text-transform: uppercase; color: var(--coral-ink); font-weight: 600; margin: 0 0 6px; }
   .orange { font-size: clamp(22px, 6vw, 34px); overflow-wrap: anywhere; font-weight: 600; letter-spacing: -.5px; line-height: 1.2; font-variant-numeric: tabular-nums; margin: 0; }
   .om2 { font-size: 14px; color: var(--muted); margin: 6px 0 0; font-variant-numeric: tabular-nums; }
@@ -315,7 +315,7 @@
   footer { border-top: 1px solid var(--hairline); margin-top: 64px; padding: 38px 0 64px; color: var(--muted); font-size: 13px; }
   .note { font-size: 12px; margin-top: 10px; max-width: 78ch; }
 
-  @media (max-width: 1000px) { .quad, .trio { grid-template-columns: repeat(2,1fr); } .calc { grid-template-columns: 1fr; } .calc__out { position: static; } }
+  @media (max-width: 1000px) { .quad, .trio { grid-template-columns: repeat(2,1fr); } .calc { grid-template-columns: minmax(0, 1fr); } .calc__out { position: static; } }
   @media (max-width: 780px) {
     .tiers, .trio, .pay, .quad { grid-template-columns: 1fr; }
     .tabs { gap: 1.6rem; }
@@ -505,7 +505,7 @@
           </div>
         </div>
 
-        <a class="cta" href="https://wa.me/5511925049959" target="_blank" rel="noopener">Falar com a KAI</a>
+        <a class="cta" id="btnFalar" href="https://wa.me/5511925049959" target="_blank" rel="noopener">Falar com a KAI</a>
         </div>
 
         <!-- card compartilhar -->
@@ -658,6 +658,20 @@
 
   var LAST = null; // guarda o último resultado p/ PDF e compartilhamento
 
+  // Mensagem do botão "Falar com a KAI" — abre o WhatsApp já com a estimativa do cliente.
+  var btnFalar = document.getElementById('btnFalar');
+  var WA_FALAR = 'https://wa.me/5511925049959?text=';
+  function textoFalar() {
+    var base = 'Olá, KAI! 👋\nFiz a estimativa na calculadora de reforma do site e queria conversar sobre o meu projeto.';
+    if (!LAST) return base;
+    return base + '\n\n*Minha estimativa*\n' +
+      'Área: ' + LAST.area + ' m² · Padrão ' + LAST.padrao.toLowerCase() + ' · ' + LAST.regiao + '\n' +
+      'Ambientes: ' + (LAST.ambientes.join(', ') || '—') + '\n' +
+      'Melhorias: ' + LAST.itens.map(function (i) { return i.nome; }).join(', ') + '\n' +
+      'Investimento estimado: ' + brl(LAST.min) + ' a ' + brl(LAST.max);
+  }
+  function atualizaFalar() { if (btnFalar) btnFalar.href = WA_FALAR + encodeURIComponent(textoFalar()); }
+
   function calc() {
     var a = parseFloat(area.value);
     areaOut.textContent = a;
@@ -692,7 +706,7 @@
 
     if (itens.length === 0) {
       out.textContent = 'Selecione ao menos uma melhoria';
-      outM2.textContent = ''; detailList.innerHTML = ''; LAST = null; return;
+      outM2.textContent = ''; detailList.innerHTML = ''; LAST = null; atualizaFalar(); return;
     }
 
     var subtotal = itens.reduce(function (s, it) { return s + it.valor; }, 0);
@@ -722,6 +736,7 @@
     var regTxt = document.querySelector('#regiao input:checked').parentNode.querySelector('span').textContent;
     var ambTxt = AMB.filter(function (x) { return counts[x.id] > 0; }).map(function (x) { return counts[x.id] + '× ' + x.nome; });
     LAST = { area: a, padrao: padTxt, regiao: regTxt, ambientes: ambTxt, itens: itens, min: min, max: max, m2: temArea ? (min / a) : 0 };
+    atualizaFalar();
   }
 
   Array.prototype.forEach.call(document.querySelectorAll('#escopo input, #padrao input, #regiao input'), function (el) {
