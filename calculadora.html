@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <!-- Google Tag Manager -->
+  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+  new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+  j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+  'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+  })(window,document,'script','dataLayer','GTM-NTBDS8SK');</script>
+  <!-- End Google Tag Manager -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calculadora de Reforma | KAI Arquitetura</title>
+  <meta name="description" content="Descubra em poucos passos quanto pode custar a sua reforma, com base nos preços médios do mercado brasileiro em 2026. Ferramenta gratuita da KAI Arquitetura.">
+  <link rel="icon" type="image/png" href="img/simbolo.png">
+  <link rel="stylesheet" href="css/fonts.css">
+  <style>:root {
+    --bg: #F7F3EF; --white: #FFFFFF; --surface: #FFFFFF; --surface-2: #F0EAE3;
+    --ink: #1C1C1C; --muted: #6F655C; --hairline: #E6DED4;
+    --coral: #D87C63; --coral-ink: #B05A40; --coral-soft: #F5E7E0;
+    --beige: #D9CFC5; --beige-dark: #A89888; --peach: #F0BBA3; --on-coral: #FFFFFF;
+    --btn-dark-bg: #1C1C1C; --btn-dark-fg: #FFFFFF;
+    --shadow: 0 1px 2px rgba(28,28,28,.04), 0 14px 40px rgba(28,28,28,.07);
+    /* liquid glass — bem translúcido */
+    --glass-bg: linear-gradient(155deg, rgba(255,255,255,.50), rgba(255,255,255,.20));
+    --glass-brd: rgba(255,255,255,.68);
+    --glass-sh: 0 10px 44px rgba(28,28,28,.10), inset 0 1px 0 rgba(255,255,255,.85);
+    --glass-inner: rgba(255,255,255,.34);
+    --glass-blur: blur(26px) saturate(185%);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #1D1A18; --white: #262220; --surface: #262220; --surface-2: #2E2926;
+      --ink: #F1EBE4; --muted: #A99E92; --hairline: #38322D;
+      --coral: #D87C63; --coral-ink: #E39781; --coral-soft: #33241F;
+      --beige: #4A423B; --beige-dark: #A89888; --peach: #F0BBA3; --on-coral: #201B18;
+      --btn-dark-bg: #F1EBE4; --btn-dark-fg: #1C1C1C;
+      --shadow: 0 1px 2px rgba(0,0,0,.3), 0 16px 44px rgba(0,0,0,.4);
+      --glass-bg: linear-gradient(155deg, rgba(255,255,255,.07), rgba(255,255,255,.025));
+      --glass-brd: rgba(255,255,255,.11);
+      --glass-sh: 0 10px 44px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.07);
+      --glass-inner: rgba(255,255,255,.045);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #1D1A18; --white: #262220; --surface: #262220; --surface-2: #2E2926;
+    --ink: #F1EBE4; --muted: #A99E92; --hairline: #38322D;
+    --coral: #D87C63; --coral-ink: #E39781; --coral-soft: #33241F;
+    --beige: #4A423B; --beige-dark: #A89888; --peach: #F0BBA3; --on-coral: #201B18;
+    --btn-dark-bg: #F1EBE4; --btn-dark-fg: #1C1C1C;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 16px 44px rgba(0,0,0,.4);
+    --glass-bg: linear-gradient(155deg, rgba(255,255,255,.07), rgba(255,255,255,.025));
+    --glass-brd: rgba(255,255,255,.11);
+    --glass-sh: 0 10px 44px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.07);
+    --glass-inner: rgba(255,255,255,.045);
+  }
+  :root[data-theme="light"] {
+    --bg: #F7F3EF; --white: #FFFFFF; --surface: #FFFFFF; --surface-2: #F0EAE3;
+    --ink: #1C1C1C; --muted: #6F655C; --hairline: #E6DED4;
+    --coral: #D87C63; --coral-ink: #B05A40; --coral-soft: #F5E7E0;
+    --beige: #D9CFC5; --beige-dark: #A89888; --peach: #F0BBA3; --on-coral: #FFFFFF;
+    --btn-dark-bg: #1C1C1C; --btn-dark-fg: #FFFFFF;
+    --shadow: 0 1px 2px rgba(28,28,28,.04), 0 14px 40px rgba(28,28,28,.07);
+    --glass-bg: linear-gradient(155deg, rgba(255,255,255,.50), rgba(255,255,255,.20));
+    --glass-brd: rgba(255,255,255,.68);
+    --glass-sh: 0 10px 44px rgba(28,28,28,.10), inset 0 1px 0 rgba(255,255,255,.85);
+    --glass-inner: rgba(255,255,255,.34);
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font-family: 'ClashDisplay', 'Segoe UI', system-ui, sans-serif;
+    font-size: 16px; line-height: 1.62; font-weight: 400; -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 1200px; margin: 0 auto; padding: 0 2rem; }
+
+  .proposal { background: var(--coral-soft); border-bottom: 1px solid var(--hairline); font-size: 13px; text-align: center; padding: 9px 28px; }
+  .proposal strong { color: var(--coral-ink); letter-spacing: .06em; }
+
+  /* ---------- HEADER ---------- */
+  .header { background: var(--bg); border-bottom: 1px solid var(--hairline); position: sticky; top: 0; z-index: 100; }
+  .nav { display: flex; justify-content: space-between; align-items: center; max-width: 1200px; margin: 0 auto; padding: 0 2rem; height: 60px; gap: 16px; }
+  .nav__logo { flex-shrink: 0; cursor: pointer; }
+  .nav__logo img { height: 110px; width: auto; margin: -28px 0; object-fit: contain; display: block; }
+  :root[data-theme="dark"] .nav__logo img { filter: brightness(0) invert(1); }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .nav__logo img { filter: brightness(0) invert(1); } }
+  .nav__links { display: flex; gap: 2.5rem; align-items: center; list-style: none; margin: 0; padding: 0; }
+  .nav__links a { font-weight: 500; font-size: .85rem; letter-spacing: .08em; text-transform: uppercase; color: var(--ink); text-decoration: none; position: relative; transition: color .3s; cursor: pointer; }
+  .nav__links a::after { content: ''; position: absolute; bottom: -4px; left: 0; width: 0; height: 2px; background-color: var(--coral); transition: width .3s; }
+  .nav__links a:hover { color: var(--coral); }
+  .nav__links a:hover::after, .nav__links a.is-current::after { width: 100%; }
+  .nav__links a.is-current { color: var(--coral); }
+  .nav__cta { display: flex; align-items: center; gap: .6rem; flex-shrink: 0; }
+  .btn { padding: .55rem 1.4rem; font-size: .75rem; border: 2px solid var(--coral); background: transparent; color: var(--coral); border-radius: 50px; font-family: inherit; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; text-decoration: none; transition: all .3s; display: inline-block; white-space: nowrap; cursor: pointer; }
+  .btn:hover { background: var(--coral); color: var(--on-coral); }
+  .btn--dark { background: var(--btn-dark-bg); border-color: var(--btn-dark-bg); color: var(--btn-dark-fg); }
+  .btn--dark:hover { background: transparent; color: var(--btn-dark-bg); border-color: var(--btn-dark-bg); }
+  @media (max-width: 1080px) { .nav__links { display: none; } }
+  @media (max-width: 620px) { .btn { padding: .5rem 1rem; font-size: .68rem; } .nav { gap: 8px; } }
+
+  .view[hidden] { display: none; }
+
+  /* ---------- HERO / TABS / TIERS (página serviços) ---------- */
+  .hero { padding: 74px 0 46px; text-align: center; }
+  .eyebrow { font-size: 12px; letter-spacing: .28em; text-transform: uppercase; color: var(--coral-ink); font-weight: 600; margin: 0 0 14px; }
+  .hero h1 { font-size: clamp(32px, 5vw, 54px); line-height: 1.08; margin: 0 auto 20px; max-width: 17ch; font-weight: 600; text-wrap: balance; letter-spacing: -.5px; }
+  .hero p { color: var(--muted); max-width: 58ch; margin: 0 auto; font-size: 17px; }
+  .tabs { display: flex; justify-content: center; gap: 3rem; border-bottom: 1px solid var(--hairline); margin: 40px 0 0; flex-wrap: wrap; }
+  .tab { background: none; border: 0; cursor: pointer; font-family: inherit; font-size: .85rem; letter-spacing: .08em; text-transform: uppercase; font-weight: 600; color: var(--muted); padding: 0 0 14px; position: relative; transition: color .3s; }
+  .tab::after { content: ''; position: absolute; bottom: -1px; left: 0; width: 0; height: 2px; background: var(--coral); transition: width .3s; }
+  .tab:hover { color: var(--coral); }
+  .tab[aria-selected="true"] { color: var(--ink); }
+  .tab[aria-selected="true"]::after { width: 100%; }
+  .tab:focus-visible { outline: 2px solid var(--coral); outline-offset: 4px; }
+  .panel[hidden] { display: none; }
+  .panel { padding: 46px 0 10px; }
+  .panel-intro { text-align: center; max-width: 62ch; margin: 0 auto 42px; color: var(--muted); font-size: 15.5px; }
+  .tiers { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; align-items: start; }
+  .tier { background: var(--surface); border: 1px solid var(--hairline); border-radius: 6px; padding: 34px 28px 30px; display: flex; flex-direction: column; gap: 20px; position: relative; }
+  .tier.feature { border-color: var(--coral); box-shadow: var(--shadow); }
+  .ribbon { position: absolute; top: -12px; left: 28px; background: var(--coral); color: var(--on-coral); font-size: 11px; letter-spacing: .16em; text-transform: uppercase; font-weight: 600; padding: 5px 13px; border-radius: 100px; }
+  .tname { font-size: 25px; margin: 0; font-weight: 600; }
+  .tfor { color: var(--muted); font-size: 13.5px; margin: -12px 0 0; min-height: 3em; }
+  .quote { font-size: 11.5px; letter-spacing: .16em; text-transform: uppercase; color: var(--muted); font-weight: 600; border-top: 1px solid var(--hairline); border-bottom: 1px solid var(--hairline); padding: 11px 0; }
+  ul.feat { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 11px; }
+  ul.feat li { display: grid; grid-template-columns: 18px 1fr; gap: 10px; font-size: 14px; align-items: start; }
+  ul.feat .k { color: var(--coral); font-weight: 700; line-height: 1.45; }
+  ul.feat .no { color: var(--hairline); font-weight: 700; }
+  ul.feat li.off { color: var(--muted); }
+  ul.feat .v { line-height: 1.45; }
+  ul.feat .v em { font-style: normal; color: var(--muted); font-size: 12.5px; display: block; }
+  .cta { display: inline-block; text-align: center; padding: .7rem 1.5rem; border-radius: 50px; border: 2px solid var(--ink); color: var(--ink); text-decoration: none; font-size: .75rem; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; transition: all .3s; margin-top: auto; font-family: inherit; cursor: pointer; }
+  .cta:hover { background: var(--ink); color: var(--bg); }
+  .cta.solid { background: var(--coral); border-color: var(--coral); color: var(--on-coral); }
+  .cta.solid:hover { filter: brightness(1.06); }
+  .addons { margin-top: 26px; font-size: 13.5px; color: var(--muted); background: var(--surface-2); border: 1px solid var(--hairline); border-radius: 6px; padding: 16px 20px; }
+  .addons strong { color: var(--ink); }
+  .trio { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+  .flat { background: var(--surface); border: 1px solid var(--hairline); border-radius: 6px; padding: 32px 28px; display: flex; flex-direction: column; gap: 16px; }
+  .flat h3 { margin: 0; font-size: 22px; font-weight: 600; }
+  .flat .meta { color: var(--coral-ink); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; margin: -8px 0 0; font-weight: 600; }
+  .flat p { margin: 0; font-size: 14.5px; }
+  .price { display: flex; align-items: baseline; gap: 6px; flex-wrap: wrap; }
+  .price .val { font-size: 30px; font-weight: 600; letter-spacing: -.4px; }
+  .price .unit { font-size: 13px; color: var(--muted); }
+  .price-note { font-size: 12px; color: var(--muted); margin: -10px 0 0; }
+  .quad { display: grid; grid-template-columns: repeat(4,1fr); gap: 18px; }
+  .mini { background: var(--surface); border: 1px solid var(--hairline); border-radius: 6px; padding: 26px 22px; display: flex; flex-direction: column; gap: 10px; }
+  .mini .num { font-size: 11px; letter-spacing: .18em; text-transform: uppercase; color: var(--coral-ink); font-weight: 600; }
+  .mini h3 { margin: 0; font-size: 19px; font-weight: 600; }
+  .mini p { margin: 0; color: var(--muted); font-size: 13.5px; flex: 1; }
+  .pay-sec { padding: 60px 0 20px; }
+  .sec-head { text-align: center; margin-bottom: 38px; }
+  .sec-head h2 { font-size: clamp(26px,3.4vw,36px); margin: 6px 0 12px; font-weight: 600; letter-spacing: -.3px; }
+  .sec-head p { color: var(--muted); max-width: 56ch; margin: 0 auto; font-size: 15.5px; }
+  .pay { display: grid; grid-template-columns: repeat(3,1fr); gap: 22px; }
+  .pay .cell { border-top: 2px solid var(--coral); padding-top: 16px; }
+  .pay h4 { margin: 0 0 6px; font-size: 16px; font-weight: 600; }
+  .pay p { margin: 0; color: var(--muted); font-size: 13.5px; }
+
+  /* ================= CALCULADORA (liquid glass) ================= */
+  .calcpage { position: relative; overflow: hidden; padding-bottom: 40px; }
+  .blobs { position: absolute; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+  .blob { position: absolute; border-radius: 50%; filter: blur(90px); }
+  .blob--1 { width: 540px; height: 540px; background: var(--peach); top: -160px; left: -120px; opacity: .62; }
+  .blob--2 { width: 480px; height: 480px; background: var(--coral); top: 200px; right: -150px; opacity: .34; }
+  .blob--3 { width: 440px; height: 440px; background: var(--beige-dark); bottom: -120px; left: 34%; opacity: .4; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .blob { opacity: .22; } }
+  :root[data-theme="dark"] .blob { opacity: .22; }
+  .calcpage > .wrap { position: relative; z-index: 1; }
+
+  .calc-hero { padding: 62px 0 40px; text-align: center; }
+  .calc-hero h1 { font-size: clamp(30px, 4.6vw, 50px); line-height: 1.1; margin: 0 auto 18px; max-width: 18ch; font-weight: 600; text-wrap: balance; letter-spacing: -.5px; }
+  .calc-hero p { color: var(--muted); max-width: 56ch; margin: 0 auto; font-size: 16.5px; }
+
+  .glass {
+    background: var(--glass-bg);
+    backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
+    border: 1px solid var(--glass-brd); box-shadow: var(--glass-sh); border-radius: 24px;
+  }
+
+  .calc { display: grid; grid-template-columns: 1.1fr .9fr; gap: 22px; align-items: stretch; }
+  .calc__form { padding: 36px 34px; display: flex; flex-direction: column; gap: 34px; }
+  .calc__right { display: flex; flex-direction: column; gap: 22px; }
+
+  .step__head { display: flex; align-items: center; gap: 11px; margin-bottom: 18px; }
+  .step__num { width: 26px; height: 26px; border-radius: 50%; background: var(--coral); color: var(--on-coral); font-size: 14px; font-weight: 600; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .step__title { margin: 0; font-size: 16px; font-weight: 600; }
+
+  /* tooltip */
+  .tip { position: relative; display: inline-flex; }
+  .tip__btn { width: 18px; height: 18px; border-radius: 50%; border: 1.5px solid var(--coral); color: var(--coral); background: transparent; font-size: 11px; font-weight: 700; line-height: 1; cursor: help; display: inline-flex; align-items: center; justify-content: center; font-family: inherit; padding: 0; }
+  .tip__bubble {
+    position: absolute; bottom: calc(100% + 10px); left: 0; width: 250px; max-width: 62vw; padding: 13px 15px;
+    font-size: 12.5px; line-height: 1.5; color: var(--ink); font-weight: 400; text-transform: none; letter-spacing: normal;
+    background: var(--surface); border: 1px solid var(--hairline); border-radius: 14px;
+    box-shadow: 0 12px 34px rgba(28,28,28,.18);
+    opacity: 0; visibility: hidden; transform: translateY(5px); transition: opacity .2s, transform .2s, visibility .2s; z-index: 30;
+  }
+  .tip__bubble b { color: var(--coral-ink); }
+  .tip:hover .tip__bubble, .tip__btn:focus-visible + .tip__bubble { opacity: 1; visibility: visible; transform: translateY(0); }
+
+  /* slider */
+  .range-row { display: flex; align-items: center; gap: 18px; }
+  .rng-wrap { position: relative; flex: 1; height: 28px; border-radius: 50px; }
+  .rng-track { position: absolute; inset: 0; border-radius: 50px; overflow: hidden; background: var(--glass-inner); }
+  .rng-fill { height: 100%; border-radius: 50px; width: calc(var(--p, 0) * (100% - 28px) + 28px); background: linear-gradient(90deg, #F3C4AC 0%, #E08A6C 45%, #D0603F 100%); }
+  .rng-knob { position: absolute; top: 50%; left: calc(var(--p, 0) * (100% - 28px) + 14px); width: 10px; height: 10px; border-radius: 50%; background: var(--glass-inner); box-shadow: 0 1px 3px rgba(28,28,28,.18); transform: translate(-50%, -50%); pointer-events: none; }
+  .rng { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; -webkit-appearance: none; appearance: none; background: transparent; cursor: pointer; }
+  .rng::-webkit-slider-runnable-track { height: 100%; background: transparent; }
+  .rng::-moz-range-track { background: transparent; }
+  .rng::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 28px; height: 28px; background: transparent; border: 0; cursor: pointer; }
+  .rng::-moz-range-thumb { width: 28px; height: 28px; background: transparent; border: 0; cursor: pointer; }
+  .rng-wrap:focus-within { outline: 2px solid var(--ink); outline-offset: 4px; }
+  .area-val { font-size: 24px; font-weight: 600; min-width: 6ch; text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .area-val small { font-size: 13px; color: var(--muted); font-weight: 400; }
+
+  /* segmentos e multi-seleção */
+  .segs { display: flex; gap: 8px; flex-wrap: wrap; }
+  .seg { position: relative; }
+  .seg input { position: absolute; opacity: 0; width: 0; height: 0; }
+  .seg span { display: block; padding: 9px 16px; border: 1px solid var(--glass-brd); border-radius: 50px; font-size: 13px; cursor: pointer; transition: all .2s; background: var(--glass-inner); }
+  /* selecionado: vidro translúcido com toque de coral (mais clean que o laranja cheio) */
+  .seg input:checked + span { background: rgba(216,124,99,.16); border-color: var(--coral); color: var(--coral-ink); font-weight: 600; }
+  .segs--multi .seg input:checked + span::before { content: '✓ '; }
+  .seg input:focus-visible + span { outline: 2px solid var(--coral); outline-offset: 2px; }
+  .seg span:hover { border-color: var(--coral); }
+
+  /* lista de ambientes (rows com stepper) */
+  .amb-list { display: flex; flex-direction: column; }
+  .amb-row { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 14px 0; border-bottom: 1px solid var(--glass-brd); }
+  .amb-row:first-child { padding-top: 4px; }
+  .amb-row:last-child { border-bottom: 0; padding-bottom: 0; }
+  .amb-row__lbl { font-size: 15px; }
+  .amb-row__lbl small { display: block; color: var(--muted); font-size: 12px; }
+  .stepper { display: flex; align-items: center; gap: 14px; flex-shrink: 0; }
+  .stepper button { width: 32px; height: 32px; border-radius: 50%; border: 1px solid var(--coral); background: transparent; color: var(--coral); font-size: 18px; line-height: 1; cursor: pointer; font-family: inherit; transition: all .2s; display: flex; align-items: center; justify-content: center; }
+  .stepper button:hover:not(:disabled) { background: var(--coral); color: var(--on-coral); }
+  .stepper button:disabled { opacity: .35; cursor: default; }
+  .stepper output { font-size: 17px; font-weight: 600; min-width: 1.5ch; text-align: center; font-variant-numeric: tabular-nums; }
+
+  /* stepper embutido (ar-condicionado) */
+  .subq { margin-top: 16px; display: none; align-items: center; justify-content: space-between; gap: 14px; background: var(--glass-inner); border: 1px solid var(--glass-brd); border-radius: 16px; padding: 13px 18px; }
+  .subq.show { display: flex; }
+  .subq__lbl { font-size: 13.5px; }
+  .subq__lbl small { display: block; color: var(--muted); font-size: 11.5px; }
+
+  /* ---- painel de resultado ---- */
+  .calc__out { padding: 34px 30px; display: flex; flex-direction: column; }
+  .olbl { font-size: 11px; letter-spacing: .18em; text-transform: uppercase; color: var(--coral-ink); font-weight: 600; margin: 0 0 6px; }
+  .orange { font-size: clamp(26px, 3.2vw, 34px); font-weight: 600; letter-spacing: -.5px; line-height: 1.2; font-variant-numeric: tabular-nums; margin: 0; }
+  .om2 { font-size: 14px; color: var(--muted); margin: 6px 0 0; font-variant-numeric: tabular-nums; }
+
+  /* detalhamento expansível */
+  .detail { margin-top: 16px; border-top: 1px solid var(--glass-brd); }
+  .detail > summary { list-style: none; cursor: pointer; display: flex; align-items: center; justify-content: space-between; padding: 15px 0 6px; }
+  .detail > summary::-webkit-details-marker { display: none; }
+  .detail__lbl { font-size: 12px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--coral-ink); }
+  /* + quando fechado, − quando aberto — sem bola, alinhado com o texto */
+  .detail > summary .chev { color: var(--coral-ink); font-size: 20px; font-weight: 700; line-height: 1; transition: color .2s; }
+  .detail > summary:hover .chev { color: var(--coral); }
+  .detail > summary .chev::before { content: '+'; }
+  .detail[open] > summary .chev::before { content: '−'; }
+  .detail__list { list-style: none; margin: 4px 0 6px; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+  .detail__list li { display: flex; justify-content: space-between; gap: 12px; font-size: 13px; }
+  .detail__list li span:first-child { color: var(--muted); }
+  .detail__list li span:last-child { font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .detail__list li.tot { border-top: 1px dashed var(--glass-brd); padding-top: 8px; font-weight: 600; }
+  .detail__list li.tot span:first-child { color: var(--ink); }
+
+  .odis { font-size: 12px; color: var(--muted); margin: 16px 0 0; line-height: 1.5; border-top: 1px solid var(--glass-brd); padding-top: 16px; }
+
+  /* carrossel de diferenciais */
+  .why { margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--glass-brd); }
+  .why__viewport { overflow: hidden; margin-top: 12px; }
+  .why__track { display: flex; transition: transform .45s cubic-bezier(.4,0,.2,1); }
+  .why__card { flex: 0 0 100%; text-align: center; padding: 4px 6px; }
+  .why__stat { font-size: 2.6rem; font-weight: 700; line-height: 1; margin: 0 0 .3rem; color: var(--coral); letter-spacing: -1px; }
+  .why__title { font-size: .95rem; font-weight: 600; margin: 0 0 .6rem; }
+  .why__text { font-size: .85rem; line-height: 1.6; color: var(--muted); margin: 0; }
+  .why__src { font-size: 11px; color: var(--muted); opacity: .75; margin: 8px 0 0; }
+  .dots { display: flex; justify-content: center; gap: 9px; margin-top: 14px; }
+  .dot { width: 9px; height: 9px; border-radius: 50%; border: 0; padding: 0; background: var(--beige-dark); opacity: .45; cursor: pointer; transition: all .25s; }
+  .dot[aria-selected="true"] { opacity: 1; background: var(--coral); transform: scale(1.25); }
+  .dot:focus-visible { outline: 2px solid var(--coral); outline-offset: 3px; }
+  .calc__out .cta { margin-top: 20px; background: var(--coral); border-color: var(--coral); color: var(--on-coral); align-self: stretch; }
+
+  /* ---- card compartilhar (preenche a altura restante e alinha o rodapé com o formulário) ---- */
+  .share { flex: 1; padding: 30px 32px; text-align: center; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+  .share h3 { margin: 0 0 8px; font-size: 21px; font-weight: 600; }
+  .share p { margin: 0 auto 20px; font-size: 14px; color: var(--muted); max-width: 46ch; }
+  .share__btns { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+  .sbtn { display: inline-flex; align-items: center; gap: 8px; padding: .7rem 1.4rem; border-radius: 50px; font-family: inherit; font-size: .78rem; font-weight: 600; letter-spacing: .03em; cursor: pointer; border: 1px solid var(--glass-brd); background: var(--glass-inner); color: var(--ink); transition: all .2s; }
+  .sbtn:hover { border-color: var(--coral); color: var(--coral-ink); }
+  .sbtn--primary { background: var(--coral); border-color: var(--coral); color: var(--on-coral); }
+  .sbtn--primary:hover { filter: brightness(1.06); color: var(--on-coral); }
+  .sbtn svg { width: 16px; height: 16px; }
+  .share__menu { position: relative; display: inline-block; }
+  /* balão sólido, igual ao tooltip (sobrepõe o .glass aplicado no HTML) */
+  .share__pop { position: absolute; bottom: calc(100% + 10px); left: 50%; transform: translateX(-50%) translateY(6px); min-width: 210px; padding: 8px; display: none; flex-direction: column; gap: 3px; z-index: 30;
+    background: var(--surface); backdrop-filter: none; -webkit-backdrop-filter: none; border: 1px solid var(--hairline); border-radius: 14px; box-shadow: 0 12px 34px rgba(28,28,28,.18); }
+  .share__pop.show { display: flex; transform: translateX(-50%) translateY(0); }
+  .share__pop button { display: flex; align-items: center; gap: 10px; width: 100%; padding: 10px 12px; border: 0; background: transparent; border-radius: 10px; font-family: inherit; font-size: 13.5px; color: var(--ink); cursor: pointer; text-align: left; }
+  .share__pop button:hover { background: var(--surface-2); }
+  .share__pop svg { width: 17px; height: 17px; flex-shrink: 0; }
+
+  .toast { position: fixed; bottom: 26px; left: 50%; transform: translateX(-50%) translateY(20px); background: var(--ink); color: var(--bg); padding: 12px 22px; border-radius: 50px; font-size: 13.5px; font-weight: 500; opacity: 0; pointer-events: none; transition: all .3s; z-index: 200; box-shadow: 0 10px 30px rgba(0,0,0,.25); }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  footer { border-top: 1px solid var(--hairline); margin-top: 64px; padding: 38px 0 64px; color: var(--muted); font-size: 13px; }
+  .note { font-size: 12px; margin-top: 10px; max-width: 78ch; }
+
+  @media (max-width: 1000px) { .quad, .trio { grid-template-columns: repeat(2,1fr); } .calc { grid-template-columns: 1fr; } .calc__out { position: static; } }
+  @media (max-width: 780px) {
+    .tiers, .trio, .pay, .quad { grid-template-columns: 1fr; }
+    .tabs { gap: 1.6rem; }
+    .hero { padding: 52px 0 36px; }
+    .calc__form { padding: 28px 22px; }
+  }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+
+  /* ================= FOLHA DE IMPRESSÃO (A4) ================= */
+  .print-sheet { display: none; }
+  @media print {
+    @page { size: A4; margin: 14mm; }
+    body { background: #fff; color: #1C1C1C; }
+    body > *:not(.print-sheet) { display: none !important; }
+    .print-sheet { display: block; }
+    .ps { font-family: 'ClashDisplay', sans-serif; color: #1C1C1C; }
+    .ps__top { display: flex; align-items: center; justify-content: space-between; border-bottom: 2px solid #D87C63; padding-bottom: 14px; margin-bottom: 22px; }
+    .ps__top img { height: 70px; }
+    .ps__top .ps__tag { text-align: right; font-size: 11px; color: #6F655C; letter-spacing: .04em; }
+    .ps h1 { font-size: 26px; margin: 0 0 4px; }
+    .ps__sub { color: #6F655C; font-size: 13px; margin: 0 0 22px; }
+    .ps__grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 28px; margin-bottom: 22px; font-size: 13px; }
+    .ps__grid div { border-bottom: 1px solid #E6DED4; padding: 6px 0; display: flex; justify-content: space-between; gap: 12px; }
+    .ps__grid span:first-child { color: #6F655C; }
+    .ps__total { background: #F5E7E0; border-radius: 12px; padding: 20px 24px; margin-bottom: 22px; }
+    .ps__total .l { font-size: 11px; letter-spacing: .16em; text-transform: uppercase; color: #B05A40; font-weight: 700; margin: 0 0 4px; }
+    .ps__total .v { font-size: 28px; font-weight: 700; margin: 0; }
+    .ps__total .m { font-size: 12px; color: #6F655C; margin: 4px 0 0; }
+    .ps h2 { font-size: 14px; margin: 0 0 8px; }
+    .ps__items { width: 100%; border-collapse: collapse; font-size: 12.5px; margin-bottom: 22px; }
+    .ps__items td { padding: 7px 0; border-bottom: 1px solid #E6DED4; }
+    .ps__items td:last-child { text-align: right; font-weight: 600; }
+    .ps__dis { font-size: 10.5px; color: #6F655C; line-height: 1.5; border-top: 1px solid #E6DED4; padding-top: 12px; margin-bottom: 20px; }
+    .ps__foot { display: flex; justify-content: space-between; align-items: flex-end; border-top: 2px solid #D87C63; padding-top: 14px; font-size: 12px; }
+    .ps__foot b { color: #B05A40; }
+  }
+</style>
+</head>
+<body>
+  <!-- Google Tag Manager (noscript) -->
+  <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NTBDS8SK"
+  height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+  <!-- End Google Tag Manager -->
+
+  <header class="header">
+    <nav class="nav">
+      <a href="index.html" class="nav__logo"><img src="img/logo.png" alt="KAI Arquitetura"></a>
+      <ul class="nav__links">
+        <li><a href="index.html#sobre">Sobre</a></li>
+        <li><a href="servicos-projeto.html">Serviços</a></li>
+        <li><a href="portfolio.html">Portfólio</a></li>
+        <li><a href="index.html#contato">Contato</a></li>
+      </ul>
+      <div class="nav__cta">
+        <a href="calculadora.html" class="btn btn--dark">Calculadora de reforma</a>
+        <a href="https://wa.me/5511925049959" target="_blank" class="btn">Orçamento</a>
+      </div>
+    </nav>
+  </header>
+<main class="view calcpage" id="view-calculadora">
+  <div class="blobs" aria-hidden="true"><span class="blob blob--1"></span><span class="blob blob--2"></span><span class="blob blob--3"></span></div>
+
+  <section class="wrap calc-hero">
+    <p class="eyebrow">Ferramenta gratuita</p>
+    <h1>Quanto vai custar a sua reforma?</h1>
+    <p>Faça uma estimativa em poucos passos com base nos preços médios praticados no mercado brasileiro em 2026.</p>
+  </section>
+
+  <div class="wrap">
+    <div class="calc">
+      <div class="calc__form glass">
+        <!-- 1 -->
+        <div class="step">
+          <div class="step__head">
+            <span class="step__num">1</span><h3 class="step__title">Área da reforma</h3>
+            <span class="tip"><button class="tip__btn" type="button" aria-label="Ajuda">?</button><span class="tip__bubble" role="tooltip">Informe só a metragem que será <b>transformada</b>. Numa reforma parcial, some apenas os ambientes envolvidos (ex.: cozinha + 1 banheiro ≈ 12 m²).</span></span>
+          </div>
+          <div class="range-row">
+            <div class="rng-wrap" id="rngWrap">
+              <div class="rng-track"><div class="rng-fill"></div></div>
+              <span class="rng-knob" aria-hidden="true"></span>
+              <input type="range" class="rng" id="area" min="5" max="400" step="5" value="5" aria-label="Área da reforma em metros quadrados">
+            </div>
+            <div class="area-val"><span id="areaOut">5</span> <small>m²</small></div>
+          </div>
+        </div>
+
+        <!-- 2 -->
+        <div class="step">
+          <div class="step__head">
+            <span class="step__num">2</span><h3 class="step__title">Ambientes</h3>
+            <span class="tip"><button class="tip__btn" type="button" aria-label="Ajuda">?</button><span class="tip__bubble" role="tooltip">Conte quantos ambientes de cada tipo entram na reforma. Isso estima os valores com mais precisão.</span></span>
+          </div>
+          <div class="amb-list" id="ambientes"></div>
+        </div>
+
+        <!-- 3 -->
+        <div class="step">
+          <div class="step__head">
+            <span class="step__num">3</span><h3 class="step__title">Padrão de acabamento</h3>
+            <span class="tip"><button class="tip__btn" type="button" aria-label="Ajuda">?</button><span class="tip__bubble" role="tooltip"><b>Simples:</b> acabamentos econômicos. <b>Médio:</b> marcas intermediárias, bom custo-benefício. <b>Alto padrão:</b> materiais premium.</span></span>
+          </div>
+          <div class="segs" id="padrao">
+            <label class="seg"><input type="radio" name="padrao" value="0"><span>Simples</span></label>
+            <label class="seg"><input type="radio" name="padrao" value="1" checked><span>Médio</span></label>
+            <label class="seg"><input type="radio" name="padrao" value="2"><span>Alto padrão</span></label>
+          </div>
+        </div>
+
+        <!-- 4 -->
+        <div class="step">
+          <div class="step__head">
+            <span class="step__num">4</span><h3 class="step__title">Quais melhorias você quer fazer?</h3>
+            <span class="tip"><button class="tip__btn" type="button" aria-label="Ajuda">?</button><span class="tip__bubble" role="tooltip">Marque tudo o que a obra inclui. Itens como <b>bancadas, box e louças</b> são calculados pelos ambientes que você informou acima.</span></span>
+          </div>
+          <div class="segs segs--multi" id="escopo">
+            <label class="seg"><input type="checkbox" data-kind="area" value="115" data-pad="0.85,1,1.4"><span>Pintura e acabamentos</span></label>
+            <label class="seg"><input type="checkbox" data-kind="piso"><span>Piso e revestimentos</span></label>
+            <label class="seg"><input type="checkbox" data-kind="amb" data-attr="marm" data-pad="0.85,1,2"><span>Tampos e marmoraria</span></label>
+            <label class="seg"><input type="checkbox" data-kind="amb" data-attr="box" data-pad="0.85,1,1.5"><span>Box e espelhos</span></label>
+            <label class="seg"><input type="checkbox" data-kind="amb" data-attr="louca" data-pad="0.8,1,1.6"><span>Cubas e torneiras</span></label>
+            <label class="seg"><input type="checkbox" data-kind="area" value="150" data-pad="0.9,1,1.15"><span>Forro de gesso</span></label>
+            <label class="seg"><input type="checkbox" data-kind="area" value="90" data-pad="0.6,1,1.6"><span>Iluminação</span></label>
+            <label class="seg"><input type="checkbox" data-kind="area" value="220" data-pad="0.9,1,1.2"><span>Elétrica e hidráulica</span></label>
+            <label class="seg"><input type="checkbox" data-kind="amb" data-attr="marc" data-pad="0.75,1,1.9"><span>Marcenaria sob medida</span></label>
+            <label class="seg"><input type="checkbox" data-kind="ac" id="acChk"><span>Ar-condicionado</span></label>
+            <label class="seg"><input type="checkbox" data-kind="area" value="140" data-pad="0.9,1,1.1"><span>Demolições ou novas paredes</span></label>
+          </div>
+          <div class="subq" id="acBox">
+            <div class="subq__lbl">Quantos ambientes com ar?<small>Equipamento + Instalação</small></div>
+            <div class="stepper">
+              <button type="button" id="acMinus" aria-label="Menos">−</button>
+              <output id="acOut" aria-live="polite">1</output>
+              <button type="button" id="acPlus" aria-label="Mais">+</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 5 -->
+        <div class="step">
+          <div class="step__head">
+            <span class="step__num">5</span><h3 class="step__title">Qual região?</h3>
+            <span class="tip"><button class="tip__btn" type="button" aria-label="Ajuda">?</button><span class="tip__bubble" role="tooltip">O custo de mão de obra muda por região. Capitais como <b>São Paulo e Rio</b> ficam acima da média nacional.</span></span>
+          </div>
+          <div class="segs" id="regiao">
+            <label class="seg"><input type="radio" name="regiao" value="1.2" checked><span>Capital SP / RJ</span></label>
+            <label class="seg"><input type="radio" name="regiao" value="1.05"><span>Sul / Sudeste</span></label>
+            <label class="seg"><input type="radio" name="regiao" value="0.9"><span>Demais regiões</span></label>
+          </div>
+        </div>
+      </div>
+
+      <div class="calc__right">
+        <div class="calc__out glass">
+        <p class="olbl">Investimento estimado na obra</p>
+        <p class="orange" id="out">Selecione ao menos uma melhoria</p>
+        <p class="om2" id="outM2"></p>
+
+        <details class="detail" id="detail">
+          <summary><span class="detail__lbl">Detalhamento dos valores</span> <span class="chev" aria-hidden="true"></span></summary>
+          <ul class="detail__list" id="detailList"></ul>
+        </details>
+
+        <p class="odis">Estimativa de <strong>mão de obra e materiais da reforma</strong>, com base em médias de mercado de 2026. Não inclui mobiliário solto, decoração, eletrodomésticos e nem honorários de projeto / acompanhamento de obra. Os valores finais dependem de orçamento detalhado.</p>
+
+        <div class="why">
+          <p class="olbl">Por que contratar a KAI?</p>
+          <div class="why__viewport">
+            <div class="why__track" id="whyTrack">
+              <div class="why__card"><p class="why__stat">30%</p><h4 class="why__title">Menos desperdício na obra</h4><p class="why__text">Até 30% do material de uma obra vira desperdício por falhas de planejamento. Com cada medida e quantidade definidas antes da primeira compra, você não compra errado nem refaz o que já foi feito.</p><p class="why__src">Fonte: SindusCon-SP e CBIC</p></div>
+              <div class="why__card"><p class="why__stat">✓</p><h4 class="why__title">Transparência em todas as etapas</h4><p class="why__text">Você acompanha escopo, prazos e custos do começo ao fim — do orçamento à entrega da obra. Cada valor é apresentado com clareza, sem taxas escondidas e sem surpresa no meio do caminho.</p></div>
+              <div class="why__card"><p class="why__stat">100%</p><h4 class="why__title">Personalizado para você</h4><p class="why__text">Cada projeto é único e pensado exclusivamente para refletir suas necessidades, preferências e rotina. Nada de soluções genéricas.</p></div>
+            </div>
+          </div>
+          <div class="dots" role="tablist" aria-label="Diferenciais">
+            <button class="dot" role="tab" aria-selected="true" aria-label="Diferencial 1"></button>
+            <button class="dot" role="tab" aria-selected="false" aria-label="Diferencial 2"></button>
+            <button class="dot" role="tab" aria-selected="false" aria-label="Diferencial 3"></button>
+          </div>
+        </div>
+
+        <a class="cta">Falar com a KAI</a>
+        </div>
+
+        <!-- card compartilhar -->
+        <div class="share glass">
+      <h3>Pronto para começar sua reforma?</h3>
+      <p>Salve para consultar mais tarde, ou compartilhe com quem vai encarar essa obra com você.</p>
+      <div class="share__btns">
+        <button class="sbtn sbtn--primary" id="btnDownload">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Baixar estimativa (PDF)
+        </button>
+        <div class="share__menu">
+          <button class="sbtn" id="btnShare" aria-haspopup="true" aria-expanded="false">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.6" y1="13.5" x2="15.4" y2="17.5"/><line x1="15.4" y1="6.5" x2="8.6" y2="10.5"/></svg>
+          Compartilhar
+          </button>
+          <div class="share__pop glass" id="sharePop">
+            <button data-share="whatsapp"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15l-1.3 4.7 4.8-1.3A10 10 0 1 0 12 2zm0 18a8 8 0 0 1-4.1-1.1l-.3-.2-2.9.8.8-2.8-.2-.3A8 8 0 1 1 12 20zm4.4-6c-.2-.1-1.4-.7-1.6-.8s-.4-.1-.5.1l-.7.9c-.1.2-.3.2-.5.1a6.5 6.5 0 0 1-3.2-2.8c-.2-.4.2-.4.6-1.2.1-.2 0-.3 0-.5l-.7-1.7c-.2-.4-.4-.4-.5-.4h-.5a1 1 0 0 0-.7.3A3 3 0 0 0 6.5 9c0 1.8 1.3 3.5 1.5 3.7s2.6 3.9 6.2 5.2c2.2.8 2.6.6 3.1.6s1.4-.6 1.6-1.1.2-1 .1-1.1-.3-.2-.6-.3z"/></svg> WhatsApp</button>
+            <button data-share="email"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg> E-mail</button>
+            <button data-share="copy"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copiar link</button>
+          </div>
+        </div>
+      </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<div class="print-sheet"><div class="ps">
+  <div class="ps__top">
+    <img src="img/logo.png" alt="KAI Arquitetura">
+    <div class="ps__tag">Estimativa de Reforma<br><span id="psDate"></span></div>
+  </div>
+  <h1>Estimativa da sua reforma</h1>
+  <p class="ps__sub">Gerada na calculadora de reforma da KAI Arquitetura · valores de referência 2026</p>
+  <div class="ps__grid" id="psGrid"></div>
+  <div class="ps__total">
+    <p class="l">Investimento estimado na obra</p>
+    <p class="v" id="psTotal">—</p>
+    <p class="m" id="psM2">—</p>
+  </div>
+  <h2>Detalhamento por item</h2>
+  <table class="ps__items"><tbody id="psItems"></tbody></table>
+  <p class="ps__dis">Estimativa de mão de obra e materiais da reforma, com base em médias de mercado de 2026. Não inclui mobiliário solto, decoração, eletrodomésticos nem honorários de projeto. Contratar um profissional evita até 30% de desperdício de material em obra (SindusCon-SP e CBIC). Valores finais dependem de orçamento detalhado.</p>
+  <div class="ps__foot">
+    <div>
+      <b>KAI Arquitetura</b><br>
+      WhatsApp (11) 92504-9959 · @kaiarquitetura<br>
+      kaiarquitetura.com.br
+    </div>
+    <div style="text-align:right">Faça a sua estimativa:<br><b>kaiarquitetura.com.br/calculadora</b></div>
+  </div>
+</div></div>
+
+<div class="toast" id="toast"></div>
+<footer>
+  <div class="wrap">
+    <p class="note">Estimativa de mão de obra e materiais da reforma, com base em médias de mercado de 2026. Serve como referência e não substitui um orçamento detalhado.<br>KAI Arquitetura &middot; WhatsApp (11) 92504-9959 &middot; @kaiarquitetura &middot; kaiarquitetura.com.br</p>
+  </div>
+</footer>
+
+<script>
+  var KAI = { whats: '5511925049959', ig: 'instagram.com/kaiarquitetura', site: 'kaiarquitetura.com.br', calc: 'https://kaiarquitetura.com.br/calculadora' };
+
+  // ---------- carrossel diferenciais ----------
+  var whyTrack = document.getElementById('whyTrack');
+  var dots = Array.prototype.slice.call(document.querySelectorAll('.dot'));
+  function showCard(i) {
+    whyTrack.style.transform = 'translateX(' + (-i * 100) + '%)';
+    dots.forEach(function (d, j) { d.setAttribute('aria-selected', j === i ? 'true' : 'false'); });
+  }
+  dots.forEach(function (d, i) { d.addEventListener('click', function () { showCard(i); }); });
+
+  // =========================================================
+  //   MODELO DE CÁLCULO
+  // =========================================================
+  var MOBILIZACAO = 1.15;         // canteiro, proteção, limpeza, descarte
+  var PISO_MAT = 110;             // material do piso/revestimento (R$/m², médio) — colocação some à parte
+  var AC_MAQUINA = 2500;          // split 12.000 BTU inverter (média)
+  var AC_INSTAL_BASE = 900;       // instalação do 1º ponto
+  var AC_INSTAL_EXTRA = 650;      // acréscimo por ponto adicional (não multiplica a base)
+
+  // Cada ambiente carrega quanto consome de marcenaria / bancada (marm) / box / louças e metais (padrão médio, R$).
+  // wet = área molhada (entra no acréscimo de revestimento de parede do piso).
+  var AMB = [
+    { id: 'sala',    nome: 'Sala',                    sub: 'Estar, jantar, home', marc: 5000,  marm: 0,    box: 0,    louca: 0,    wet: false, def: 0 },
+    { id: 'varanda', nome: 'Varanda',                 sub: 'Sacada ou gourmet',   marc: 2500,  marm: 1300, box: 0,    louca: 800,  wet: false, def: 0 },
+    { id: 'cozinha', nome: 'Cozinha / Área de serviço', sub: 'Com pia e bancada', marc: 14000, marm: 2800, box: 0,    louca: 1300, wet: true,  def: 0 },
+    { id: 'banheiro',nome: 'Banheiro / Lavabo',        sub: 'Com box e louças',    marc: 2000,  marm: 1000, box: 1500, louca: 2000, wet: true,  def: 0 },
+    { id: 'quarto',  nome: 'Quarto',                   sub: 'Dormitório ou closet',marc: 9000,  marm: 0,    box: 0,    louca: 0,    wet: false, def: 0 },
+    { id: 'hall',    nome: 'Hall / Circulação',        sub: 'Entrada e corredores',marc: 3000,  marm: 0,    box: 0,    louca: 0,    wet: false, def: 0 }
+  ];
+  var counts = {};
+
+  // monta a lista de ambientes com steppers
+  var ambWrap = document.getElementById('ambientes');
+  AMB.forEach(function (a) {
+    counts[a.id] = a.def;
+    var row = document.createElement('div');
+    row.className = 'amb-row';
+    row.innerHTML =
+      '<div class="amb-row__lbl">' + a.nome + '<small>' + a.sub + '</small></div>' +
+      '<div class="stepper">' +
+        '<button type="button" data-amb="' + a.id + '" data-d="-1" aria-label="Menos ' + a.nome + '">−</button>' +
+        '<output id="amb-' + a.id + '">' + a.def + '</output>' +
+        '<button type="button" data-amb="' + a.id + '" data-d="1" aria-label="Mais ' + a.nome + '">+</button>' +
+      '</div>';
+    ambWrap.appendChild(row);
+  });
+  Array.prototype.forEach.call(ambWrap.querySelectorAll('button'), function (b) {
+    b.addEventListener('click', function () {
+      var id = b.getAttribute('data-amb'), d = parseInt(b.getAttribute('data-d'), 10);
+      counts[id] = Math.max(0, Math.min(9, counts[id] + d));
+      document.getElementById('amb-' + id).textContent = counts[id];
+      calc();
+    });
+  });
+
+  function sumAmb(attr) {
+    var s = 0;
+    AMB.forEach(function (a) { s += counts[a.id] * a[attr]; });
+    return s;
+  }
+
+  // ---------- ar-condicionado ----------
+  var acChk = document.getElementById('acChk');
+  var acBox = document.getElementById('acBox');
+  var acOut = document.getElementById('acOut');
+  var acQty = 1;
+  document.getElementById('acPlus').addEventListener('click', function () { acQty = Math.min(12, acQty + 1); acOut.textContent = acQty; calc(); });
+  document.getElementById('acMinus').addEventListener('click', function () { acQty = Math.max(1, acQty - 1); acOut.textContent = acQty; calc(); });
+
+  // ---------- slider ----------
+  var area = document.getElementById('area');
+  var areaOut = document.getElementById('areaOut');
+  var rngWrap = document.getElementById('rngWrap');
+  function fillSlider() {
+    var mn = parseFloat(area.min), mx = parseFloat(area.max), v = parseFloat(area.value);
+    rngWrap.style.setProperty('--p', (v - mn) / (mx - mn));
+  }
+
+  // ---------- saída ----------
+  var out = document.getElementById('out');
+  var outM2 = document.getElementById('outM2');
+  var detailList = document.getElementById('detailList');
+  function brl(n) { return 'R$ ' + (Math.round(n / 1000) * 1000).toLocaleString('pt-BR'); }
+  function brlExato(n) { return 'R$ ' + Math.round(n).toLocaleString('pt-BR'); }
+  function brlM2(n) { return 'R$ ' + (Math.round(n / 10) * 10).toLocaleString('pt-BR'); }
+
+  var LAST = null; // guarda o último resultado p/ PDF e compartilhamento
+
+  function calc() {
+    var a = parseFloat(area.value);
+    areaOut.textContent = a;
+    fillSlider();
+
+    // padrão vira índice 0 (simples) / 1 (médio) / 2 (alto); cada item tem seu próprio trio.
+    var padIdx = parseInt(document.querySelector('#padrao input:checked').value, 10);
+    var regiao = parseFloat(document.querySelector('#regiao input:checked').value);
+    acBox.classList.toggle('show', acChk.checked);
+    var wet = (counts.cozinha > 0 || counts.banheiro > 0);
+
+    var itens = [];   // { nome, valor }
+    var checks = document.querySelectorAll('#escopo input:checked');
+
+    Array.prototype.forEach.call(checks, function (c) {
+      var nome = c.parentNode.querySelector('span').textContent, v = 0;
+      var pad = (c.dataset.pad || '1,1,1').split(',');
+      if (c.dataset.kind === 'piso') {
+        // material (varia com o padrão) + colocação (labor, ~100% do material) + revestimento de parede nas molhadas
+        var mat = [0.8, 1.0, 1.6][padIdx], inst = [0.8, 1.0, 1.2][padIdx];
+        var perM2 = PISO_MAT * mat * (wet ? 1.1 : 1.0) + PISO_MAT * inst;
+        v = a * perM2 * MOBILIZACAO * regiao;
+      } else if (c.dataset.kind === 'area') {
+        v = a * parseFloat(c.value) * parseFloat(pad[padIdx]) * MOBILIZACAO * regiao;
+      } else if (c.dataset.kind === 'amb') {
+        v = sumAmb(c.dataset.attr) * parseFloat(pad[padIdx]) * MOBILIZACAO * regiao;
+      } else if (c.dataset.kind === 'ac') {
+        v = (acQty * AC_MAQUINA + AC_INSTAL_BASE + (acQty - 1) * AC_INSTAL_EXTRA) * regiao;
+      }
+      if (v > 0) itens.push({ nome: nome, valor: v });
+    });
+
+    if (itens.length === 0) {
+      out.textContent = 'Selecione ao menos uma melhoria';
+      outM2.textContent = ''; detailList.innerHTML = ''; LAST = null; return;
+    }
+
+    var subtotal = itens.reduce(function (s, it) { return s + it.valor; }, 0);
+    var min = subtotal * 0.83, max = subtotal * 1.17;
+
+    out.textContent = brl(min) + ' – ' + brl(max);
+
+    var temArea = Array.prototype.some.call(checks, function (c) { return c.dataset.kind === 'area' || c.dataset.kind === 'piso'; });
+    outM2.textContent = (temArea && subtotal > 0)
+      ? '≈ ' + brlM2(min / a) + ' – ' + brlM2(max / a) + ' por m²'
+      : 'Itens por ambiente — não variam com a metragem';
+
+    // detalhamento
+    detailList.innerHTML = '';
+    itens.forEach(function (it) {
+      var li = document.createElement('li');
+      li.innerHTML = '<span>' + it.nome + '</span><span>' + brlExato(it.valor) + '</span>';
+      detailList.appendChild(li);
+    });
+    var tot = document.createElement('li');
+    tot.className = 'tot';
+    tot.innerHTML = '<span>Estimativa central</span><span>' + brlExato(subtotal) + '</span>';
+    detailList.appendChild(tot);
+
+    // guarda p/ PDF e share
+    var padTxt = document.querySelector('#padrao input:checked').parentNode.querySelector('span').textContent;
+    var regTxt = document.querySelector('#regiao input:checked').parentNode.querySelector('span').textContent;
+    var ambTxt = AMB.filter(function (x) { return counts[x.id] > 0; }).map(function (x) { return counts[x.id] + '× ' + x.nome; });
+    LAST = { area: a, padrao: padTxt, regiao: regTxt, ambientes: ambTxt, itens: itens, min: min, max: max, m2: temArea ? (min / a) : 0 };
+  }
+
+  Array.prototype.forEach.call(document.querySelectorAll('#escopo input, #padrao input, #regiao input'), function (el) {
+    el.addEventListener('change', calc);
+  });
+  area.addEventListener('input', calc);
+  calc();
+
+  // =========================================================
+  //   COMPARTILHAR / BAIXAR
+  // =========================================================
+  var toast = document.getElementById('toast');
+  var toastT;
+  function showToast(msg) {
+    toast.textContent = msg; toast.classList.add('show');
+    clearTimeout(toastT); toastT = setTimeout(function () { toast.classList.remove('show'); }, 2400);
+  }
+
+  function resumoTexto() {
+    if (!LAST) return '';
+    var l = ['*Estimativa de reforma — KAI Arquitetura*',
+      'Área: ' + LAST.area + ' m² · Padrão ' + LAST.padrao.toLowerCase() + ' · ' + LAST.regiao,
+      'Ambientes: ' + (LAST.ambientes.join(', ') || '—'),
+      'Melhorias: ' + LAST.itens.map(function (i) { return i.nome; }).join(', '),
+      '',
+      'Investimento estimado: ' + brl(LAST.min) + ' a ' + brl(LAST.max),
+      '',
+      'Faça a sua: ' + KAI.calc];
+    return l.join('\n');
+  }
+
+  // popover de compartilhar
+  var btnShare = document.getElementById('btnShare');
+  var sharePop = document.getElementById('sharePop');
+  btnShare.addEventListener('click', function (e) {
+    e.stopPropagation();
+    var open = sharePop.classList.toggle('show');
+    btnShare.setAttribute('aria-expanded', open ? 'true' : 'false');
+  });
+  document.addEventListener('click', function () { sharePop.classList.remove('show'); btnShare.setAttribute('aria-expanded', 'false'); });
+  sharePop.addEventListener('click', function (e) { e.stopPropagation(); });
+
+  Array.prototype.forEach.call(sharePop.querySelectorAll('[data-share]'), function (b) {
+    b.addEventListener('click', function () {
+      var tipo = b.getAttribute('data-share'), txt = resumoTexto();
+      if (tipo === 'whatsapp') window.open('https://wa.me/?text=' + encodeURIComponent(txt), '_blank');
+      else if (tipo === 'email') window.location.href = 'mailto:?subject=' + encodeURIComponent('Estimativa de reforma — KAI Arquitetura') + '&body=' + encodeURIComponent(txt);
+      else if (tipo === 'copy') {
+        var done = function () { showToast('Link copiado!'); };
+        if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(KAI.calc).then(done, function () { fallbackCopy(KAI.calc); done(); });
+        else { fallbackCopy(KAI.calc); done(); }
+      }
+      sharePop.classList.remove('show');
+    });
+  });
+  function fallbackCopy(t) {
+    var ta = document.createElement('textarea'); ta.value = t; ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.select(); try { document.execCommand('copy'); } catch (e) {} document.body.removeChild(ta);
+  }
+
+  // ---------- baixar (PDF via impressão) ----------
+  function preencherFolha() {
+    if (!LAST) return;
+    document.getElementById('psDate').textContent = new Date().toLocaleDateString('pt-BR');
+    var g = document.getElementById('psGrid');
+    g.innerHTML =
+      '<div><span>Área da reforma</span><span>' + LAST.area + ' m²</span></div>' +
+      '<div><span>Padrão</span><span>' + LAST.padrao + '</span></div>' +
+      '<div><span>Região</span><span>' + LAST.regiao + '</span></div>' +
+      '<div><span>Ambientes</span><span>' + (LAST.ambientes.join(', ') || '—') + '</span></div>';
+    document.getElementById('psTotal').textContent = brl(LAST.min) + ' – ' + brl(LAST.max);
+    document.getElementById('psM2').textContent = LAST.m2 ? ('≈ ' + brlM2(LAST.m2) + ' por m²') : '';
+    var t = document.getElementById('psItems'); t.innerHTML = '';
+    LAST.itens.forEach(function (it) {
+      var tr = document.createElement('tr');
+      tr.innerHTML = '<td>' + it.nome + '</td><td>' + brlExato(it.valor) + '</td>';
+      t.appendChild(tr);
+    });
+  }
+  document.getElementById('btnDownload').addEventListener('click', function () {
+    if (!LAST) { showToast('Selecione ao menos uma melhoria'); return; }
+    preencherFolha();
+    window.print();
+  });
+</script>
+</body>
+</html>

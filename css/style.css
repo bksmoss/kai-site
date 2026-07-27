@@ -1756,3 +1756,16 @@ img {
     font-size: 2.2rem;
   }
 }
+
+/* ============================================================
+   Botao escuro "Calculadora de reforma" no header
+   (adicionado para a pagina calculadora.html)
+   ============================================================ */
+.nav__cta { gap: 0.6rem; }
+.nav__cta .btn--dark { background: var(--black); border-color: var(--black); color: var(--white); }
+.nav__cta .btn--dark:hover { background: transparent; color: var(--black); border-color: var(--black); }
+.header--transparent .nav__cta .btn--dark { background: var(--white); border-color: var(--white); color: var(--black); }
+.header--transparent .nav__cta .btn--dark:hover { background: transparent; color: var(--white); border-color: var(--white); }
+.header.scrolled.header--transparent .nav__cta .btn--dark { background: var(--black); border-color: var(--black); color: var(--white); }
+.header.scrolled.header--transparent .nav__cta .btn--dark:hover { background: transparent; color: var(--black); border-color: var(--black); }
+@media (max-width: 768px) { .nav__cta .btn--dark { display: none; } }
