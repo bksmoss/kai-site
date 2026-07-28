@@ -542,6 +542,7 @@
           Compartilhar
           </button>
           <div class="share__pop glass" id="sharePop">
+            <button data-share="imagem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg> Enviar como imagem</button>
             <button data-share="whatsapp"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15l-1.3 4.7 4.8-1.3A10 10 0 1 0 12 2zm0 18a8 8 0 0 1-4.1-1.1l-.3-.2-2.9.8.8-2.8-.2-.3A8 8 0 1 1 12 20zm4.4-6c-.2-.1-1.4-.7-1.6-.8s-.4-.1-.5.1l-.7.9c-.1.2-.3.2-.5.1a6.5 6.5 0 0 1-3.2-2.8c-.2-.4.2-.4.6-1.2.1-.2 0-.3 0-.5l-.7-1.7c-.2-.4-.4-.4-.5-.4h-.5a1 1 0 0 0-.7.3A3 3 0 0 0 6.5 9c0 1.8 1.3 3.5 1.5 3.7s2.6 3.9 6.2 5.2c2.2.8 2.6.6 3.1.6s1.4-.6 1.6-1.1.2-1 .1-1.1-.3-.2-.6-.3z"/></svg> WhatsApp</button>
             <button data-share="email"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg> E-mail</button>
             <button data-share="copy"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copiar link</button>
@@ -803,8 +804,108 @@
       '',
       'Investimento estimado: ' + brl(LAST.min) + ' a ' + brl(LAST.max),
       '',
-      'Faça a sua: ' + KAI.calc];
+      'Veja ou edite esta estimativa: ' + linkEstimativa()];
     return l.join('\n');
+  }
+
+  // ---------- link que reabre a estimativa (opção C) ----------
+  var escInputs = Array.prototype.slice.call(document.querySelectorAll('#escopo input'));
+  function linkEstimativa() {
+    var p = new URLSearchParams();
+    p.set('a', area.value);
+    p.set('p', document.querySelector('#padrao input:checked').value);
+    p.set('r', document.querySelector('#regiao input:checked').value);
+    p.set('amb', AMB.map(function (a) { return counts[a.id]; }).join('-'));
+    var mel = []; escInputs.forEach(function (inp, i) { if (inp.checked) mel.push(i); });
+    p.set('mel', mel.join('-'));
+    p.set('ac', acQty);
+    return KAI.calc + '?' + p.toString();
+  }
+  function restaurarDoLink() {
+    var q = new URLSearchParams(location.search);
+    if (!q.has('a')) return;
+    area.value = q.get('a');
+    var pr = document.querySelector('#padrao input[value="' + q.get('p') + '"]'); if (pr) pr.checked = true;
+    var rr = document.querySelector('#regiao input[value="' + q.get('r') + '"]'); if (rr) rr.checked = true;
+    (q.get('amb') || '').split('-').forEach(function (v, i) {
+      if (!AMB[i]) return;
+      counts[AMB[i].id] = Math.max(0, Math.min(9, parseInt(v, 10) || 0));
+      document.getElementById('amb-' + AMB[i].id).textContent = counts[AMB[i].id];
+    });
+    escInputs.forEach(function (inp) { inp.checked = false; });
+    (q.get('mel') || '').split('-').forEach(function (i) { if (i !== '' && escInputs[+i]) escInputs[+i].checked = true; });
+    acQty = Math.max(1, Math.min(12, parseInt(q.get('ac'), 10) || 1)); acOut.textContent = acQty;
+    calc();
+  }
+
+  // ---------- imagem da estimativa para compartilhar (opção A) ----------
+  var logoWM = new Image(); logoWM.src = 'img/logo-wordmark.png';
+  function gerarImagemBlob() {
+    return document.fonts.ready.then(function () {
+      var W = 1080, PAD = 84, CW = W - PAD * 2;
+      var m = document.createElement('canvas').getContext('2d');
+      function fit(txt, weight, max, min) { var s = max; do { m.font = weight + ' ' + s + 'px "ClashDisplay", sans-serif'; if (m.measureText(txt).width <= CW) break; s -= 2; } while (s > min); return s; }
+      function wrap(txt, font, maxw) {
+        m.font = font; var words = txt.split(' '), lines = [], line = '';
+        words.forEach(function (w) { var t = line ? line + ' ' + w : w; if (m.measureText(t).width > maxw && line) { lines.push(line); line = w; } else line = t; });
+        if (line) lines.push(line); return lines;
+      }
+      var ambTxt = LAST.ambientes.join(' · ') || '—';
+      var melTxt = LAST.itens.map(function (i) { return i.nome; }).join(' · ');
+      var ambL = wrap(ambTxt, '400 26px "ClashDisplay", sans-serif', CW);
+      var melL = wrap(melTxt, '400 26px "ClashDisplay", sans-serif', CW);
+      var valTxt = brl(LAST.min) + ' – ' + brl(LAST.max);
+      var valSize = fit(valTxt, '700', 76, 40);
+
+      var H = Math.max(1080, 84 + 150 + 40 + 40 + valSize + 52 + 44 + 34 + 3 * 46 + 30 + ambL.length * 36 + 26 + melL.length * 36 + 60 + 96);
+      var c = document.createElement('canvas'); c.width = W; c.height = H;
+      var g = c.getContext('2d');
+      var grd = g.createLinearGradient(0, 0, W, H); grd.addColorStop(0, '#FBF7F3'); grd.addColorStop(1, '#F6E7DD');
+      g.fillStyle = grd; g.fillRect(0, 0, W, H);
+      g.textBaseline = 'top';
+
+      var cy = 84;
+      if (logoWM.complete && logoWM.naturalWidth) { var lw = 300, lh = lw * (logoWM.naturalHeight / logoWM.naturalWidth); g.drawImage(logoWM, (W - lw) / 2, cy, lw, lh); cy += lh + 40; } else { cy += 190; }
+      g.textAlign = 'center';
+      g.fillStyle = '#B05A40'; g.font = '600 22px "ClashDisplay", sans-serif'; g.fillText('E S T I M A T I V A   D E   R E F O R M A', W / 2, cy); cy += 40;
+      g.fillStyle = '#1C1C1C'; g.font = '700 ' + valSize + 'px "ClashDisplay", sans-serif'; g.fillText(valTxt, W / 2, cy); cy += valSize + 10;
+      g.fillStyle = '#8C8175'; g.font = '400 24px "ClashDisplay", sans-serif'; g.fillText(LAST.m2 ? ('≈ ' + brlM2(LAST.m2) + ' por m² · mão de obra e materiais') : 'valores por ambiente', W / 2, cy); cy += 44;
+
+      cy += 20; g.strokeStyle = '#E9C6B6'; g.lineWidth = 2; g.beginPath(); g.moveTo(PAD, cy); g.lineTo(W - PAD, cy); g.stroke(); cy += 22;
+      function linha(lbl, val) {
+        g.textAlign = 'left'; g.fillStyle = '#8C8175'; g.font = '400 26px "ClashDisplay", sans-serif'; g.fillText(lbl, PAD, cy);
+        g.textAlign = 'right'; g.fillStyle = '#1C1C1C'; g.font = '600 26px "ClashDisplay", sans-serif'; g.fillText(val, W - PAD, cy); cy += 46;
+      }
+      linha('Área da reforma', LAST.area + ' m²');
+      linha('Padrão de acabamento', LAST.padrao);
+      linha('Região', LAST.regiao);
+      cy += 10; g.textAlign = 'left';
+      g.fillStyle = '#B05A40'; g.font = '600 20px "ClashDisplay", sans-serif'; g.fillText('AMBIENTES', PAD, cy); cy += 30;
+      g.fillStyle = '#2A2622'; g.font = '400 26px "ClashDisplay", sans-serif'; ambL.forEach(function (ln) { g.fillText(ln, PAD, cy); cy += 36; });
+      cy += 8;
+      g.fillStyle = '#B05A40'; g.font = '600 20px "ClashDisplay", sans-serif'; g.fillText('MELHORIAS', PAD, cy); cy += 30;
+      g.fillStyle = '#2A2622'; g.font = '400 26px "ClashDisplay", sans-serif'; melL.forEach(function (ln) { g.fillText(ln, PAD, cy); cy += 36; });
+
+      var fy = H - 96;
+      g.strokeStyle = '#E9C6B6'; g.lineWidth = 2; g.beginPath(); g.moveTo(PAD, fy - 24); g.lineTo(W - PAD, fy - 24); g.stroke();
+      g.textAlign = 'center';
+      g.fillStyle = '#B05A40'; g.font = '700 24px "ClashDisplay", sans-serif'; g.fillText('Faça a sua em kaiarquitetura.com.br/calculadora', W / 2, fy);
+      g.fillStyle = '#8C8175'; g.font = '400 22px "ClashDisplay", sans-serif'; g.fillText('WhatsApp (11) 92504-9959 · @kaiarquitetura', W / 2, fy + 36);
+
+      return new Promise(function (resolve) { c.toBlob(function (b) { resolve(b); }, 'image/png'); });
+    });
+  }
+  function compartilharImagem() {
+    if (!LAST) { showToast('Selecione ao menos uma melhoria'); return; }
+    gerarImagemBlob().then(function (blob) {
+      var file = new File([blob], 'estimativa-kai.png', { type: 'image/png' });
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        navigator.share({ files: [file], title: 'Estimativa de reforma — KAI', text: resumoTexto() }).catch(function () {});
+      } else {
+        var url = URL.createObjectURL(blob), a = document.createElement('a'); a.href = url; a.download = 'estimativa-kai.png'; a.click();
+        setTimeout(function () { URL.revokeObjectURL(url); }, 5000); showToast('Imagem baixada');
+      }
+    });
   }
 
   // popover de compartilhar
@@ -820,13 +921,15 @@
 
   Array.prototype.forEach.call(sharePop.querySelectorAll('[data-share]'), function (b) {
     b.addEventListener('click', function () {
-      var tipo = b.getAttribute('data-share'), txt = resumoTexto();
+      var tipo = b.getAttribute('data-share');
+      if (tipo === 'imagem') { compartilharImagem(); sharePop.classList.remove('show'); return; }
+      var txt = resumoTexto();
       if (tipo === 'whatsapp') window.open('https://wa.me/?text=' + encodeURIComponent(txt), '_blank');
       else if (tipo === 'email') window.location.href = 'mailto:?subject=' + encodeURIComponent('Estimativa de reforma — KAI Arquitetura') + '&body=' + encodeURIComponent(txt);
       else if (tipo === 'copy') {
-        var done = function () { showToast('Link copiado!'); };
-        if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(KAI.calc).then(done, function () { fallbackCopy(KAI.calc); done(); });
-        else { fallbackCopy(KAI.calc); done(); }
+        var link = linkEstimativa(), done = function () { showToast('Link copiado!'); };
+        if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(link).then(done, function () { fallbackCopy(link); done(); });
+        else { fallbackCopy(link); done(); }
       }
       sharePop.classList.remove('show');
     });
@@ -868,6 +971,8 @@
     preencherFolha();
     window.print();
   });
+
+  restaurarDoLink();
 </script>
 </body>
 </html>
