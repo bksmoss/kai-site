@@ -332,33 +332,53 @@
   }
   @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 
-  /* ================= FOLHA DE IMPRESSÃO (A4) ================= */
+  /* ================= FOLHA DE IMPRESSÃO — PDF A4, sempre 1 página, estilo leve ================= */
   .print-sheet { display: none; }
   @media print {
-    @page { size: A4; margin: 14mm; }
-    body { background: #fff; color: #1C1C1C; }
+    @page { size: A4; margin: 11mm; }
+    html, body { background: #fff; }
     body > *:not(.print-sheet) { display: none !important; }
     .print-sheet { display: block; }
-    .ps { font-family: 'ClashDisplay', sans-serif; color: #1C1C1C; }
-    .ps__top { display: flex; align-items: center; justify-content: space-between; border-bottom: 2px solid #D87C63; padding-bottom: 14px; margin-bottom: 22px; }
-    .ps__top img { height: 70px; }
-    .ps__top .ps__tag { text-align: right; font-size: 11px; color: #6F655C; letter-spacing: .04em; }
-    .ps h1 { font-size: 26px; margin: 0 0 4px; }
-    .ps__sub { color: #6F655C; font-size: 13px; margin: 0 0 22px; }
-    .ps__grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 28px; margin-bottom: 22px; font-size: 13px; }
-    .ps__grid div { border-bottom: 1px solid #E6DED4; padding: 6px 0; display: flex; justify-content: space-between; gap: 12px; }
-    .ps__grid span:first-child { color: #6F655C; }
-    .ps__total { background: #F5E7E0; border-radius: 12px; padding: 20px 24px; margin-bottom: 22px; }
-    .ps__total .l { font-size: 11px; letter-spacing: .16em; text-transform: uppercase; color: #B05A40; font-weight: 700; margin: 0 0 4px; }
-    .ps__total .v { font-size: 28px; font-weight: 700; margin: 0; }
-    .ps__total .m { font-size: 12px; color: #6F655C; margin: 4px 0 0; }
-    .ps h2 { font-size: 14px; margin: 0 0 8px; }
-    .ps__items { width: 100%; border-collapse: collapse; font-size: 12.5px; margin-bottom: 22px; }
-    .ps__items td { padding: 7px 0; border-bottom: 1px solid #E6DED4; }
-    .ps__items td:last-child { text-align: right; font-weight: 600; }
-    .ps__dis { font-size: 10.5px; color: #6F655C; line-height: 1.5; border-top: 1px solid #E6DED4; padding-top: 12px; margin-bottom: 20px; }
-    .ps__foot { display: flex; justify-content: space-between; align-items: flex-end; border-top: 2px solid #D87C63; padding-top: 14px; font-size: 12px; }
-    .ps__foot b { color: #B05A40; }
+    .print-sheet, .print-sheet * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .ps { font-family: 'ClashDisplay', 'Segoe UI', sans-serif; color: #2A2622; font-size: 11px; line-height: 1.45; }
+    .ps > * { page-break-inside: avoid; }
+    .ps__head { display: flex; align-items: center; justify-content: space-between; }
+    .ps__logo { height: 56px; }
+    .ps__meta { text-align: right; }
+    .ps__k { display: block; font-size: 9.5px; letter-spacing: .18em; text-transform: uppercase; color: #B05A40; font-weight: 600; }
+    .ps__d { font-size: 9.5px; color: #928678; }
+    .ps__rule { height: 2px; background: linear-gradient(90deg, #E9A98F, #F3D9CB 70%, #FBEDE4); border-radius: 2px; margin: 9px 0 15px; }
+    .ps__title { font-size: 21px; font-weight: 600; margin: 0 0 2px; letter-spacing: -.3px; }
+    .ps__sub { color: #928678; font-size: 10.5px; margin: 0 0 14px; }
+    .ps__hero { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 15px 20px; border-radius: 16px; background: linear-gradient(135deg, #FBEEE7, #F6E2D7); border: 1px solid #F1DBCE; margin-bottom: 13px; }
+    .ps__herolbl { font-size: 9.5px; letter-spacing: .16em; text-transform: uppercase; color: #B05A40; font-weight: 700; margin: 0 0 3px; }
+    .ps__heroval { font-size: 25px; font-weight: 700; margin: 0; letter-spacing: -.6px; }
+    .ps__herom2 { font-size: 10px; color: #8C8175; margin: 4px 0 0; }
+    .ps__badge { text-align: center; flex-shrink: 0; }
+    .ps__badgen { display: block; font-size: 19px; font-weight: 700; color: #D87C63; line-height: 1; }
+    .ps__badget { font-size: 8.5px; text-transform: uppercase; letter-spacing: .1em; color: #928678; }
+    .ps__cols { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+    .ps__card { background: linear-gradient(155deg, #FFFFFF, #FCF5F0); border: 1px solid #EFE4DA; border-radius: 14px; padding: 13px 15px; }
+    .ps__h2 { font-size: 9.5px; letter-spacing: .14em; text-transform: uppercase; color: #B05A40; font-weight: 600; margin: 0 0 8px; }
+    .ps__kv { display: flex; justify-content: space-between; gap: 10px; padding: 4.5px 0; border-bottom: 1px solid #F1E9E0; font-size: 10.5px; }
+    .ps__kv:last-child { border-bottom: 0; }
+    .ps__kv span:first-child { color: #8C8175; }
+    .ps__kv span:last-child { font-weight: 500; text-align: right; }
+    .ps__chips { display: flex; flex-wrap: wrap; gap: 5px; }
+    .ps__chip { font-size: 10px; background: #F4EAE2; border-radius: 40px; padding: 4px 10px; }
+    .ps__det { margin-bottom: 12px; }
+    .ps__items { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: 1fr 1fr; column-gap: 22px; }
+    .ps__items li { display: flex; justify-content: space-between; gap: 10px; padding: 4.5px 0; border-bottom: 1px solid #F1E9E0; font-size: 10.5px; }
+    .ps__items li span:last-child { font-weight: 600; white-space: nowrap; }
+    .ps__items li.ps__sum { grid-column: 1 / -1; border-bottom: 0; border-top: 1.5px solid #E9A98F; margin-top: 3px; padding-top: 6px; font-weight: 700; }
+    .ps__why { display: flex; align-items: center; gap: 14px; background: linear-gradient(135deg, #FBEEE7, #FBF3EE); border: 1px solid #F1DBCE; border-radius: 14px; padding: 11px 16px; margin-bottom: 11px; }
+    .ps__whyn { font-size: 28px; font-weight: 700; color: #D87C63; line-height: 1; flex-shrink: 0; }
+    .ps__whyt { font-size: 10px; line-height: 1.5; color: #514639; }
+    .ps__whyt b { color: #B05A40; }
+    .ps__dis { font-size: 8.5px; color: #928678; line-height: 1.5; margin: 0 0 11px; }
+    .ps__foot { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #EFE4DA; padding-top: 9px; }
+    .ps__brand { font-size: 15px; font-weight: 600; letter-spacing: .26em; color: #1C1C1C; }
+    .ps__contact { font-size: 9.5px; color: #928678; text-align: right; }
   }
 </style>
 </head>
@@ -536,28 +556,49 @@
 </main>
 
 <div class="print-sheet"><div class="ps">
-  <div class="ps__top">
-    <img src="img/logo.png" alt="KAI Arquitetura">
-    <div class="ps__tag">Estimativa de Reforma<br><span id="psDate"></span></div>
+  <div class="ps__head">
+    <img class="ps__logo" src="img/logo.png" alt="KAI Arquitetura">
+    <div class="ps__meta"><span class="ps__k">Estimativa de Reforma</span><span class="ps__d" id="psDate"></span></div>
   </div>
-  <h1>Estimativa da sua reforma</h1>
-  <p class="ps__sub">Gerada na calculadora de reforma da KAI Arquitetura · valores de referência 2026</p>
-  <div class="ps__grid" id="psGrid"></div>
-  <div class="ps__total">
-    <p class="l">Investimento estimado na obra</p>
-    <p class="v" id="psTotal">—</p>
-    <p class="m" id="psM2">—</p>
-  </div>
-  <h2>Detalhamento por item</h2>
-  <table class="ps__items"><tbody id="psItems"></tbody></table>
-  <p class="ps__dis">Estimativa de mão de obra e materiais da reforma, com base em médias de mercado de 2026. Não inclui mobiliário solto, decoração, eletrodomésticos nem honorários de projeto. Contratar um profissional evita até 30% de desperdício de material em obra (SindusCon-SP e CBIC). Valores finais dependem de orçamento detalhado.</p>
-  <div class="ps__foot">
+  <div class="ps__rule"></div>
+  <h1 class="ps__title">Estimativa da sua reforma</h1>
+  <p class="ps__sub">Feita na calculadora da KAI Arquitetura · valores de referência do mercado 2026</p>
+
+  <div class="ps__hero">
     <div>
-      <b>KAI Arquitetura</b><br>
-      WhatsApp (11) 92504-9959 · @kaiarquitetura<br>
-      kaiarquitetura.com.br
+      <p class="ps__herolbl">Investimento estimado na obra</p>
+      <p class="ps__heroval" id="psTotal">—</p>
+      <p class="ps__herom2" id="psM2"></p>
     </div>
-    <div style="text-align:right">Faça a sua estimativa:<br><b>kaiarquitetura.com.br/calculadora</b></div>
+    <div class="ps__badge"><span class="ps__badgen" id="psArea">—</span><span class="ps__badget">área reformada</span></div>
+  </div>
+
+  <div class="ps__cols">
+    <div class="ps__card">
+      <h2 class="ps__h2">Sua reforma</h2>
+      <div id="psGrid"></div>
+    </div>
+    <div class="ps__card">
+      <h2 class="ps__h2">Ambientes</h2>
+      <div class="ps__chips" id="psAmb"></div>
+    </div>
+  </div>
+
+  <div class="ps__card ps__det">
+    <h2 class="ps__h2">Detalhamento por item</h2>
+    <ul class="ps__items" id="psItems"></ul>
+  </div>
+
+  <div class="ps__why">
+    <span class="ps__whyn">30%</span>
+    <span class="ps__whyt">Até <b>30% do material de uma obra</b> vira desperdício por falhas de planejamento. Um projeto e o acompanhamento da KAI protegem esse investimento — sem comprar errado nem refazer o que já foi feito. <b>Fonte: SindusCon-SP e CBIC.</b></span>
+  </div>
+
+  <p class="ps__dis">Estimativa de mão de obra e materiais da reforma, com base em médias de mercado de 2026. Não inclui mobiliário solto, decoração, eletrodomésticos e nem honorários de projeto/acompanhamento de obra. Os valores finais dependem de orçamento detalhado.</p>
+
+  <div class="ps__foot">
+    <span class="ps__brand">KAI</span>
+    <span class="ps__contact">WhatsApp (11) 92504-9959 &middot; @kaiarquitetura &middot; kaiarquitetura.com.br/calculadora</span>
   </div>
 </div></div>
 
@@ -801,20 +842,28 @@
   function preencherFolha() {
     if (!LAST) return;
     document.getElementById('psDate').textContent = new Date().toLocaleDateString('pt-BR');
-    var g = document.getElementById('psGrid');
-    g.innerHTML =
-      '<div><span>Área da reforma</span><span>' + LAST.area + ' m²</span></div>' +
-      '<div><span>Padrão</span><span>' + LAST.padrao + '</span></div>' +
-      '<div><span>Região</span><span>' + LAST.regiao + '</span></div>' +
-      '<div><span>Ambientes</span><span>' + (LAST.ambientes.join(', ') || '—') + '</span></div>';
+    document.getElementById('psArea').textContent = LAST.area + ' m²';
     document.getElementById('psTotal').textContent = brl(LAST.min) + ' – ' + brl(LAST.max);
-    document.getElementById('psM2').textContent = LAST.m2 ? ('≈ ' + brlM2(LAST.m2) + ' por m²') : '';
-    var t = document.getElementById('psItems'); t.innerHTML = '';
-    LAST.itens.forEach(function (it) {
-      var tr = document.createElement('tr');
-      tr.innerHTML = '<td>' + it.nome + '</td><td>' + brlExato(it.valor) + '</td>';
-      t.appendChild(tr);
+    document.getElementById('psM2').textContent = LAST.m2
+      ? '≈ ' + brlM2(LAST.m2) + ' por m² · mão de obra e materiais'
+      : 'valores por ambiente · mão de obra e materiais';
+
+    var g = document.getElementById('psGrid'); g.innerHTML = '';
+    [['Área da reforma', LAST.area + ' m²'], ['Padrão de acabamento', LAST.padrao], ['Região', LAST.regiao]].forEach(function (d) {
+      g.insertAdjacentHTML('beforeend', '<div class="ps__kv"><span>' + d[0] + '</span><span>' + d[1] + '</span></div>');
     });
+
+    var amb = document.getElementById('psAmb'); amb.innerHTML = '';
+    (LAST.ambientes.length ? LAST.ambientes : ['—']).forEach(function (a) {
+      amb.insertAdjacentHTML('beforeend', '<span class="ps__chip">' + a + '</span>');
+    });
+
+    var it = document.getElementById('psItems'); it.innerHTML = '';
+    LAST.itens.forEach(function (x) {
+      it.insertAdjacentHTML('beforeend', '<li><span>' + x.nome + '</span><span>' + brlExato(x.valor) + '</span></li>');
+    });
+    var soma = LAST.itens.reduce(function (s, i) { return s + i.valor; }, 0);
+    it.insertAdjacentHTML('beforeend', '<li class="ps__sum"><span>Estimativa central</span><span>' + brlExato(soma) + '</span></li>');
   }
   document.getElementById('btnDownload').addEventListener('click', function () {
     if (!LAST) { showToast('Selecione ao menos uma melhoria'); return; }
