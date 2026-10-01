@@ -468,6 +468,9 @@ img {
 .glass-zone__blobs span:nth-child(1) { width: 520px; height: 520px; background: var(--peach); top: -140px; left: -140px; opacity: 0.55; }
 .glass-zone__blobs span:nth-child(2) { width: 460px; height: 460px; background: var(--coral); top: 30%; right: -170px; opacity: 0.28; }
 .glass-zone__blobs span:nth-child(3) { width: 440px; height: 440px; background: var(--beige-dark); bottom: -160px; left: 32%; opacity: 0.35; }
+/* manchas extras para zonas mais altas (home: Serviços + Conheça nosso trabalho) */
+.glass-zone__blobs span:nth-child(4) { width: 480px; height: 480px; background: var(--peach); bottom: 8%; left: -180px; opacity: 0.45; }
+.glass-zone__blobs span:nth-child(5) { width: 420px; height: 420px; background: var(--coral); bottom: -120px; right: 4%; opacity: 0.22; }
 
 .glass {
   background: var(--glass-bg);
