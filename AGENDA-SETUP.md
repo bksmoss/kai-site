@@ -61,12 +61,13 @@ O envio usa o [Resend](https://resend.com) — plano gratuito de 3.000 e‑mails
 
 ## Passo 4 — Telegram: sua central de notificações
 
-O Telegram é a central de avisos só sua, separada do WhatsApp (onde ficam clientes e fornecedores). Depois de conectado, ele entrega **três coisas**:
+O Telegram é a central de avisos só sua, separada do WhatsApp (onde ficam clientes e fornecedores). Depois de conectado, ele entrega **cinco coisas**:
 
 1. **Novo pedido de reunião** — na hora, com botões *Confirmar* e *Recusar* (resolve tudo pelo celular, sem abrir o painel)
 2. **Resumo da agenda toda manhã** — a lista de reuniões do dia, no horário que você escolher (padrão 7h). As reuniões do dia ainda **não confirmadas** aparecem aqui já com o link de confirmar — é o lembrete "confirme a reunião de hoje"
 3. **Cobrança 24h antes** — se você ainda não confirmou um pedido, o Telegram te lembra cerca de **1 dia antes** da reunião, com os botões de confirmar/recusar
 4. **Lembrete 30 min antes** — só para reuniões **já confirmadas**, com o link da sala
+5. **Novo contato pelo site** — cada mensagem do formulário da home (nome, e-mail, telefone, localização e mensagem). O mesmo contato também chega por e-mail, no mesmo modelo dos e-mails da agenda, e o botão *Responder* já vai direto para o cliente
 
 Os itens 2 e 4 você liga/desliga e ajusta no painel → aba **Ajustes** → *Avisos no Telegram*.
 

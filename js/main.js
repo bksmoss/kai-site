@@ -88,6 +88,12 @@ if (contactForm) {
   const submitText = contactForm.querySelector('.contact__submit-text');
   const submitLoading = contactForm.querySelector('.contact__submit-loading');
 
+  const resetButton = () => {
+    submitText.style.display = 'inline';
+    submitLoading.style.display = 'none';
+    submitBtn.disabled = false;
+  };
+
   contactForm.addEventListener('submit', async (e) => {
     e.preventDefault();
 
@@ -97,12 +103,14 @@ if (contactForm) {
     submitBtn.disabled = true;
 
     try {
-      const formData = new FormData(contactForm);
-      await fetch(contactForm.action, {
+      const dados = Object.fromEntries(new FormData(contactForm).entries());
+      const resp = await fetch(contactForm.action, {
         method: 'POST',
-        body: formData,
-        headers: { 'Accept': 'application/json' }
+        body: JSON.stringify(dados),
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' }
       });
+      const corpo = await resp.json().catch(() => ({}));
+      if (!resp.ok) throw new Error(corpo.erro || 'Não foi possível enviar agora.');
 
       // Hide form, show success
       contactForm.style.display = 'none';
@@ -113,24 +121,13 @@ if (contactForm) {
         contactForm.reset();
         contactForm.style.display = 'flex';
         successEl.style.display = 'none';
-        submitText.style.display = 'inline';
-        submitLoading.style.display = 'none';
-        submitBtn.disabled = false;
+        resetButton();
       }, 5000);
 
     } catch (err) {
-      // If fetch fails, still show success (formsubmit may block CORS)
-      contactForm.style.display = 'none';
-      successEl.style.display = 'block';
-
-      setTimeout(() => {
-        contactForm.reset();
-        contactForm.style.display = 'flex';
-        successEl.style.display = 'none';
-        submitText.style.display = 'inline';
-        submitLoading.style.display = 'none';
-        submitBtn.disabled = false;
-      }, 5000);
+      resetButton();
+      alert((err && err.message ? err.message : 'Não foi possível enviar agora.') +
+        '\nSe preferir, fale com a gente pelo WhatsApp: (11) 92504-9959.');
     }
   });
 }
@@ -162,180 +159,6 @@ if (carouselSlides.length > 0) {
       carouselInterval = setInterval(nextSlide, 4000);
     });
   });
-}
-
-// ===== SERVICE CARDS CAROUSEL (Dots + Drag + Autoplay) =====
-document.querySelectorAll('.service-cards-carousel').forEach(carousel => {
-  const track = carousel.querySelector('.service-cards-carousel__track');
-  const dotsContainer = carousel.querySelector('.carousel-dots');
-  const cards = Array.from(track.querySelectorAll('.service-type-card'));
-  let cardIndex = 0;
-  let autoplayTimer;
-
-  function getVisibleCount() {
-    if (window.innerWidth <= 768) return 1;
-    if (window.innerWidth <= 1024) return 2;
-    return 3;
-  }
-
-  function getMaxIndex() {
-    return Math.max(0, cards.length - getVisibleCount());
-  }
-
-  function getPageCount() {
-    const visible = getVisibleCount();
-    return Math.ceil(cards.length / visible);
-  }
-
-  // Build dots — one per group/page
-  function buildDots() {
-    if (!dotsContainer) return;
-    dotsContainer.innerHTML = '';
-    const pages = getPageCount();
-    for (let i = 0; i < pages; i++) {
-      const dot = document.createElement('button');
-      dot.classList.add('carousel-dot');
-      if (i === 0) dot.classList.add('active');
-      dot.setAttribute('aria-label', 'Grupo ' + (i + 1));
-      dot.addEventListener('click', () => {
-        const visible = getVisibleCount();
-        cardIndex = Math.min(i * visible, getMaxIndex());
-        updateCarousel();
-        startAutoplay();
-      });
-      dotsContainer.appendChild(dot);
-    }
-  }
-
-  function updateDots() {
-    if (!dotsContainer) return;
-    const visible = getVisibleCount();
-    const currentPage = Math.floor(cardIndex / visible);
-    dotsContainer.querySelectorAll('.carousel-dot').forEach((dot, i) => {
-      dot.classList.toggle('active', i === currentPage);
-    });
-  }
-
-  function updateCarousel(animate) {
-    const visible = getVisibleCount();
-    cardIndex = Math.min(cardIndex, getMaxIndex());
-    // Use actual card width for precise centering
-    const wrapperWidth = carousel.querySelector('.service-cards-carousel__track-wrapper').offsetWidth;
-    const card = cards[0];
-    const cardStyle = getComputedStyle(card);
-    const cardWidth = card.offsetWidth + parseFloat(cardStyle.marginLeft) + parseFloat(cardStyle.marginRight);
-    const offset = cardIndex * cardWidth;
-    if (animate === false) {
-      track.style.transition = 'none';
-    } else {
-      track.style.transition = 'transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
-    }
-    track.style.transform = 'translateX(-' + offset + 'px)';
-    updateDots();
-  }
-
-  function goNext() {
-    const visible = getVisibleCount();
-    cardIndex += visible;
-    if (cardIndex > getMaxIndex()) cardIndex = 0;
-    updateCarousel();
-  }
-
-  function startAutoplay() {
-    stopAutoplay();
-    autoplayTimer = setInterval(goNext, 5000);
-  }
-
-  function stopAutoplay() {
-    if (autoplayTimer) clearInterval(autoplayTimer);
-  }
-
-  // Mouse drag support
-  let isDragging = false;
-  let startX = 0;
-  let currentTranslate = 0;
-
-  track.addEventListener('mousedown', (e) => {
-    isDragging = true;
-    startX = e.pageX;
-    track.classList.add('dragging');
-    stopAutoplay();
-  });
-
-  track.addEventListener('mousemove', (e) => {
-    if (!isDragging) return;
-    e.preventDefault();
-  });
-
-  document.addEventListener('mouseup', (e) => {
-    if (!isDragging) return;
-    isDragging = false;
-    track.classList.remove('dragging');
-    const diff = e.pageX - startX;
-    if (Math.abs(diff) > 50) {
-      if (diff < 0) {
-        cardIndex = Math.min(cardIndex + 1, getMaxIndex());
-      } else {
-        cardIndex = Math.max(cardIndex - 1, 0);
-      }
-    }
-    updateCarousel();
-    startAutoplay();
-  });
-
-  // Touch drag support
-  track.addEventListener('touchstart', (e) => {
-    startX = e.touches[0].pageX;
-    stopAutoplay();
-  }, { passive: true });
-
-  track.addEventListener('touchend', (e) => {
-    const diff = e.changedTouches[0].pageX - startX;
-    if (Math.abs(diff) > 50) {
-      if (diff < 0) {
-        cardIndex = Math.min(cardIndex + 1, getMaxIndex());
-      } else {
-        cardIndex = Math.max(cardIndex - 1, 0);
-      }
-    }
-    updateCarousel();
-    startAutoplay();
-  });
-
-  // Pause on hover
-  carousel.addEventListener('mouseenter', stopAutoplay);
-  carousel.addEventListener('mouseleave', startAutoplay);
-
-  window.addEventListener('resize', () => {
-    buildDots();
-    updateCarousel(false);
-  });
-
-  // Init
-  buildDots();
-  updateCarousel(false);
-  startAutoplay();
-});
-
-// ===== PROCESS STEPS ANIMATION (slower, more fluid) =====
-const processSection = document.querySelector('.process-steps');
-if (processSection) {
-  const steps = processSection.querySelectorAll('.process-step');
-
-  const processObserver = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        steps.forEach((step, i) => {
-          setTimeout(() => {
-            step.classList.add('animate-in');
-          }, i * 600); // Slower, more elegant sequential delay
-        });
-        processObserver.unobserve(entry.target);
-      }
-    });
-  }, { threshold: 0.3 });
-
-  processObserver.observe(processSection);
 }
 
 // ===== SCROLL REVEAL ANIMATION =====

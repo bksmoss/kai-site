@@ -319,7 +319,7 @@ async function horarioValido(env, cfg, data, hora) {
 
 /* ============================ e-mail / avisos ============================ */
 
-async function enviarEmail(env, { para, assunto, html, texto, anexos }) {
+async function enviarEmail(env, { para, assunto, html, texto, anexos, responderPara }) {
   const chave = env.RESEND_API_KEY;
   if (!chave) return { ok: false, motivo: 'RESEND_API_KEY nao configurada' };
 
@@ -330,7 +330,8 @@ async function enviarEmail(env, { para, assunto, html, texto, anexos }) {
     html,
     text: texto,
   };
-  if (env.MAIL_REPLY_TO) corpo.reply_to = env.MAIL_REPLY_TO;
+  const responder = responderPara || env.MAIL_REPLY_TO;
+  if (responder) corpo.reply_to = responder;
   if (anexos && anexos.length) corpo.attachments = anexos;
 
   try {
@@ -794,6 +795,112 @@ async function avisarKarina(env, cfg, reserva) {
       .slice(0, 400);
     await env.AGENDA.put(chave, JSON.stringify(atual));
   }
+}
+
+/* ---------- formulario de contato do site ---------- */
+
+// Plano B do formulario de contato: reaproveita o mesmo FormSubmit da agenda.
+async function avisoContatoFormSubmit(env, c) {
+  const hash = env.FORMSUBMIT_HASH;
+  if (!hash) return { ok: false, motivo: 'FORMSUBMIT_HASH nao configurada' };
+  const base = env.SITE_URL || 'https://kaiarquitetura.com.br';
+  try {
+    const r = await fetch('https://formsubmit.co/ajax/' + hash, {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        accept: 'application/json',
+        origin: base,
+        referer: base + '/',
+      },
+      body: JSON.stringify({
+        _subject: `Novo contato pelo site — ${c.nome}`,
+        Nome: c.nome,
+        Email: c.email,
+        Telefone: c.telefone || '-',
+        Localização: c.local || '-',
+        Mensagem: c.mensagem || '-',
+      }),
+    });
+    const corpo = await r.json().catch(() => ({}));
+    if (!r.ok || String(corpo.success) !== 'true') {
+      return { ok: false, motivo: `FormSubmit ${r.status}: ${corpo.message || 'resposta inesperada'}` };
+    }
+    return { ok: true };
+  } catch (e) {
+    return { ok: false, motivo: String(e) };
+  }
+}
+
+// Monta o e-mail bonito (mesmo template da agenda) e avisa nos canais.
+async function avisarContato(env, c) {
+  const cfg = await lerConfig(env);
+  const html = moldura('Novo contato pelo site', `
+    ${linhas([
+      ['Nome', escapar(c.nome)],
+      ['E-mail', `<a href="mailto:${escapar(c.email)}" style="color:#D87C63;">${escapar(c.email)}</a>`],
+      ['Telefone', c.telefone ? `<a href="https://wa.me/55${c.telefone.replace(/\D/g, '')}" style="color:#D87C63;">${escapar(c.telefone)}</a>` : ''],
+      ['Localização', escapar(c.local)],
+    ])}
+    ${recadoHtml(c.mensagem)}
+    <p style="margin:22px 0 0;font-size:13px;color:#8a8078;">Responda este e-mail para falar direto com o cliente.</p>
+  `);
+
+  const texto = `Novo contato pelo site\n${c.nome} · ${c.email}${c.telefone ? ' · ' + c.telefone : ''}` +
+    `${c.local ? '\nLocalização: ' + c.local : ''}\n\n${c.mensagem || ''}`;
+
+  const email = await enviarEmail(env, {
+    para: cfg.emailAviso,
+    assunto: `Novo contato pelo site — ${c.nome}`,
+    html, texto,
+    responderPara: c.email, // "Responder" vai direto para o cliente
+  });
+  // Se o Resend ainda nao estiver configurado, cai no FormSubmit.
+  const formsubmit = email.ok ? { ok: false, motivo: 'nao precisou' } : await avisoContatoFormSubmit(env, c);
+
+  const telegram = await avisoTelegram(env,
+    `Novo contato pelo site\n${c.nome} — ${c.email}${c.telefone ? '\n' + c.telefone : ''}` +
+    `${c.local ? '\n' + c.local : ''}${c.mensagem ? '\n\n' + c.mensagem : ''}`);
+
+  const ntfy = await avisoNtfy(env, 'Novo contato pelo site', `${c.nome} — ${c.email}`);
+
+  const canais = { email, formsubmit, telegram, ntfy };
+  if (!Object.values(canais).some((x) => x.ok)) {
+    console.error('nenhum aviso de contato saiu', JSON.stringify(canais));
+  }
+}
+
+async function rotaContato(req, env, ctx) {
+  let dados;
+  const ct = req.headers.get('content-type') || '';
+  if (ct.includes('application/json')) {
+    dados = await req.json().catch(() => null);
+  } else {
+    const fd = await req.formData().catch(() => null);
+    dados = fd ? Object.fromEntries(fd.entries()) : null;
+  }
+  if (!dados) return json({ erro: 'Pedido inválido.' }, 400);
+
+  // campo-isca: preenchido = robo. Responde "ok" sem enviar nada.
+  if (dados.website) return json({ ok: true });
+
+  const c = {
+    nome: String(dados.name || dados.nome || '').trim().slice(0, 80),
+    email: String(dados.email || '').trim().slice(0, 120),
+    telefone: String(dados.phone || dados.telefone || '').trim().slice(0, 30),
+    local: String(dados.location || dados.localizacao || '').trim().slice(0, 120),
+    mensagem: String(dados.message || dados.mensagem || '').trim().slice(0, 2000),
+  };
+
+  if (c.nome.length < 2) return json({ erro: 'Informe seu nome.' }, 400);
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(c.email)) return json({ erro: 'Informe um e-mail válido.' }, 400);
+  if (c.mensagem.length < 2) return json({ erro: 'Escreva uma mensagem.' }, 400);
+
+  // Envia em segundo plano: a resposta ao cliente nao espera os avisos.
+  ctx.waitUntil(avisarContato(env, c).catch((e) => console.error('falha ao avisar contato:', e)));
+  ctx.waitUntil(registrarEvento(env, { tipo: 'contato', name: c.nome, email: c.email }));
+
+  return json({ ok: true, mensagem: 'Mensagem enviada! Retornaremos em breve.' });
 }
 
 async function buscarReserva(env, id) {
@@ -1325,6 +1432,7 @@ export default {
     try {
       if (rota === '/api/horarios' && metodo === 'GET') return await rotaHorarios(req, env);
       if (rota === '/api/agendar' && metodo === 'POST') return await rotaAgendar(req, env, ctx);
+      if (rota === '/api/contato' && metodo === 'POST') return await rotaContato(req, env, ctx);
       if (rota === '/api/acao' && metodo === 'GET') return await rotaAcao(req, env);
       if (rota === '/api/convite' && metodo === 'GET') return await rotaConvite(req, env);
       if (rota === '/api/admin/login' && metodo === 'POST') return await rotaLogin(req, env);

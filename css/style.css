@@ -13,6 +13,13 @@
   --beige-dark: #A89888;
   --peach: #F0BBA3;
   --white: #FFFFFF;
+  --coral-ink: #B05A40;
+  --muted: #6F655C;
+  /* liquid glass — mesmo da calculadora */
+  --glass-bg: linear-gradient(155deg, rgba(255,255,255,0.5), rgba(255,255,255,0.2));
+  --glass-brd: rgba(255,255,255,0.68);
+  --glass-sh: 0 10px 44px rgba(28,28,28,0.1), inset 0 1px 0 rgba(255,255,255,0.85);
+  --glass-blur: blur(26px) saturate(185%);
   --font: 'ClashDisplay', sans-serif;
   --side-margin: 5rem;
 }
@@ -347,6 +354,16 @@ img {
   text-shadow: 0 2px 20px rgba(0,0,0,0.3);
 }
 
+.hero__subtitle {
+  font-size: 1.25rem;
+  font-weight: 400;
+  color: var(--white);
+  max-width: 560px;
+  margin: -1rem auto 2rem;
+  line-height: 1.5;
+  text-shadow: 0 2px 16px rgba(0,0,0,0.3);
+}
+
 .hero__title--dark {
   color: var(--black);
   text-shadow: none;
@@ -426,56 +443,417 @@ img {
   max-width: 600px;
 }
 
-/* ===== SERVICES CARDS (Home) ===== */
+/* ===== LIQUID GLASS (mesmo estilo da calculadora) ===== */
+/* Seção com manchas de cor desfocadas por trás, para o vidro aparecer */
+.glass-zone {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.glass-zone__blobs {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: -1;
+  overflow: hidden;
+}
+
+.glass-zone__blobs span {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(90px);
+}
+
+.glass-zone__blobs span:nth-child(1) { width: 520px; height: 520px; background: var(--peach); top: -140px; left: -140px; opacity: 0.55; }
+.glass-zone__blobs span:nth-child(2) { width: 460px; height: 460px; background: var(--coral); top: 30%; right: -170px; opacity: 0.28; }
+.glass-zone__blobs span:nth-child(3) { width: 440px; height: 440px; background: var(--beige-dark); bottom: -160px; left: 32%; opacity: 0.35; }
+
+.glass {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-brd);
+  border-radius: 24px;
+  box-shadow: var(--glass-sh);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+}
+
+/* Cabeçalho de seção centralizado (título + subtítulo + texto) */
+.sec-head {
+  text-align: center;
+  max-width: 760px;
+  margin: 0 auto 2.8rem;
+}
+
+.sec-head__eyebrow {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--coral-ink);
+  margin-bottom: 0.6rem;
+}
+
+.sec-head__title {
+  font-size: 1.8rem;
+  font-weight: 600;
+  line-height: 1.2;
+  margin-bottom: 0.7rem;
+}
+
+.sec-head__sub {
+  font-size: 1.15rem;
+  font-weight: 500;
+  color: var(--black);
+  margin-bottom: 0.9rem;
+}
+
+.sec-head__text {
+  font-size: 0.98rem;
+  color: var(--muted);
+  line-height: 1.7;
+}
+
+/* Quebra de linha controlada: "Acompanhamento" / "de Obra" */
+.nobr {
+  white-space: nowrap;
+}
+
+/* ===== CHECKS (bolinha coral translúcida + check laranja escuro) ===== */
+.checks {
+  list-style: none;
+  text-align: left;
+}
+
+.checks li {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  padding: 0.3rem 0;
+  font-size: 0.9rem;
+  line-height: 1.45;
+  color: #4a4038;
+}
+
+.checks li::before {
+  content: '';
+  flex: 0 0 auto;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background:
+    rgba(216,124,99,0.2)
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23B05A40' stroke-width='3.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12.5l4.2 4.2L19 7'/%3E%3C/svg%3E")
+    center / 11px 11px no-repeat;
+}
+
+/* item não incluso: X e texto em cinza */
+.checks li.off {
+  color: #a39a91;
+}
+
+.checks li.off::before {
+  background:
+    rgba(168,152,136,0.16)
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ABA197' stroke-width='3' stroke-linecap='round'%3E%3Cpath d='M7 7l10 10M17 7L7 17'/%3E%3C/svg%3E")
+    center / 10px 10px no-repeat;
+}
+
+/* ===== SERVICES CARDS (Home) — liquid glass ===== */
 .services-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 2rem;
+  gap: 1.8rem;
   max-width: 1100px;
   margin: 0 auto;
+  align-items: stretch;
 }
 
 .service-card {
-  background: var(--white);
-  border-radius: 12px;
-  padding: 2.5rem 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2.6rem 1.9rem;
   text-align: center;
-  transition: transform 0.3s, box-shadow 0.3s;
+  color: inherit;
+  text-decoration: none;
+  transition: transform 0.35s ease, box-shadow 0.35s ease;
 }
 
 .service-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+  transform: translateY(-6px);
+  box-shadow: 0 20px 50px rgba(216,124,99,0.18), inset 0 1px 0 rgba(255,255,255,0.85);
 }
 
 .service-card__icon {
-  width: 80px;
-  height: 80px;
-  margin: 0 auto 1.2rem;
-}
-
-.service-card__icon--dark {
-  /* SVG strokes already set to dark */
+  width: 72px;
+  height: auto;
+  margin: 0 auto 1.4rem;
 }
 
 .service-card__title {
   font-size: 1.1rem;
   font-weight: 600;
   text-transform: uppercase;
-  margin-bottom: 1rem;
+  margin-bottom: 1.2rem;
+  line-height: 1.25;
 }
 
 .service-card__list {
-  text-align: left;
-  font-size: 0.9rem;
-  line-height: 1.8;
+  width: 100%;
+  max-width: 250px;
+  margin: 0 auto;
 }
 
-.service-card__list li::before {
-  content: '\2022';
+.service-card__list li {
+  font-size: 0.92rem;
+}
+
+/* ===== PLANOS (cards de Projetos e Consultorias) ===== */
+.glass-zone .service-detail {
+  padding-bottom: 0;
+}
+
+.plans-wrap {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 0.5rem 2rem 3.5rem;
+}
+
+.plans {
+  display: grid;
+  gap: 1.4rem;
+  align-items: stretch;
+}
+
+.plans--3 { grid-template-columns: repeat(3, 1fr); }
+.plans--4 { grid-template-columns: repeat(4, 1fr); }
+
+.plan {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+  padding: 2.1rem 1.6rem 1.8rem;
+}
+
+.plan--feature {
+  border: 1.5px solid var(--coral);
+  box-shadow: 0 18px 50px rgba(216,124,99,0.2), inset 0 1px 0 rgba(255,255,255,0.85);
+}
+
+.plan__ribbon {
+  position: absolute;
+  top: -12px;
+  left: 1.6rem;
+  background: var(--coral);
+  color: var(--white);
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  padding: 0.3rem 0.85rem;
+  border-radius: 50px;
+}
+
+.plan__name {
+  font-size: 1.45rem;
+  font-weight: 600;
+  line-height: 1.15;
+}
+
+.plan__meta {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--coral-ink);
+  margin-top: -0.6rem;
+  line-height: 1.5;
+}
+
+.plan__sub {
+  font-size: 0.98rem;
+  font-weight: 500;
+  margin-top: -0.6rem;
+  line-height: 1.4;
+}
+
+.plan__text {
+  font-size: 0.88rem;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.plan__label {
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--beige-dark);
+  padding-top: 0.9rem;
+  border-top: 1px solid rgba(168,152,136,0.25);
+  margin-bottom: -0.5rem;
+}
+
+.plan .checks li {
+  font-size: 0.86rem;
+  padding: 0.24rem 0;
+}
+
+.plan__ideal {
+  font-size: 0.84rem;
+  color: var(--muted);
+  line-height: 1.55;
+  background: rgba(255,255,255,0.35);
+  border: 1px solid var(--glass-brd);
+  border-radius: 14px;
+  padding: 0.8rem 1rem;
+}
+
+.plan__ideal strong {
+  color: var(--black);
+  font-weight: 600;
+}
+
+.plan__foot {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  padding-top: 0.4rem;
+}
+
+.plan__price {
+  display: flex;
+  align-items: baseline;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(168,152,136,0.25);
+}
+
+.plan__price-val {
+  font-size: 1.9rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+
+.plan__price-unit {
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.plan__note {
+  font-size: 0.78rem;
+  color: var(--muted);
+  margin-top: -0.5rem;
+}
+
+.plan__cta {
+  display: block;
+  text-align: center;
+  padding: 0.8rem 1.2rem;
+  border-radius: 50px;
+  border: 2px solid var(--black);
+  color: var(--black);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  transition: all 0.3s;
+}
+
+.plan__cta:hover {
+  background: var(--black);
+  color: var(--white);
+}
+
+.plan--feature .plan__cta {
+  background: var(--coral);
+  border-color: var(--coral);
+  color: var(--white);
+}
+
+.plan--feature .plan__cta:hover {
+  background: #c46b55;
+  border-color: #c46b55;
+}
+
+/* ===== MODALIDADES (cards explicativos — Acompanhamento de Obra) ===== */
+.modes {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.3rem;
+}
+
+.mode {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+  padding: 1.9rem 1.5rem;
+}
+
+.mode__tag {
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--coral-ink);
+}
+
+.mode__name {
+  font-size: 1.2rem;
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.mode__text {
+  font-size: 0.88rem;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+/* ===== TRANSPARÊNCIA (como funciona o pagamento) ===== */
+.pay-section {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 1.5rem 2rem 4rem;
+}
+
+.pay {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.8rem;
+}
+
+.pay__cell {
+  border-top: 2px solid var(--coral);
+  padding-top: 1.1rem;
+}
+
+.pay__title {
+  font-size: 1.02rem;
+  font-weight: 600;
+  margin-bottom: 0.4rem;
+}
+
+.pay__text {
+  font-size: 0.9rem;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.pay__link {
+  color: var(--coral-ink);
+  font-weight: 600;
+  border-bottom: 1px solid currentColor;
+  transition: color 0.3s;
+}
+
+.pay__link:hover {
   color: var(--coral);
-  margin-right: 0.5rem;
-  font-weight: 700;
 }
 
 /* ===== WORK / CTA SECTION (with carousel) ===== */
@@ -683,6 +1061,16 @@ img {
   display: flex;
   flex-direction: column;
   gap: 1.2rem;
+}
+
+/* campo-isca anti-spam: escondido de gente, visível para robôs */
+.contact__hp {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
 }
 
 .contact__input,
@@ -940,234 +1328,6 @@ img {
   line-height: 1.7;
 }
 
-/* ===== SERVICE CARDS CAROUSEL (Slider) ===== */
-.service-cards-carousel {
-  position: relative;
-  margin-bottom: 2rem;
-  padding: 0;
-}
-
-.service-cards-carousel__track-wrapper {
-  overflow: hidden;
-  padding: 0 0.5rem;
-}
-
-.service-cards-carousel__track {
-  display: flex;
-  transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  cursor: grab;
-  user-select: none;
-}
-
-.service-cards-carousel__track.dragging {
-  cursor: grabbing;
-  transition: none;
-}
-
-.service-cards-carousel__track .service-type-card {
-  flex: 0 0 calc(33.333% - 0.8rem);
-  max-width: calc(33.333% - 0.8rem);
-  padding: 1.8rem;
-  margin: 0 0.4rem;
-  background: var(--white);
-  border-radius: 12px;
-  transition: transform 0.3s, box-shadow 0.3s;
-  box-sizing: border-box;
-}
-
-.service-cards-carousel__track .service-type-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 8px 30px rgba(0,0,0,0.06);
-}
-
-.service-type-card__title {
-  font-size: 1rem;
-  font-weight: 600;
-  margin-bottom: 0.8rem;
-  color: var(--coral);
-}
-
-.service-type-card__text {
-  font-size: 0.88rem;
-  line-height: 1.7;
-  color: #555;
-}
-
-/* Carousel arrows hidden - replaced by dots */
-.carousel-arrow {
-  display: none;
-}
-
-/* Carousel dots (below cards) */
-.carousel-dots {
-  display: flex;
-  justify-content: center;
-  gap: 0.5rem;
-  margin-top: 1.5rem;
-}
-
-.carousel-dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  border: 2px solid var(--beige-dark);
-  background: transparent;
-  cursor: pointer;
-  padding: 0;
-  transition: background 0.3s, border-color 0.3s;
-}
-
-.carousel-dot.active {
-  background: var(--coral);
-  border-color: var(--coral);
-}
-
-.carousel-dot:hover {
-  border-color: var(--coral);
-}
-
-/* Old grid fallback - keep for non-carousel pages */
-.service-types-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 2rem;
-  margin-bottom: 3rem;
-}
-
-.service-type-card {
-  background: var(--white);
-  border-radius: 12px;
-  padding: 2rem;
-  transition: transform 0.3s, box-shadow 0.3s;
-}
-
-.service-type-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 8px 30px rgba(0,0,0,0.06);
-}
-
-/* ===== PROCESS STEPS (animated) ===== */
-.process-section {
-  padding: 3rem 2rem;
-  background: var(--bg);
-}
-
-.process-section__title {
-  font-size: 1.3rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  text-align: center;
-  margin-bottom: 2rem;
-  letter-spacing: 0.12em;
-  max-width: 1000px;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-.process-steps {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 1.5rem;
-  max-width: 1000px;
-  margin: 0 auto;
-  padding: 1rem 0;
-  position: relative;
-}
-
-.process-step {
-  text-align: center;
-  flex: 1;
-  min-width: 80px;
-  max-width: 140px;
-  position: relative;
-  opacity: 0;
-  transform: translateY(25px) scale(0.95);
-  transition: opacity 1s cubic-bezier(0.25, 0.46, 0.45, 0.94),
-              transform 1s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-}
-
-/* Zigzag: odd steps up, even steps down */
-.process-step:nth-child(odd) {
-  align-self: flex-start;
-}
-
-.process-step:nth-child(even) {
-  align-self: flex-end;
-  margin-top: 2rem;
-}
-
-.process-step.animate-in {
-  opacity: 1;
-  transform: translateY(0) scale(1);
-}
-
-.process-step__circle {
-  width: 50px;
-  height: 50px;
-  background: var(--coral);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 auto 0.8rem;
-  color: var(--white);
-  font-weight: 600;
-  font-size: 1rem;
-  transition: transform 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease;
-}
-
-.process-step.animate-in:hover .process-step__circle {
-  transform: scale(1.18);
-  background-color: #D9CFC5;
-  box-shadow: 0 6px 20px rgba(217, 207, 197, 0.4);
-}
-
-.process-step__label {
-  font-size: 0.82rem;
-  font-weight: 500;
-  line-height: 1.4;
-  transition: color 0.3s ease;
-  color: var(--black);
-}
-
-.process-step.animate-in:hover .process-step__label {
-  color: var(--coral);
-}
-
-/* Organic curved arrow between steps (using seta SVGs) */
-.process-step__arrow {
-  position: absolute;
-  right: -38px;
-  width: 45px;
-  height: 25px;
-  opacity: 0;
-  transition: opacity 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.5s;
-  z-index: 2;
-}
-
-/* Odd steps: arrow curves down (seta-1) */
-.process-step:nth-child(odd) .process-step__arrow {
-  top: auto;
-  bottom: -15px;
-}
-
-/* Even steps: arrow curves up (seta-2) */
-.process-step:nth-child(even) .process-step__arrow {
-  top: -15px;
-  bottom: auto;
-}
-
-.process-step__arrow img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-}
-
-.process-step.animate-in .process-step__arrow {
-  opacity: 0.5;
-}
-
 /* ===== SERVICE FULL-WIDTH IMAGE ===== */
 .service-image-full {
   width: 100%;
@@ -1176,60 +1336,6 @@ img {
   max-height: 900px;
   object-fit: cover;
   object-position: center 40%;
-}
-
-/* ===== BENEFITS (with stats) ===== */
-.benefits-section {
-  background-color: var(--coral);
-  color: var(--white);
-  padding: 3rem 2rem;
-}
-
-.benefits-section__title {
-  text-align: center;
-  font-size: 1.5rem;
-  font-weight: 600;
-  margin-bottom: 2rem;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-}
-
-.benefits-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 2rem;
-  max-width: 1000px;
-  margin: 0 auto;
-}
-
-.benefit-card {
-  text-align: center;
-}
-
-.benefit-card__stat {
-  font-size: 2.8rem;
-  font-weight: 700;
-  margin-bottom: 0.3rem;
-  line-height: 1;
-}
-
-.benefit-card__icon {
-  width: 50px;
-  height: 50px;
-  margin: 0 auto 1rem;
-  filter: brightness(0) invert(1);
-}
-
-.benefit-card__title {
-  font-size: 0.95rem;
-  font-weight: 600;
-  margin-bottom: 0.6rem;
-}
-
-.benefit-card__text {
-  font-size: 0.85rem;
-  line-height: 1.6;
-  opacity: 0.9;
 }
 
 /* ===== FAQ (side-by-side layout) ===== */
@@ -1311,151 +1417,6 @@ img {
   max-height: 500px;
   padding-top: 1rem;
 }
-
-/* ===== ACOMPANHAMENTO - Formats ===== */
-.format-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 2rem;
-  margin: 2rem 0 1rem;
-}
-
-.format-card {
-  background: var(--white);
-  border-radius: 16px;
-  padding: 2.5rem 2rem;
-  position: relative;
-  overflow: hidden;
-  transition: transform 0.3s, box-shadow 0.3s;
-}
-
-.format-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 12px 40px rgba(0,0,0,0.08);
-}
-
-.format-card__badge {
-  display: inline-block;
-  background: var(--coral);
-  color: var(--white);
-  font-size: 0.7rem;
-  font-weight: 600;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  padding: 0.3rem 0.8rem;
-  border-radius: 50px;
-  margin-bottom: 1rem;
-}
-
-.format-card__title {
-  font-size: 1.3rem;
-  font-weight: 600;
-  color: var(--coral);
-  margin-bottom: 0.5rem;
-}
-
-.format-card__subtitle {
-  font-size: 0.85rem;
-  font-weight: 500;
-  color: var(--beige-dark);
-  margin-bottom: 1rem;
-}
-
-.format-card__text {
-  font-size: 0.9rem;
-  line-height: 1.7;
-  color: #555;
-  margin-bottom: 1.5rem;
-}
-
-.format-card__features {
-  list-style: none;
-}
-
-.format-card__features li {
-  font-size: 0.85rem;
-  line-height: 1.8;
-  padding-left: 1.5rem;
-  position: relative;
-  color: #555;
-}
-
-.format-card__features li::before {
-  content: '\2713';
-  position: absolute;
-  left: 0;
-  color: var(--coral);
-  font-weight: 700;
-}
-
-/* Comparison table */
-.comparison-section {
-  padding: 1.5rem 2rem 3rem;
-  max-width: 1100px;
-  margin: 0 auto;
-}
-
-.comparison-section__title {
-  font-size: 1.3rem;
-  font-weight: 600;
-  text-align: center;
-  margin-bottom: 2rem;
-  letter-spacing: 0.12em;
-}
-
-.comparison-table {
-  width: 100%;
-  border-collapse: collapse;
-  background: var(--white);
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.05);
-}
-
-.comparison-table th,
-.comparison-table td {
-  padding: 1rem 1.5rem;
-  text-align: center;
-  font-size: 0.9rem;
-}
-
-.comparison-table thead th {
-  background: var(--coral);
-  color: var(--white);
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-.comparison-table thead th:first-child {
-  text-align: left;
-}
-
-.comparison-table tbody td:first-child {
-  text-align: left;
-  font-weight: 500;
-}
-
-.comparison-table tbody tr {
-  border-bottom: 1px solid #eee;
-}
-
-.comparison-table tbody tr:last-child {
-  border-bottom: none;
-}
-
-.comparison-table .check {
-  color: var(--coral);
-  font-weight: 700;
-  font-size: 1.1rem;
-}
-
-.comparison-table .partial {
-  color: var(--beige-dark);
-  font-size: 0.85rem;
-}
-
-/* Includes list removed - integrated into format cards */
 
 /* Acompanhamento CTA */
 .acomp-cta {
@@ -1573,6 +1534,14 @@ img {
 }
 
 /* ===== RESPONSIVE ===== */
+
+@media (max-width: 1100px) {
+  .plans--4,
+  .modes {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
 @media (max-width: 1024px) {
   :root {
     --side-margin: 2rem;
@@ -1581,6 +1550,17 @@ img {
   .services-grid {
     grid-template-columns: 1fr;
     max-width: 500px;
+  }
+
+  .plans--3 {
+    grid-template-columns: 1fr;
+    max-width: 520px;
+    margin: 0 auto;
+  }
+
+  .pay {
+    grid-template-columns: 1fr;
+    gap: 1.4rem;
   }
 
   .work-section__inner,
@@ -1608,25 +1588,6 @@ img {
 
   .portfolio-grid {
     grid-template-columns: repeat(3, 1fr);
-  }
-
-  .service-types-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .service-cards-carousel__track .service-type-card {
-    flex: 0 0 calc(50% - 0.8rem);
-    max-width: calc(50% - 0.8rem);
-  }
-
-  .benefits-grid {
-    grid-template-columns: 1fr;
-    max-width: 400px;
-    margin: 0 auto;
-  }
-
-  .format-grid {
-    grid-template-columns: 1fr;
   }
 
   .faq-section--side {
@@ -1691,19 +1652,6 @@ img {
     grid-row: span 2;
   }
 
-  .process-steps {
-    flex-direction: column;
-    align-items: center;
-  }
-
-  .process-step__arrow {
-    display: none;
-  }
-
-  .process-step:not(:last-child)::after {
-    display: none;
-  }
-
   /* Work section: single image on mobile */
   .work-carousel {
     border-radius: 12px;
@@ -1713,24 +1661,23 @@ img {
     border-radius: 12px;
   }
 
-  .service-cards-carousel__track .service-type-card {
-    flex: 0 0 calc(100% - 0.8rem);
-    max-width: calc(100% - 0.8rem);
+  .plans--4,
+  .modes {
+    grid-template-columns: 1fr;
+    max-width: 520px;
+    margin: 0 auto;
   }
 
-  .service-cards-carousel {
-    padding: 0;
+  .plans-wrap {
+    padding: 0.5rem 1.2rem 3rem;
   }
 
-  /* Process steps: vertical on mobile, no zigzag */
-  .process-step:nth-child(even) {
-    margin-top: 0;
+  .sec-head__title {
+    font-size: 1.45rem;
   }
 
-  .comparison-table th,
-  .comparison-table td {
-    padding: 0.7rem 0.8rem;
-    font-size: 0.8rem;
+  .hero__subtitle {
+    font-size: 1.05rem;
   }
 }
 
@@ -1752,9 +1699,6 @@ img {
     margin: -14px 0;
   }
 
-  .benefit-card__stat {
-    font-size: 2.2rem;
-  }
 }
 
 /* ============================================================

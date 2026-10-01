@@ -313,7 +313,7 @@
       .catch(function () {
         $('carregando').hidden = true;
         $('conteudo').hidden = false;
-        mostrarErro('erroGeral', 'Não conseguimos carregar a agenda agora. Atualize a página ou <a href="https://wa.me/5511925049959" style="color:inherit;text-decoration:underline">fale conosco no WhatsApp</a>.');
+        mostrarErro('erroGeral', 'Não conseguimos carregar a agenda agora. Atualize a página ou <a href="https://wa.me/5511925049959?text=Ol%C3%A1%2C%20KAI%21%20Gostaria%20de%20ter%20uma%20conversa%20r%C3%A1pida%20para%20tirar%20algumas%20d%C3%BAvidas." target="_blank" rel="noopener" style="color:inherit;text-decoration:underline">fale conosco no WhatsApp</a>.');
       });
 
     setInterval(revalidar, 45000);
