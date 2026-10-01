@@ -16,11 +16,12 @@
 /js/admin-agenda.js
   Cache-Control: no-cache
 
-# CSS e JS -> cache de 1 dia
+# CSS e JS -> sempre revalidar (o navegador confere se mudou antes de usar;
+# evita página nova com estilo antigo depois de um deploy)
 /css/*
-  Cache-Control: public, max-age=86400
+  Cache-Control: no-cache
 /js/*
-  Cache-Control: public, max-age=86400
+  Cache-Control: no-cache
 
 # Paginas ocultas da agenda -> fora dos buscadores e sem cache
 /agendar-reuniao*
